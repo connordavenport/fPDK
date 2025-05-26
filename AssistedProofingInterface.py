@@ -14,6 +14,8 @@ from pathlib import Path
 import getpass
 import datetime
 from ufoProcessor.ufoOperator import UFOOperator as uop
+import plistlib
+import inspect
 
 # API
 # Assisted Proofing Interface
@@ -159,9 +161,8 @@ class proofFont:
         self.instances          = []
         self.sources            = []
         self.locations          = []
-        self.operator_reference = None
+        self.operator           = None
         self._name              = self._compile_name()
-
 
         self.load_locations()
 
@@ -197,7 +198,7 @@ class proofFont:
 
     def load_locations(self):
         source   = self.font_object
-        operator = self.operator_reference
+        operator = self.operator
 
         if "fvar" in source:
             _instances = []  
@@ -240,19 +241,19 @@ class proofFont:
 class proofDocument:
 
     def __repr__(self):
-        return f"<proofDocument @ {self.identifier} : {len(self.fonts)}>"
+        return f"<proofDocument @ {self.identifier} : {len(self._fonts)}>"
 
     def __init__(self):
 
-        self.NOW = datetime.datetime.now()
+        self._now = datetime.datetime.now()
 
         self._identifier = None
-        self.fonts = []
+        self._fonts = []
         # size can either be a tuple of ints or a DrawBot
         # compatible paper size name string
         
-        self.operator = None
-        self.crop = ""
+        self._operator = None
+        self._crop = ""
         self._use_instances = False
 
         self._path = None
@@ -333,7 +334,6 @@ class proofDocument:
 
     caption_font = property(_get_caption_font, _set_caption_font)
 
-
     def _set_auto_open(self, bool):
         self._auto_open = bool
 
@@ -357,12 +357,21 @@ class proofDocument:
         self._name = new_name
 
     def _get_name(self):
-        if not self._name and self.fonts:
+        if not self._name and self._fonts:
             # return family name for top level font
-            self._name = self.fonts[0].font_object["name"].getBestFamilyName().replace(" ","")
+            self._name = self._fonts[0].font_object["name"].getBestFamilyName().replace(" ","")
         return self._name
 
     name = property(_get_name, _set_name)
+
+
+    def _set_operator(self, new_operator):
+        self._operator = new_operator
+
+    def _get_operator(self):
+        return self._operator
+
+    operator = property(_get_operator, _set_operator)
 
     def uniquify(self, path):
         # https://stackoverflow.com/a/57896232
@@ -373,16 +382,42 @@ class proofDocument:
             counter += 1
         return path
 
-    def generate_path_base(self):
-        cd = os.path.split(self.fonts[0].path)[0]
+    def generate_path_base(self, suffix=".pdf", overwrite=True):
+        cd = os.path.split(self._fonts[0].path)[0]
         directory = find_proof_directory(cd, "proofs") 
         if not directory:
             directory = cd
-        # make sure file names are always unique!
-        path = self.uniquify(f'{directory}/{self.NOW:%Y-%m%d}-{self.name}-Proof.pdf')
+        type = "-Proof" if suffix == ".pdf" else ""
+        path = f'{directory}/{self._now:%Y-%m%d}-{self.name}{type}{suffix}'
+
+        # make sure file names are unique if have overwrite flag on
+        path = self.uniquify(path) if not overwrite else path
+
         return path
 
-    def save(self, path=None, open="_"):
+    def load(self, proof_data_path):
+        with open(proof_data_path, "rb") as proof_settings:
+            data = plistlib.load(proof_settings)
+            for name, val in data.items():
+                if val:
+                    attr = setattr(self, name, val)
+
+    def write(self, path=None, overwrite=True):
+        to_store = [item[0] for item in inspect.getmembers(self) if not item[0].startswith("_") and not inspect.ismethod(item[1])]
+        data = {}
+        for item in to_store:
+            comp = getattr(self, item)
+            data[item] = comp
+            if hasattr(comp, "path"):
+                data[item] = getattr(self,item).path
+
+        dump_path = path if path else self.generate_path_base(".proof", overwrite)
+        with open(dump_path, "wb") as proof_settings:
+            plistlib.dump(data, proof_settings)
+        # pass
+
+    def save(self, path=None, open="_", overwrite=True):
+
         _save_path = path if path else self.path
         _auto = open if open != "_" else self.open_automatically
 
@@ -480,7 +515,7 @@ class proofDocument:
 
                 te = proofFont(p)
                 te.is_variable = True
-                te.operator_reference = self.operator
+                te.operator = self.operator
                 # print(vf.axisSubsets)
 
                 # I dont know a better way right now but 
@@ -493,7 +528,7 @@ class proofDocument:
                 for sub_op in op:
                     name, processor = sub_op
                     if name == vf.name:
-                        te.operator_reference = processor
+                        te.operator = processor
 
                 te.load_locations()
 
@@ -507,11 +542,11 @@ class proofDocument:
         suff = os.path.splitext(path)[-1]
         if suff in suffixes.split(" "):
             o = proofFont(path)        
-            self.fonts.append(o)
+            self._fonts.append(o)
         elif suff == ".designspace":
             self.operator = dsp_doc.fromfile(path)
             vfs = self.get_variable_fonts_from_op()
-            self.fonts.extend(vfs)
+            self._fonts.extend(vfs)
 
 
     #convience function to add multiple paths at once
@@ -547,10 +582,18 @@ class proofDocument:
                 result[tag] = lbound
         return result
 
+    def _get_crop(self):
+        return self._crop
+
+    def _set_crop(self, fence=""):
+        self._crop = fence
+        self.crop_space(fence)
+
+    crop = property(_get_crop, _set_crop)
 
     def crop_space(self, zone):
         zone = self.reformat_limits(zone)
-        for font in self.fonts:
+        for font in self._fonts:
             cropped = []
             instances = font.instances
             instances.extend(font.sources)
@@ -589,7 +632,7 @@ class proofDocument:
     def setup_proof(self, cover_page=True):
         bot.newDrawing()
         if cover_page:
-            self.cover_page(self.fonts)
+            self._cover_page(self._fonts)
 
     def text_attributes(self):
         bot.fill(0)
@@ -602,7 +645,7 @@ class proofDocument:
         self.text_attributes()
 
         bot.text(f'Project: {self.name}', (self._margin_left, self.size[1]-(self._margin_left/2)), align='left')
-        bot.text(f'Date: {self.NOW:%Y-%m-%d %H:%M}', (self.size[0] - self._margin_right, self.size[1]-(self._margin_left/2)), align='right')
+        bot.text(f'Date: {self._now:%Y-%m-%d %H:%M}', (self.size[0] - self._margin_right, self.size[1]-(self._margin_left/2)), align='right')
         if not cover:
             bot.text(f'Fontfile: {font.name}', (self._margin_left+((self.size[0]/5)*2), self.size[1]-(self._margin_left/2)), align="right")
             bot.text(f'Characterset: {p.stem}', (self._margin_left+((self.size[0]/5)*3), self.size[1]-(self._margin_left/2)))
@@ -610,7 +653,7 @@ class proofDocument:
         if fileName != "core" and var:
             bot.linkRect(f"beginPage_{font}{var}", (self._margin_left + (self.size[0]/4)*2, self.size[1]-self._margin_left, fw, fh))
 
-        bot.text(f'© {self.NOW:%Y}' + ' ' + USER, (self._margin_left, self._margin_bottom/2))
+        bot.text(f'© {self._now:%Y}' + ' ' + USER, (self._margin_left, self._margin_bottom/2))
         # if instanceProof:
         #     cs = 6
         #     stroke(0.5819, 0.2157, 1.0, 1.0)
@@ -621,7 +664,7 @@ class proofDocument:
         bot.stroke(None)
 
 
-    def cover_page(self, fonts):
+    def _cover_page(self, fonts):
         # this function is biased and draws a custom cover page of all
         # locations / fonts and scales to fit them all
 
@@ -695,13 +738,16 @@ class proofDocument:
 
 doc = proofDocument()
 
+# # load old settings
+# doc.load("/Users/connordavenport/Dropbox/Clients/Dinamo/03_DifferentTimes/Sources/variable_ttf/2025-0526-ABCDifferentTimes.proof")
+
+# add a font or designspace, only accepts path strings
 doc.add_object("/Users/connordavenport/Dropbox/Clients/Dinamo/03_DifferentTimes/Sources/Different-Times-v10.designspace")
-# doc.crop_space("wght=0:320:600")
-
+# crop design-space to be proofed, using the varLib instantiator syntax
+doc.crop_space("wght=0:320:600")
 # test invalid sizes
-# doc.size = (100,100,20)
-# doc.size = "big paper size"
-
+doc.size = (100,100,20)
+doc.size = "big paper size"
 # test valid size
 doc.size = "LetterLandscape"
 
@@ -713,23 +759,26 @@ doc.size = "LetterLandscape"
         # print(s.location)
         # print(s.in_crop)
 
+# set font used in captions
 doc.caption_font = "ABCGaisyrMonoUnlicensedTrial-Regular"
-
 # auto will use some %s but can accept 1 int which will apply
 # to all or a tuple of 4 values in top, left, bottom, right order
 doc.margin = "auto"
-
 # we can turn this on and off whenever between new sections
-doc.use_instances = True
-
+doc.use_instances = False
 doc.setup_proof() # setup newDrawing() and make a cover page
-
-doc.new_section() #build new proof sections
-
+doc.new_section() # build new proof sections...not implemented yet
 doc.open_automatically = True
-# kwargs inside of save override whatever the doc says
+# kwargs inside of save overwrite whatever the doc says
 # write to disk
 doc.save(open=False)
+
+# write to custom file format to save exact proof settings for later
+# doc and save both allow for overwriting the previous file on disk
+# overwrite is set to True by default
+doc.write(overwrite=True)
+
+
 
 
 
