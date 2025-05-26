@@ -13,6 +13,7 @@ from defcon.tools.identifiers import makeRandomIdentifier
 from pathlib import Path
 import getpass
 import datetime
+from ufoProcessor.ufoOperator import UFOOperator as uop
 
 # API
 # Assisted Proofing Interface
@@ -84,12 +85,15 @@ def italicVal(slnt_user_value) -> Union[int, float]:
 
 class proofLocation:
 
-    def __init__(self):
+    def __repr__(self):
+        return f"<proofLocation.{self.type} @ {self.name}>"
+
+    def __init__(self, location):
 
         self.type = None
 
         self._name = "unnamed location"
-        self._location = None
+        self._location = location
 
         # DesignSpaceDocument or TTFont
         self._source_loca = "TTFont"
@@ -140,27 +144,6 @@ class proofLocation:
         return best_name
 
 
-class proofSource(proofLocation):
-
-    def __init__(self, location):
-        self.location = location
-        self.type = "source"
-        self.in_crop = True
-
-    def __repr__(self):
-        return f"<proofSource @ {self.name}>"
-
-
-class proofInstance(proofLocation):
-
-    def __init__(self, location):
-        self.location = location
-        self.type = "instance"
-        self.in_crop = True
-
-    def __repr__(self):
-        return f"<proofInstance @ {self.name}>"
-    
 
 class proofFont:
 
@@ -178,6 +161,7 @@ class proofFont:
         self.locations          = []
         self.operator_reference = None
         self._name              = self._compile_name()
+
 
         self.load_locations()
 
@@ -199,16 +183,15 @@ class proofFont:
 
     name = property(_get_name, _set_name)
 
-
     def _sort_locations(self, instances):
         return sorted(instances, key=lambda d: (-widthClass(d.location.get("wdth",0)), -italicVal(d.location.get("slnt",0)), weightClass(d.location.get("wght",0))))
 
-    def _reformat_locations(self,designspace,instance,axisMap,renamer):
+    def _reformat_locations(self,designspace,instance,axis_map,renamer):
         parsed = {}
         instance = designspace.map_backward(instance.location)
         for axis,val in instance.items():
             a = renamer.get(axis)
-            if a in axisMap.keys():
+            if a in axis_map.keys():
                 parsed[a]=val
         return parsed
 
@@ -216,36 +199,41 @@ class proofFont:
         source   = self.font_object
         operator = self.operator_reference
 
-        _instances = []  
-
-        for inst in [instance.coordinates for instance in source["fvar"].instances]:
-            built = proofInstance(inst)
-            n = built.generate_name(source)
-            built.name = n
-            built._source_loca = "TTFont"
-            _instances.append(built)
-
-        self.instances = self._sort_locations(_instances)
-
-        if operator:
-            RENAME  = {a.name:a.tag for a in operator.axes}
-            axisMap = {a.axisTag:(a.minValue,a.maxValue) for a in source["fvar"].axes}            
-
-            _sources = []
-
-            for _master in [master for master in operator.sources if not master.layerName]:
-                src = self._reformat_locations(operator,_master,axisMap,RENAME)
-                built = proofSource(src)
-                n = f"{_master.familyName} {_master.styleName}"
+        if "fvar" in source:
+            _instances = []  
+            for inst in [instance.coordinates for instance in source["fvar"].instances]:
+                built = proofLocation(inst)
+                n = built.generate_name(source)
                 built.name = n
-                built._source_loca = "DesignSpaceDocument"
-                _sources.append(built)
+                built._source_loca = "TTFont"
+                built.type = "instance"
+                _instances.append(built)
 
-            self.sources = self._sort_locations(_sources)
+            self.instances = self._sort_locations(_instances)
 
-        self.locations = []
-        self.locations.extend(self.sources)
-        self.locations.extend(self.instances)
+            if operator:
+                renamer = {a.name:a.tag for a in operator.axes}
+                axis_map = {a.axisTag:(a.minValue,a.maxValue) for a in source["fvar"].axes}            
+                _sources = []
+                for _master in [master for master in operator.sources if not master.layerName]:
+                    src = self._reformat_locations(operator,_master,axis_map,renamer)
+                    built = proofLocation(src)
+                    n = f"{_master.familyName} {_master.styleName}"
+                    built.name = n
+                    built._source_loca = "DesignSpaceDocument"
+                    built.type = "source"
+                    _sources.append(built)
+                self.sources = self._sort_locations(_sources)
+
+            # self.locations ONLY has unique instances and remove instances that are also sources
+            # this is a convenince property, self.instances and self.sources will have the
+            # complete data sets
+            self.locations = []
+            self.locations.extend(self.sources)
+            for inst in self.instances:
+                if inst.location not in [s.location for s in self.sources]:
+                    self.locations.append(inst)
+            self.locations = self._sort_locations(self.locations)
 
 
 
@@ -265,7 +253,7 @@ class proofDocument:
         
         self.operator = None
         self.crop = ""
-        self._expand_instances = False
+        self._use_instances = False
 
         self._path = None
         self._name = None
@@ -394,9 +382,14 @@ class proofDocument:
         path = self.uniquify(f'{directory}/{self.NOW:%Y-%m%d}-{self.name}-Proof.pdf')
         return path
 
-    def save(self, path=None):
-        save_path = path if path else self.path
-        bot.saveImage(save_path)
+    def save(self, path=None, open="_"):
+        _save_path = path if path else self.path
+        _auto = open if open != "_" else self.open_automatically
+
+        bot.saveImage(_save_path)
+        if open:
+            os.system(f"open -a Preview '{_save_path}'")
+
 
     def new_section(self,
                     proof_type=None,
@@ -488,6 +481,20 @@ class proofDocument:
                 te = proofFont(p)
                 te.is_variable = True
                 te.operator_reference = self.operator
+                # print(vf.axisSubsets)
+
+                # I dont know a better way right now but 
+                # this will check the subspaces within the operator
+                # and check if the names are the same and asign that op
+
+                uu = uop()
+                uu.read(d.path)
+                op = uu.getInterpolableUFOOperators(True)
+                for sub_op in op:
+                    name, processor = sub_op
+                    if name == vf.name:
+                        te.operator_reference = processor
+
                 te.load_locations()
 
                 allVFs.append(te)
@@ -505,6 +512,7 @@ class proofDocument:
             self.operator = dsp_doc.fromfile(path)
             vfs = self.get_variable_fonts_from_op()
             self.fonts.extend(vfs)
+
 
     #convience function to add multiple paths at once
     def add_objects(self, paths=[]):
@@ -570,13 +578,13 @@ class proofDocument:
                         inst.in_crop = False
 
 
-    def _get_expand_instances(self):
-        return self._expand_instances
+    def _get_use_instances(self):
+        return self._use_instances
 
-    def _set_expand_instances(self, bool):
-        self._expand_instances = bool
+    def _set_use_instances(self, bool):
+        self._use_instances = bool
 
-    expandInstances = property(_get_expand_instances, _set_expand_instances)
+    use_instances = property(_get_use_instances, _set_use_instances)
 
     def setup_proof(self, cover_page=True):
         bot.newDrawing()
@@ -593,16 +601,16 @@ class proofDocument:
         p = Path(fileName)
         self.text_attributes()
 
-        bot.text(f'Project: {self.name}', (self.margin[0], self.size[1]-(self.margin[0]/2)), align='left')
-        bot.text(f'Date: {self.NOW:%Y-%m-%d %H:%M}', (self.size[0] - self.margin[-1], self.size[1]-(self.margin[0]/2)), align='right')
+        bot.text(f'Project: {self.name}', (self._margin_left, self.size[1]-(self._margin_left/2)), align='left')
+        bot.text(f'Date: {self.NOW:%Y-%m-%d %H:%M}', (self.size[0] - self._margin_right, self.size[1]-(self._margin_left/2)), align='right')
         if not cover:
-            bot.text(f'Fontfile: {font.name}', (self.margin[0]+((self.size[0]/5)*2), self.size[1]-(self.margin[0]/2)), align="right")
-            bot.text(f'Characterset: {p.stem}', (self.margin[0]+((self.size[0]/5)*3), self.size[1]-(self.margin[0]/2)))
+            bot.text(f'Fontfile: {font.name}', (self._margin_left+((self.size[0]/5)*2), self.size[1]-(self._margin_left/2)), align="right")
+            bot.text(f'Characterset: {p.stem}', (self._margin_left+((self.size[0]/5)*3), self.size[1]-(self._margin_left/2)))
         fw,fh = bot.textSize(f'Fontfile: {font.name}')
         if fileName != "core" and var:
-            bot.linkRect(f"beginPage_{font}{var}", (self.margin[0] + (self.size[0]/4)*2, self.size[1]-self.margin[0], fw, fh))
+            bot.linkRect(f"beginPage_{font}{var}", (self._margin_left + (self.size[0]/4)*2, self.size[1]-self._margin_left, fw, fh))
 
-        bot.text(f'© {self.NOW:%Y}' + ' ' + USER, (self.margin[0], self.margin[1]/2))
+        bot.text(f'© {self.NOW:%Y}' + ' ' + USER, (self._margin_left, self._margin_bottom/2))
         # if instanceProof:
         #     cs = 6
         #     stroke(0.5819, 0.2157, 1.0, 1.0)
@@ -614,6 +622,8 @@ class proofDocument:
 
 
     def cover_page(self, fonts):
+        # this function is biased and draws a custom cover page of all
+        # locations / fonts and scales to fit them all
 
         bot.newPage(*self.size)
 
@@ -622,8 +632,10 @@ class proofDocument:
 
         _fonts = {}
         for font in fonts:
+
             if font.is_variable:
-                _fonts[font] = [it for it in font.locations if it.in_crop] 
+                to_use = font.sources if self.use_instances == False else font.locations
+                _fonts[font] = [it for it in to_use if it.in_crop] 
             else:
                 _fonts[font] = ""
 
@@ -631,33 +643,36 @@ class proofDocument:
         box_x, box_y = 50, 50
 
         fs = bot.FormattedString()
-        allNames = {}
+
         for proof_font,locations in _fonts.items():
-            if proof_font.name not in list(allNames.values()):
-                newName = f"{proof_font.name} {list(allNames.keys()).count(proof_font.name)}"
-                allNames[newName] = proof_font.name
             if locations:
-                for ind_loc in locations:
-                    fs.fontVariations(**ind_loc.location)
+                for loc in locations:
+                    fs.fontVariations(**loc.location)
                     fs.fontSize(FONT_SIZE_DEFAULT)
                     fs.font(proof_font.path)
                     fs.align("center")
 
                     _faded = (0,0,0,.15)
-                    if ind_loc.type == "source":
-                        fs.fill(*_faded)
-                        fs.append("〖")
+
+                    if self.use_instances == False:
                         fs.fill(0)
-                        fs.append(f"{proof_font.name}")
-                        fs.fill(*_faded)
-                        fs.append("〗")
+                        fs.append(f"{loc.name}")
                     else:
-                        fs.fill(0)
-                        fs.append(f"{proof_font.name}")
+                        if loc.type == "source":
+                            fs.fill(*_faded)
+                            fs.append("〖")
+                            fs.fill(0)
+                            fs.append(f"{loc.name}")
+                            fs.fill(*_faded)
+                            fs.append("〗")
+                        else:
+                            fs.fill(0)
+                            fs.append(f"{loc.name}")
+
                     fs.append("\n")
             else:
                 fs.fontSize(FONT_SIZE_DEFAULT)
-                fs.font(proof_font)
+                fs.font(proof_font.path)
                 fs.align("center")
                 fs.append(f"{proof_font.name}")
                 if proof_font != fonts[-1]:
@@ -688,8 +703,9 @@ doc.add_object("/Users/connordavenport/Dropbox/Clients/Dinamo/03_DifferentTimes/
 # doc.size = "big paper size"
 
 # test valid size
-doc.size = "A4Landscape"
+doc.size = "LetterLandscape"
 
+# we can see the loaded fonts and their locations
 # for font in doc.fonts:
     # print(font)
     # for s in font.instances[-5:-1]:
@@ -697,11 +713,23 @@ doc.size = "A4Landscape"
         # print(s.location)
         # print(s.in_crop)
 
-# doc.caption_font = "ABCGaisyrMonoUnlicensedTrial-Regular"
-# doc.margin = "auto"
+doc.caption_font = "ABCGaisyrMonoUnlicensedTrial-Regular"
 
-doc.setup_proof() # setup newDrawing() make cover page
-doc.new_section()
+# auto will use some %s but can accept 1 int which will apply
+# to all or a tuple of 4 values in top, left, bottom, right order
+doc.margin = "auto"
 
-doc.save()
+# we can turn this on and off whenever between new sections
+doc.use_instances = True
+
+doc.setup_proof() # setup newDrawing() and make a cover page
+
+doc.new_section() #build new proof sections
+
+doc.open_automatically = True
+# kwargs inside of save override whatever the doc says
+# write to disk
+doc.save(open=False)
+
+
 
