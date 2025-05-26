@@ -7,9 +7,20 @@ import fnmatch
 from typing import Union
 import re
 import drawBot as bot
+import drawBotGrid as grid
+from drawBotGrid import textOverflowTestMode as overflow_mode
+from defcon.tools.identifiers import makeRandomIdentifier
+
+import getpass
+import datetime
 
 # API
 # Assisted Proofing Interface
+
+NOW  = datetime.datetime.now()
+USER = getpass.getuser()
+di   = os.path.split(__file__)[0]
+PROOF_FOLDER = ""
 
 CORE         = ()
 RUNNING_TEXT = ()
@@ -19,7 +30,7 @@ INSPECTOR    = ()
 
 SECTION_TYPES = [CORE, RUNNING_TEXT, OPENTYPE, GRADIENT, INSPECTOR]
 
-COPY_TYPES = [
+RUNNING_TEXT_TYPES = [
 "spacing",
 "figures",
 "lowercaseCopy",
@@ -34,6 +45,24 @@ FONT_SIZE_MED     = 12
 
 PAGE_SIZES = bot.sizes()
 PAGE_SIZE_DEFAULT = "LetterLandscape"
+
+
+def find_proof_directory(start_location, target):
+    start_location = os.path.abspath(start_location)
+    closest_directory = save_path = None
+    closest_distance = float('inf')  # Initialize to positive infinity
+    current_path = start_location
+    while current_path != os.path.sep:
+        for filename in os.listdir(current_path):
+            if target in filename:
+                distance = len(os.path.relpath(current_path, start_location).split(os.path.sep))
+                if distance < closest_distance:
+                    closest_directory = current_path
+                    closest_distance = distance
+                    save_path = os.path.join(closest_directory, filename)
+        current_path = os.path.dirname(current_path)
+    return save_path
+
 
 ###################################
 ################################### taken from fontMake instancistator
@@ -223,7 +252,7 @@ class proofDocument:
 
     def __init__(self):
 
-        self.identifier = 1234567898
+        self._identifier = None
         self.fonts = []
         # size can either be a tuple of ints or a DrawBot
         # compatible paper size name string
@@ -233,6 +262,7 @@ class proofDocument:
         self._expand_instances = False
 
         self._path = None
+        self._name = None
 
         # proof UI settings
         self._size = "LetterLandscape"
@@ -246,6 +276,22 @@ class proofDocument:
         self._auto_open = False
 
         self._caption_font = "SFMono-Regular"
+
+
+    # do we even need ids??-----------------------
+    def _get_identifier(self):
+        if not self._identifier:
+            self._identifier = self.generate_identifier()
+        return self._identifier
+
+    def _set_identifier(self, new_id):
+        self._identifier = new_id
+
+    identifier = property(_get_identifier, _set_identifier)
+
+    def generate_identifier(self):
+        return makeRandomIdentifier(existing=[])
+    # ----------------------------------------------
 
 
     def _get_page_size(self):
@@ -307,9 +353,40 @@ class proofDocument:
         self._path = new_path
 
     def _get_path(self):
+        if not self._path:
+            self._path = self.generate_path_base()
         return self._path
 
     path = property(_get_path, _set_path)
+
+    def _set_name(self, new_name):
+        self._name = new_name
+
+    def _get_name(self):
+        if not self._name and self.fonts:
+            # return family name for top level font
+            self._name = self.fonts[0].font_object["name"].getBestFamilyName().replace(" ","")
+        return self._name
+
+    name = property(_get_name, _set_name)
+
+    def uniquify(self, path):
+        # https://stackoverflow.com/a/57896232
+        filename, extension = os.path.splitext(path)
+        counter = 1
+        while os.path.exists(path):
+            path = filename + "-" + str(counter) + extension
+            counter += 1
+        return path
+
+    def generate_path_base(self):
+        cd = os.path.split(self.fonts[0].path)[0]
+        directory = find_proof_directory(cd, "proofs") 
+        if not directory:
+            directory = cd
+        # make sure file names are always unique!
+        path = self.uniquify(f'{directory}/{NOW:%Y-%m%d}-{self.name}-Proof.pdf')
+        return path
 
     def save(self, path=None):
         pass
@@ -359,6 +436,7 @@ class proofDocument:
         self._margin_bottom = B
 
     margin = property(_get_margin, _set_margin)
+
 
 
     def find_close(self, root_dir, target_filename):
@@ -496,16 +574,19 @@ class proofDocument:
     expandInstances = property(_get_expand_instances, _set_expand_instances)
 
 
-doc = proofDocument()
-doc.add_object("/Users/connordavenport/Dropbox/Clients/Dinamo/03_DifferentTimes/Sources/Different-Times-v10.designspace")
 
+doc = proofDocument()
+
+doc.add_object("/Users/connordavenport/Dropbox/Clients/Dinamo/03_DifferentTimes/Sources/Different-Times-v10.designspace")
 doc.crop_space("wght=0:320:600")
 
 for font in doc.fonts:
-    for s in font.instances[-5:-1]:
-        print(s.name)
-        print(s.location)
-        print(s.in_crop)
+
+    print(font)
+    # for s in font.instances[-5:-1]:
+        # print(s.name)
+        # print(s.location)
+        # print(s.in_crop)
 
 doc.new_section()
 
@@ -513,8 +594,8 @@ doc.new_section()
 doc.caption_font = "ABCGaisyrMonoUnlicensedTrial-Regular"
 doc.margin = "auto"
 
+print(doc.path)
 print(doc.margin)
-print(doc.caption_font)
 
 # test invalid sizes
 # doc.size = (100,100,20)
@@ -522,4 +603,6 @@ print(doc.caption_font)
 
 # test valid size
 doc.size = "A4Landscape"
+
+
 
