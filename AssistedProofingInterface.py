@@ -95,6 +95,7 @@ class proofLocation:
         self._source_loca = "TTFont"
         self._in_crop = True
 
+
     def _get_in_crop(self):
         return self._in_crop
 
@@ -144,6 +145,7 @@ class proofSource(proofLocation):
     def __init__(self, location):
         self.location = location
         self.type = "source"
+        self.in_crop = True
 
     def __repr__(self):
         return f"<proofSource @ {self.name}>"
@@ -154,6 +156,7 @@ class proofInstance(proofLocation):
     def __init__(self, location):
         self.location = location
         self.type = "instance"
+        self.in_crop = True
 
     def __repr__(self):
         return f"<proofInstance @ {self.name}>"
@@ -269,7 +272,7 @@ class proofDocument:
 
         # proof UI settings
         self._size = "LetterLandscape"
-        self._margin = 10
+        self._margin = 50
         self._margin_left   = self._margin
         self._margin_right  = self._margin
         self._margin_top    = self._margin
@@ -392,7 +395,8 @@ class proofDocument:
         return path
 
     def save(self, path=None):
-        pass
+        save_path = path if path else self.path
+        bot.saveImage(save_path)
 
     def new_section(self,
                     proof_type=None,
@@ -401,7 +405,6 @@ class proofDocument:
                     instances=False,
                     restrict_page=False # if set to False the overflow will add new pages
                     ):
-
         pass
 
     def _get_margin(self):
@@ -545,7 +548,6 @@ class proofDocument:
             instances.extend(font.sources)
             if isinstance(zone, dict):
                 for inst in instances:
-
                     check = []
                     for axis,value in zone.items():
                         a = inst.location.get(axis)
@@ -581,7 +583,6 @@ class proofDocument:
         if cover_page:
             self.cover_page(self.fonts)
 
-
     def text_attributes(self):
         bot.fill(0)
         bot.stroke(None)
@@ -592,14 +593,15 @@ class proofDocument:
         p = Path(fileName)
         self.text_attributes()
 
-        bot.text(f'Project: {self.name}', (self.margin[0], self.size[1]-40), align='left')
-        bot.text(f'Date: {self.NOW:%Y-%m-%d %H:%M}', (self.margin[0] + 20, self.size[1]-40), align='left')
+        bot.text(f'Project: {self.name}', (self.margin[0], self.size[1]-(self.margin[0]/2)), align='left')
+        bot.text(f'Date: {self.NOW:%Y-%m-%d %H:%M}', (self.size[0] - self.margin[-1], self.size[1]-(self.margin[0]/2)), align='right')
         if not cover:
-            bot.text(f'Fontfile: {font.name}', (self.margin[0] + 40, self.size[1]-40))
-            bot.text(f'Characterset: {p.stem}', ((self.size[0] - self.margin[-1]), self.size[1]-40))
+            bot.text(f'Fontfile: {font.name}', (self.margin[0]+((self.size[0]/5)*2), self.size[1]-(self.margin[0]/2)), align="right")
+            bot.text(f'Characterset: {p.stem}', (self.margin[0]+((self.size[0]/5)*3), self.size[1]-(self.margin[0]/2)))
         fw,fh = bot.textSize(f'Fontfile: {font.name}')
         if fileName != "core" and var:
-            bot.linkRect(f"beginPage_{font}{var}", (self.margin[0] + 40, self.size[1]-40, fw, fh))
+            bot.linkRect(f"beginPage_{font}{var}", (self.margin[0] + (self.size[0]/4)*2, self.size[1]-self.margin[0], fw, fh))
+
         bot.text(f'© {self.NOW:%Y}' + ' ' + USER, (self.margin[0], self.margin[1]/2))
         # if instanceProof:
         #     cs = 6
@@ -621,48 +623,44 @@ class proofDocument:
         _fonts = {}
         for font in fonts:
             if font.is_variable:
-                instances = [it for it in font.locations if it.in_crop] 
-                _fonts[font] = instances
+                _fonts[font] = [it for it in font.locations if it.in_crop] 
             else:
                 _fonts[font] = ""
 
         box_w, box_h = self.size[0]-100, self.size[1]-150
         box_x, box_y = 50, 50
 
-
-
         fs = bot.FormattedString()
         allNames = {}
-        for fr,v in _fonts.items():
-            if fr.name not in list(allNames.values()):
-                newName = f"{fr.name} {list(allNames.keys()).count(fr.name)}"
-                allNames[newName] = fr.name
-            if v:
-                for vl in v:
-                    fs.fontVariations(**vl.location)
+        for proof_font,locations in _fonts.items():
+            if proof_font.name not in list(allNames.values()):
+                newName = f"{proof_font.name} {list(allNames.keys()).count(proof_font.name)}"
+                allNames[newName] = proof_font.name
+            if locations:
+                for ind_loc in locations:
+                    fs.fontVariations(**ind_loc.location)
                     fs.fontSize(FONT_SIZE_DEFAULT)
-                    fs.font(fr.path)
+                    fs.font(proof_font.path)
                     fs.align("center")
 
-
                     _faded = (0,0,0,.15)
-                    if vl.type == "source":
+                    if ind_loc.type == "source":
                         fs.fill(*_faded)
                         fs.append("〖")
                         fs.fill(0)
-                        fs.append(f"{fr.name}")
+                        fs.append(f"{proof_font.name}")
                         fs.fill(*_faded)
                         fs.append("〗")
                     else:
                         fs.fill(0)
-                        fs.append(f"{fr.name}")
+                        fs.append(f"{proof_font.name}")
                     fs.append("\n")
             else:
                 fs.fontSize(FONT_SIZE_DEFAULT)
-                fs.font(fr)
+                fs.font(proof_font)
                 fs.align("center")
-                fs.append(f"{fr.name}")
-                if fr != fonts[-1]:
+                fs.append(f"{proof_font.name}")
+                if proof_font != fonts[-1]:
                     fs.append("\n")    
                 
         txt_w = bot.textSize(fs)[0]
@@ -683,7 +681,7 @@ class proofDocument:
 doc = proofDocument()
 
 doc.add_object("/Users/connordavenport/Dropbox/Clients/Dinamo/03_DifferentTimes/Sources/Different-Times-v10.designspace")
-doc.crop_space("wght=0:320:600")
+# doc.crop_space("wght=0:320:600")
 
 # test invalid sizes
 # doc.size = (100,100,20)
@@ -699,14 +697,11 @@ doc.size = "A4Landscape"
         # print(s.location)
         # print(s.in_crop)
 
-doc.caption_font = "ABCGaisyrMonoUnlicensedTrial-Regular"
-doc.margin = "auto"
+# doc.caption_font = "ABCGaisyrMonoUnlicensedTrial-Regular"
+# doc.margin = "auto"
 
 doc.setup_proof() # setup newDrawing() make cover page
 doc.new_section()
 
-
-bot.saveImage(doc.path)
-
-
+doc.save()
 
