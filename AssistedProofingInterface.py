@@ -6,13 +6,20 @@ from fontTools.misc.fixedTools import otRound, strToFixedToFloat, floatToFixedTo
 import fnmatch
 from typing import Union
 import re
+import drawBot as bot
 
 # API
 # Assisted Proofing Interface
 
+CORE         = ()
+RUNNING_TEXT = ()
+OPENTYPE     = ()
+GRADIENT     = ()
+INSPECTOR    = ()
 
-PROOF_SECTION_TYPES = [
-"core",
+SECTION_TYPES = [CORE, RUNNING_TEXT, OPENTYPE, GRADIENT, INSPECTOR]
+
+COPY_TYPES = [
 "spacing",
 "figures",
 "lowercaseCopy",
@@ -21,6 +28,12 @@ PROOF_SECTION_TYPES = [
 "kerning"
 ]
 
+FONT_SIZE_DEFAULT = 28
+FONT_SIZE_SMALL   = 9
+FONT_SIZE_MED     = 12
+
+PAGE_SIZES = bot.sizes()
+PAGE_SIZE_DEFAULT = "LetterLandscape"
 
 ###################################
 ################################### taken from fontMake instancistator
@@ -214,7 +227,7 @@ class proofDocument:
         self.fonts = []
         # size can either be a tuple of ints or a DrawBot
         # compatible paper size name string
-        self.size = "LetterLandscape"
+        
         self.operator = None
         self.crop = ""
         self._expand_instances = False
@@ -222,13 +235,73 @@ class proofDocument:
         self._path = None
 
         # proof UI settings
+        self._size = "LetterLandscape"
         self._margin = 10
-
         self._margin_left   = self._margin
         self._margin_right  = self._margin
         self._margin_top    = self._margin
         self._margin_bottom = self._margin
 
+
+        self._auto_open = False
+
+        self._caption_font = "SFMono-Regular"
+
+
+    def _get_page_size(self):
+        if isinstance(self._size, str):
+            size = PAGE_SIZES[self._size]
+        else:
+            size = self._size
+        return size
+
+    def _set_page_size(self, new_page_size):
+        if isinstance(new_page_size, str):
+            if new_page_size in list(PAGE_SIZES.keys()):
+                self._size = new_page_size
+            else:
+                self._size = PAGE_SIZE_DEFAULT
+                print(f"""ERROR: {new_page_size} is not a valid page size, defaulting to {PAGE_SIZE_DEFAULT}""")
+        if isinstance(new_page_size, tuple):
+            ll = len(new_page_size)
+            if ll == 2:
+                self._size = new_page_size
+            elif ll == 1:
+                self._size = (new_page_size, new_page_size)
+            else:
+                self._size = PAGE_SIZE_DEFAULT
+                print(f"""ERROR: {new_page_size} is not a valid page size, defaulting to {PAGE_SIZES[PAGE_SIZE_DEFAULT]}""")
+
+        if self._margin == "auto":
+            self.margin = "auto"
+
+    size = property(_get_page_size, _set_page_size)
+
+    def _set_caption_font(self, new_font):
+        import errno
+        if new_font in bot.installedFonts():
+            self._caption_font = new_font
+        else:
+            raise FileNotFoundError(
+                        errno.ENOENT,
+                        os.strerror(errno.ENOENT),
+                        new_font
+                        )
+
+    def _get_caption_font(self):
+        return self._caption_font
+
+    caption_font = property(_get_caption_font, _set_caption_font)
+
+
+    def _set_auto_open(self, bool):
+        self._auto_open = bool
+
+    def _get_auto_open(self):
+        return self._auto_open
+
+    # open pdf immediately after saving to disk
+    open_automatically = property(_get_auto_open, _set_auto_open)
 
     def _set_path(self, new_path):
         self._path = new_path
@@ -243,54 +316,47 @@ class proofDocument:
 
     def new_section(self,
                     proof_type=None,
+                    point_size=FONT_SIZE_DEFAULT, # can accept list to generate section at different sizes
                     sources=True,
                     instances=False,
+                    restrict_page=False # if set to False the overflow will add new pages
                     ):
+
         pass
 
-    def _get_margin_left(self):
-        return self._margin_left
-
-    def _set_margin_left(self, new_margin_left):
-        self._margin_left = new_margin_left
-
-    margin_left = property(_get_margin_left, _set_margin_left)
-
-    def _get_margin_right(self):
-        return self._margin_right
-
-    def _set_margin_right(self, new_margin_right):
-        self._margin_right = new_margin_right
-
-    margin_right = property(_get_margin_right, _set_margin_right)
-
-    def _get_margin_top(self):
-        return self._margin_top
-
-    def _set_margin_top(self, new_margin_top):
-        self._margin_top = new_margin_top
-
-    margin_top = property(_get_margin_top, _set_margin_top)
-
-    def _get_margin_bottom(self):
-        return self._margin_bottom
-
-    def _set_margin_bottom(self, new_margin_bottom):
-        self._margin_bottom = new_margin_bottom
-
-    margin_bottom = property(_get_margin_bottom, _set_margin_bottom)
-
-
     def _get_margin(self):
-        return self._margin
+        return (
+                self._margin_top,
+                self._margin_left, 
+                self._margin_bottom,
+                self._margin_right,
+                )
 
     def _set_margin(self, new_margin):
-        # if we set the main margin, we also reset all margins
+        # we can accept a tuple of 4 to set individual 
+        # or 1 value to apply across the board
+        if isinstance(new_margin, tuple):
+            if len(new_margin) == 4:
+                # counter clockwise from top
+                T,L,B,R = new_margin
+            else:
+                # if length isnt 4 we just use the first value
+                T = L = B = R = new_margin[0]
+        elif str(new_margin).lower() == "auto":
+            # this is a biased margin spacing based on page size
+            w,h = self.size
+            T = int(h * 0.09)
+            L = R = int(w * 0.085)
+            B = int(h * 0.12)
+
+        else:
+            # if we set the main margin, we also reset all margins
+            T = L = B = R = new_margin
         self._margin        = new_margin
-        self._margin_left   = new_margin
-        self._margin_right  = new_margin
-        self._margin_top    = new_margin
-        self._margin_bottom = new_margin
+        self._margin_left   = L
+        self._margin_right  = R
+        self._margin_top    = T
+        self._margin_bottom = B
 
     margin = property(_get_margin, _set_margin)
 
@@ -433,9 +499,7 @@ class proofDocument:
 doc = proofDocument()
 doc.add_object("/Users/connordavenport/Dropbox/Clients/Dinamo/03_DifferentTimes/Sources/Different-Times-v10.designspace")
 
-#allows you to crop the 
 doc.crop_space("wght=0:320:600")
-
 
 for font in doc.fonts:
     for s in font.instances[-5:-1]:
@@ -446,4 +510,16 @@ for font in doc.fonts:
 doc.new_section()
 
 
+doc.caption_font = "ABCGaisyrMonoUnlicensedTrial-Regular"
+doc.margin = "auto"
+
+print(doc.margin)
+print(doc.caption_font)
+
+# test invalid sizes
+# doc.size = (100,100,20)
+# doc.size = "big paper size"
+
+# test valid size
+doc.size = "A4Landscape"
 
