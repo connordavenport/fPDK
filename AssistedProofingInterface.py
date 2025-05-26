@@ -10,17 +10,14 @@ import drawBot as bot
 import drawBotGrid as grid
 from drawBotGrid import textOverflowTestMode as overflow_mode
 from defcon.tools.identifiers import makeRandomIdentifier
-
+from pathlib import Path
 import getpass
 import datetime
 
 # API
 # Assisted Proofing Interface
 
-NOW  = datetime.datetime.now()
 USER = getpass.getuser()
-di   = os.path.split(__file__)[0]
-PROOF_FOLDER = ""
 
 CORE         = ()
 RUNNING_TEXT = ()
@@ -89,6 +86,8 @@ class proofLocation:
 
     def __init__(self):
 
+        self.type = None
+
         self._name = "unnamed location"
         self._location = None
 
@@ -144,6 +143,7 @@ class proofSource(proofLocation):
 
     def __init__(self, location):
         self.location = location
+        self.type = "source"
 
     def __repr__(self):
         return f"<proofSource @ {self.name}>"
@@ -153,6 +153,7 @@ class proofInstance(proofLocation):
 
     def __init__(self, location):
         self.location = location
+        self.type = "instance"
 
     def __repr__(self):
         return f"<proofInstance @ {self.name}>"
@@ -251,6 +252,8 @@ class proofDocument:
         return f"<proofDocument @ {self.identifier} : {len(self.fonts)}>"
 
     def __init__(self):
+
+        self.NOW = datetime.datetime.now()
 
         self._identifier = None
         self.fonts = []
@@ -385,7 +388,7 @@ class proofDocument:
         if not directory:
             directory = cd
         # make sure file names are always unique!
-        path = self.uniquify(f'{directory}/{NOW:%Y-%m%d}-{self.name}-Proof.pdf')
+        path = self.uniquify(f'{directory}/{self.NOW:%Y-%m%d}-{self.name}-Proof.pdf')
         return path
 
     def save(self, path=None):
@@ -573,6 +576,108 @@ class proofDocument:
 
     expandInstances = property(_get_expand_instances, _set_expand_instances)
 
+    def setup_proof(self, cover_page=True):
+        bot.newDrawing()
+        if cover_page:
+            self.cover_page(self.fonts)
+
+
+    def text_attributes(self):
+        bot.fill(0)
+        bot.stroke(None)
+        bot.font(self.caption_font, 8)
+
+
+    def draw_header_footer(self, font, fileName, var, cover=False):
+        p = Path(fileName)
+        self.text_attributes()
+
+        bot.text(f'Project: {self.name}', (self.margin[0], self.size[1]-40), align='left')
+        bot.text(f'Date: {self.NOW:%Y-%m-%d %H:%M}', (self.margin[0] + 20, self.size[1]-40), align='left')
+        if not cover:
+            bot.text(f'Fontfile: {font.name}', (self.margin[0] + 40, self.size[1]-40))
+            bot.text(f'Characterset: {p.stem}', ((self.size[0] - self.margin[-1]), self.size[1]-40))
+        fw,fh = bot.textSize(f'Fontfile: {font.name}')
+        if fileName != "core" and var:
+            bot.linkRect(f"beginPage_{font}{var}", (self.margin[0] + 40, self.size[1]-40, fw, fh))
+        bot.text(f'© {self.NOW:%Y}' + ' ' + USER, (self.margin[0], self.margin[1]/2))
+        # if instanceProof:
+        #     cs = 6
+        #     stroke(0.5819, 0.2157, 1.0, 1.0)
+        #     fill(0.5819, 0.2157, 1.0, .2)
+        #     oval(width() - (MARGIN_X1 + cs), MARGIN_BOTTOM/2, 10, 10)
+
+        bot.fill(0)
+        bot.stroke(None)
+
+
+    def cover_page(self, fonts):
+
+        bot.newPage(*self.size)
+
+        self.text_attributes()
+        self.draw_header_footer(fonts[0],"",False,True)
+
+        _fonts = {}
+        for font in fonts:
+            if font.is_variable:
+                instances = [it for it in font.locations if it.in_crop] 
+                _fonts[font] = instances
+            else:
+                _fonts[font] = ""
+
+        box_w, box_h = self.size[0]-100, self.size[1]-150
+        box_x, box_y = 50, 50
+
+
+
+        fs = bot.FormattedString()
+        allNames = {}
+        for fr,v in _fonts.items():
+            if fr.name not in list(allNames.values()):
+                newName = f"{fr.name} {list(allNames.keys()).count(fr.name)}"
+                allNames[newName] = fr.name
+            if v:
+                for vl in v:
+                    fs.fontVariations(**vl.location)
+                    fs.fontSize(FONT_SIZE_DEFAULT)
+                    fs.font(fr.path)
+                    fs.align("center")
+
+
+                    _faded = (0,0,0,.15)
+                    if vl.type == "source":
+                        fs.fill(*_faded)
+                        fs.append("〖")
+                        fs.fill(0)
+                        fs.append(f"{fr.name}")
+                        fs.fill(*_faded)
+                        fs.append("〗")
+                    else:
+                        fs.fill(0)
+                        fs.append(f"{fr.name}")
+                    fs.append("\n")
+            else:
+                fs.fontSize(FONT_SIZE_DEFAULT)
+                fs.font(fr)
+                fs.align("center")
+                fs.append(f"{fr.name}")
+                if fr != fonts[-1]:
+                    fs.append("\n")    
+                
+        txt_w = bot.textSize(fs)[0]
+        txt_h = bot.textSize(fs)[1]
+
+        width_ratio = box_w/txt_w 
+        mu = str(fs).count("\n") or 1
+        height_ratio = box_h/(FONT_SIZE_DEFAULT * mu * 1.5)
+
+        sf = min([width_ratio , height_ratio])
+
+        with bot.savedState():
+            bot.scale(sf)
+            bot.textBox(fs, (box_x/sf, box_y/sf, box_w/sf, box_h/sf))   
+
 
 
 doc = proofDocument()
@@ -580,29 +685,28 @@ doc = proofDocument()
 doc.add_object("/Users/connordavenport/Dropbox/Clients/Dinamo/03_DifferentTimes/Sources/Different-Times-v10.designspace")
 doc.crop_space("wght=0:320:600")
 
-for font in doc.fonts:
-
-    print(font)
-    # for s in font.instances[-5:-1]:
-        # print(s.name)
-        # print(s.location)
-        # print(s.in_crop)
-
-doc.new_section()
-
-
-doc.caption_font = "ABCGaisyrMonoUnlicensedTrial-Regular"
-doc.margin = "auto"
-
-print(doc.path)
-print(doc.margin)
-
 # test invalid sizes
 # doc.size = (100,100,20)
 # doc.size = "big paper size"
 
 # test valid size
 doc.size = "A4Landscape"
+
+# for font in doc.fonts:
+    # print(font)
+    # for s in font.instances[-5:-1]:
+        # print(s.name)
+        # print(s.location)
+        # print(s.in_crop)
+
+doc.caption_font = "ABCGaisyrMonoUnlicensedTrial-Regular"
+doc.margin = "auto"
+
+doc.setup_proof() # setup newDrawing() make cover page
+doc.new_section()
+
+
+bot.saveImage(doc.path)
 
 
 
