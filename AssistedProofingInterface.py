@@ -731,27 +731,26 @@ class proofDocument:
         return self._crop
 
     def _set_crop(self, fence=""):
-        self._crop = fence
-        # self.crop_space(fence)
+        # self._crop = fence
+        self.crop_space(fence, True)
 
     crop = property(_get_crop, _set_crop)
 
-    def crop_space(self, zone):
-        zone = self.reformat_limits(zone)
-        self._crop = zone
-        for font in self._fonts:
-            cropped = []
-            instances = font.instances
-            instances.extend(font.sources)
-            if isinstance(zone, dict):
-                for inst in instances:
-                    if zone == {}:
-                        inst.in_crop = True
-                    else:
+    def crop_space(self, _zone="",inf_loop=False):
+        zone = self.reformat_limits(_zone)
+        valid = False
+        if zone:
+            for font in self._fonts:
+                cropped = []
+                instances = font.instances
+                instances.extend(font.sources)
+                if isinstance(zone, dict):
+                    for inst in instances:
                         check = []
                         for axis,value in zone.items():
                             a = inst.location.get(axis)
                             if a:
+                                valid = True
                                 if isinstance(value, float):
                                     if a == value:
                                         check.append(1)
@@ -764,10 +763,14 @@ class proofDocument:
                                             check.append(1)
                                         else:
                                             check.append(0)
+                            else:
+                                valid = False
                         if 0 not in check:
                             inst.in_crop = True
                         else:
                             inst.in_crop = False
+            if valid:
+                self._crop = _zone
 
 
     def _get_use_instances(self):
@@ -893,12 +896,16 @@ doc = proofDocument()
 # add a font or designspace, only accepts path strings
 doc.add_object("/Users/connordavenport/Dropbox/Clients/Dinamo/03_DifferentTimes/Sources/Different-Times-v10.designspace")
 
+
+# crop design-space to be proofed, using the varLib instantiator syntax
+doc.crop_space("wght=0:320:600")
+
 # test an invalid or empty crop
+# an invalid crop will ignore if already set
 doc.crop = "asdas"
 doc.crop = None
 doc.crop = "fuck=420:666"
-# crop design-space to be proofed, using the varLib instantiator syntax
-doc.crop_space("wght=0:320:600")
+print(doc.crop)
 
 
 # test invalid sizes
