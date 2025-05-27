@@ -928,11 +928,12 @@ doc.caption_font = "ABCGaisyrMonoUnlicensedTrial-Regular"
 # to all or a tuple of 4 values in top, left, bottom, right order
 doc.margin = "auto"
 # we can turn this on and off whenever between new sections
-doc.use_instances = True
+doc.use_instances = False
 doc.setup_proof() # setup newDrawing() and make a cover page
 # build new proof sections...not implemented yet
-doc.use_instances = False
 doc.new_section("core")
+
+
 doc.open_automatically = False
 # kwargs inside of save overwrite whatever the doc says
 # write to disk
@@ -942,4 +943,3 @@ doc.save(open=True)
 # doc and save both allow for overwriting the previous file on disk
 # overwrite is set to True by default
 doc.write(overwrite=True)
-
