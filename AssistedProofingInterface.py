@@ -702,64 +702,72 @@ class proofDocument:
         taken from the source code ^
         '''
         result = {}
-        for limitString in [limits]:
-            match = re.match(r"^(\w{1,4})=(?:(drop)|(?:([^:]+)(?:[:](.+))?))$", limitString)
-            if not match:
-                raise ValueError("invalid location format: %r" % limitString)
-                sys.exit()
-            tag = match.group(1).ljust(4)
-            if match.group(2):  # 'drop'
-                lbound = None
-            else:
-                lbound = strToFixedToFloat(match.group(3), precisionBits=16)
-            ubound = lbound
-            if match.group(4):
-                ubound = []
-                for v in match.group(4).split(":"):
-                    ubound.append(strToFixedToFloat(v, precisionBits=16))
-            if lbound != ubound:
-                result[tag] = tuple((lbound, *ubound))
-            else:
-                result[tag] = lbound
-        return result
+        if limits:
+            for limitString in [limits]:
+                match = re.match(r"^(\w{1,4})=(?:(drop)|(?:([^:]+)(?:[:](.+))?))$", limitString)
+                if not match:
+                    # raise ValueError("invalid location format: %r" % limitString)
+                    # sys.exit()
+                    return {}
+                tag = match.group(1).ljust(4)
+                if match.group(2):  # 'drop'
+                    lbound = None
+                else:
+                    lbound = strToFixedToFloat(match.group(3), precisionBits=16)
+                ubound = lbound
+                if match.group(4):
+                    ubound = []
+                    for v in match.group(4).split(":"):
+                        ubound.append(strToFixedToFloat(v, precisionBits=16))
+                if lbound != ubound:
+                    result[tag] = tuple((lbound, *ubound))
+                else:
+                    result[tag] = lbound
+            return result
+        else:
+            return {}
 
     def _get_crop(self):
         return self._crop
 
     def _set_crop(self, fence=""):
         self._crop = fence
-        self.crop_space(fence)
+        # self.crop_space(fence)
 
     crop = property(_get_crop, _set_crop)
 
     def crop_space(self, zone):
         zone = self.reformat_limits(zone)
+        self._crop = zone
         for font in self._fonts:
             cropped = []
             instances = font.instances
             instances.extend(font.sources)
             if isinstance(zone, dict):
                 for inst in instances:
-                    check = []
-                    for axis,value in zone.items():
-                        a = inst.location.get(axis)
-                        if a:
-                            if isinstance(value, float):
-                                if a == value:
-                                    check.append(1)
-                                else:
-                                    check.append(0)
-                            if isinstance(value, tuple):
-                                mn,mx = value[0],value[-1]
-                                if a:
-                                    if mn <= a <= mx:
+                    if zone == {}:
+                        inst.in_crop = True
+                    else:
+                        check = []
+                        for axis,value in zone.items():
+                            a = inst.location.get(axis)
+                            if a:
+                                if isinstance(value, float):
+                                    if a == value:
                                         check.append(1)
                                     else:
                                         check.append(0)
-                    if 0 not in check:
-                        inst.in_crop = True
-                    else:
-                        inst.in_crop = False
+                                if isinstance(value, tuple):
+                                    mn,mx = value[0],value[-1]
+                                    if a:
+                                        if mn <= a <= mx:
+                                            check.append(1)
+                                        else:
+                                            check.append(0)
+                        if 0 not in check:
+                            inst.in_crop = True
+                        else:
+                            inst.in_crop = False
 
 
     def _get_use_instances(self):
@@ -884,11 +892,18 @@ doc = proofDocument()
 
 # add a font or designspace, only accepts path strings
 doc.add_object("/Users/connordavenport/Dropbox/Clients/Dinamo/03_DifferentTimes/Sources/Different-Times-v10.designspace")
+
+# test an invalid or empty crop
+doc.crop = "asdas"
+doc.crop = None
+doc.crop = "fuck=420:666"
 # crop design-space to be proofed, using the varLib instantiator syntax
-# doc.crop_space("wght=0:320:600")
+doc.crop_space("wght=0:320:600")
+
+
 # test invalid sizes
-doc.size = (100,100,20)
-doc.size = "big paper size"
+# doc.size = (100,100,20)
+# doc.size = "big paper size"
 # test valid size
 doc.size = "LetterLandscape"
 
@@ -919,9 +934,5 @@ doc.save(open=True)
 # write to custom file format to save exact proof settings for later
 # doc and save both allow for overwriting the previous file on disk
 # overwrite is set to True by default
-# doc.write(overwrite=True)
-
-
-
-
+doc.write(overwrite=True)
 
