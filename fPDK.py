@@ -1,6 +1,8 @@
 from fontTools.ttLib import TTFont
 import os
 from fontTools.designspaceLib import DesignSpaceDocument as dsp_doc
+from fontTools.designspaceLib import DiscreteAxisDescriptor, AxisDescriptor
+from fontTools.designspaceLib.split import *
 import fontTools.varLib as varLib
 from fontTools.misc.fixedTools import otRound, strToFixedToFloat, floatToFixedToFloat
 import fnmatch
@@ -9,6 +11,8 @@ import re
 import drawBot as bot
 import drawBotGrid as grid
 from drawBotGrid import textOverflowTestMode as overflow_mode
+import more_itertools as mit
+
 from defcon.tools.identifiers import makeRandomIdentifier
 from pathlib import Path
 import getpass
@@ -18,8 +22,7 @@ import plistlib
 import inspect
 from random import randint
 
-# API
-# Assisted Proofing Interface
+# fPDK, font Proofing Development Kit
 
 USER = getpass.getuser()
 
@@ -122,18 +125,31 @@ def italicVal(slnt_user_value) -> Union[int, float]:
 class proofLocation:
 
     def __repr__(self):
-        return f"<proofLocation.{self.type} @ {self.name}>"
+        name = ""
+        if self.is_source:
+            name = "source"
+        if self.is_instance:
+            name = "instance"
+        if self.is_source and self.is_instance:
+            name = "both"
+        return f"<proofLocation.{name} @ {self.name}>"
 
     def __init__(self, location):
 
         self.type = None
 
+        self.is_instance = False
+        self.is_source = False
+
         self._name = "unnamed location"
         self._location = location
+        self.tag_location = None
 
         # DesignSpaceDocument or TTFont
-        self._source_loca = "TTFont"
+        self.data_from = "TTFont"
         self._in_crop = True
+
+        self._font = None
 
 
     def _get_in_crop(self):
@@ -144,13 +160,13 @@ class proofLocation:
 
     in_crop = property(_get_in_crop, _set_in_crop)
 
-    def _get_source_loca(self):
-        return self._source_loca
+    def _get_origin(self):
+        return self._origin
 
-    def _set_source_loca(self, new_source_loca):
-        self._source_loca = new_source_loca
+    def _set_origin(self, new_origin):
+        self._origin = new_origin
 
-    source = property(_get_source_loca, _set_source_loca)
+    origin = property(_get_origin, _set_origin)
 
     def _get_name(self):
         return self._name
@@ -168,12 +184,16 @@ class proofLocation:
 
     location = property(_get_location, _set_location)
 
+
     def generate_name(self, TTFont):
         f = TTFont
         best_name = f["name"].getBestFullName()
         if "fvar" in f:
             for i in f["fvar"].instances: 
-                if i.coordinates == self._location:   
+                l = self._location
+                # print(l)
+                #l = {a:v for a,v in self._location.items() if a in [a.axisTag for a in f["fvar"].axes]}
+                if i.coordinates == l:   
                     for name in f["name"].names:
                         if name.nameID == i.subfamilyNameID:
                             best_name = f'{f["name"].getBestFamilyName()} {name}'
@@ -192,13 +212,9 @@ class proofFont:
         self.font_object        = None
         self.load_font()
         self.is_variable        = False
-        self.instances          = []
-        self.sources            = []
         self.locations          = []
         self.operator           = None
         self._name              = self._compile_name()
-
-        self.load_locations()
 
     def load_font(self):
         if self.path:
@@ -226,49 +242,76 @@ class proofFont:
         instance = designspace.map_backward(instance.location)
         for axis,val in instance.items():
             a = renamer.get(axis)
-            if a in axis_map.keys():
-                parsed[a]=val
+            parsed[a]=val
         return parsed
 
-    def load_locations(self):
-        source   = self.font_object
+    def build_locations(self):
+        font_obj   = self.font_object
         operator = self.operator
 
-        if "fvar" in source:
-            _instances = []  
-            for inst in [instance.coordinates for instance in source["fvar"].instances]:
-                built = proofLocation(inst)
-                n = built.generate_name(source)
-                built.name = n
-                built._source_loca = "TTFont"
-                built.type = "instance"
-                _instances.append(built)
+        _instances = {}
+        renamer = {a.name:a.tag for a in operator.axes}
 
-            self.instances = self._sort_locations(_instances)
+        if operator:
+            for v in splitVariableFonts(operator, expandLocations=True):
+                sub_space, split_op = v
+                if sub_space == os.path.splitext(os.path.basename(self.path))[0]:
+                    self.operator = split_op
+                    for item in ["source", "instance"]:
+                        i = getattr(split_op, f"{item}s")
+                        for ii in i:
 
-            if operator:
-                renamer = {a.name:a.tag for a in operator.axes}
-                axis_map = {a.axisTag:(a.minValue,a.maxValue) for a in source["fvar"].axes}            
-                _sources = []
-                for _master in [master for master in operator.sources if not master.layerName]:
-                    src = self._reformat_locations(operator,_master,axis_map,renamer)
-                    built = proofLocation(src)
-                    n = f"{_master.familyName} {_master.styleName}"
+                            re = [ir for ir in getattr(operator, f"{item}s") if ir.filename == ii.filename][0]
+                            # normalize order and formatting
+                            ii.location = {renamer.get(k,k):float(v) for k,v in sorted(operator.map_backward(re.location).items(), key=lambda item: item[0])}
+
+                            temp = _instances.get(str(ii.location))
+                            if temp:
+                                built = temp
+                            else:
+                                built = proofLocation(ii.location)
+                            built.name = f"{ii.familyName} {ii.styleName}"
+                            built.data_from = "DesignSpaceDocument"
+                            setattr(built, f"is_{item}", True)
+                            built.origin = font_obj
+                            _instances[str(built.location)] = built
+
+                
+                        #print(built.location, built.is_instance, built.is_source)
+        if not _instances:
+        # we dont want to rely on the fvar instances because there is no source data to proof
+            if "fvar" in font_obj:
+                for inst in [instance.coordinates for instance in font_obj["fvar"].instances]:
+                    built = proofLocation(inst)
+                    n = built.generate_name(font_obj)
                     built.name = n
-                    built._source_loca = "DesignSpaceDocument"
-                    built.type = "source"
-                    _sources.append(built)
-                self.sources = self._sort_locations(_sources)
+                    built.data_from = "TTFont"
+                    built.is_instance = True
+                    built.is_source = False
+                    built.origin = font_obj
+                    _instances[str(built.location)] = built
+            else:
+                _instances = {}
 
-            # self.locations ONLY has unique instances and remove instances that are also sources
-            # this is a convenince property, self.instances and self.sources will have the
-            # complete data sets
-            self.locations = []
-            self.locations.extend(self.sources)
-            for inst in self.instances:
-                if inst.location not in [s.location for s in self.sources]:
-                    self.locations.append(inst)
-            self.locations = self._sort_locations(self.locations)
+        self.locations = self._sort_locations(list(_instances.values()))
+        #print(self.locations)
+                # 
+                # axis_map = {a.axisTag:(a.minValue,a.maxValue) for a in source["fvar"].axes}       
+                # _sources = []
+                # for _master in [master for master in operator.sources if not master.layerName]:
+
+                #     src = self._reformat_locations(operator,_master,axis_map,renamer)
+                #     built = proofLocation(src)
+                #     n = f"{_master.familyName} {_master.styleName}"
+                #     built.name = n
+                #     built.data_from = "DesignSpaceDocument"
+                #     built.type = "source"
+                #     built.origin = font_obj
+                #     _sources.append(built)
+
+                # self.locations.extend(self._sort_locations(_sources))
+
+        # self.update_locations()
 
 
 
@@ -283,17 +326,20 @@ class proofDocument:
 
         self._identifier = None
         self._fonts = []
-        # size can either be a tuple of ints or a DrawBot
-        # compatible paper size name string
-        
+
         self._operator = None
         self._crop = ""
         self._use_instances = False
+
+        self.hyphenation = True
 
         self._path = None
         self._name = None
 
         # proof UI settings
+        # size can either be a tuple of ints or a DrawBot
+        # compatible paper size name string
+
         self._size = "LetterLandscape"
         self._margin = 50
         self._margin_left   = self._margin
@@ -306,7 +352,6 @@ class proofDocument:
                               )
 
         self._auto_open = False
-
         self._caption_font = "SFMono-Regular"
 
 
@@ -324,7 +369,6 @@ class proofDocument:
     def generate_identifier(self):
         return makeRandomIdentifier(existing=[])
     # ----------------------------------------------
-
 
     def _get_page_size(self):
         if isinstance(self._size, str):
@@ -465,14 +509,14 @@ class proofDocument:
         _auto = open if open != "_" else self.open_automatically
 
         bot.saveImage(_save_path)
-        if open:
+        if _auto:
             os.system(f"open -a Preview '{_save_path}'")
 
 
     def get_smallest_core_scaler(self, text):
         temp_holder = []
         for font in self._fonts:
-            loc = font.locations if self.use_instances else font.sources
+            loc = font.locations if self.use_instances else [ss for ss in font.locations if ss.is_source]
             for l in loc:
                 temp_holder.append(
                                     self.draw_core_characters(
@@ -484,48 +528,64 @@ class proofDocument:
                                   )
         return min(temp_holder)
 
+    def _init_page(self, font, proof_type, location, cover=False):
+        bot.newPage(*self.size)
+        self.text_attributes()
+        self.draw_header_footer(font,proof_type,location,cover)
+
+
     def new_section(self,
                     proof_type=None,
                     point_size=FONT_SIZE_MED, # can accept list to generate section at different sizes
+                    columns=1,
                     sources=True,
                     instances=False,
+                    multi_size_page=False,
                     restrict_page=True # if set to False the overflow will add new pages
                     ):
 
-        if isinstance(point_size, (list, tuple)):
-            point_sizes = list(point_size)
-        elif isinstance(point_size, (int, float)):
-            point_sizes = [int(point_size)]
-        else:
-            point_sizes = [FONT_SIZE_MED]
-        
+        # accept a list of point sizes or a single point size
+        point_sizes = list(mit.always_iterable(point_size))
 
         for font in self._fonts:
-            to_process = font.locations if self.use_instances else font.sources
+            to_process = font.locations if self.use_instances else [ss for ss in font.locations if ss.is_source]
+            to_process = [loca for loca in to_process if loca.in_crop]
             for loca in to_process:
-                for pt in point_sizes:
-                    txt = PROOF_DATA[proof_type]
-                    while txt:
-                        bot.newPage(*self.size)
-                        self.text_attributes()
-                        self.draw_header_footer(font,proof_type,loca.location,False)
 
-                        if proof_type == "core":
-                            min_size = self.get_smallest_core_scaler(txt)
-                            txt = self.draw_core_characters(txt,
-                                                 font.path,
-                                                 loca.location,
-                                                 True,
-                                                 min_size
-                                                )
-                        else:
+                txt = PROOF_DATA[proof_type]
+
+                while txt:
+                    if proof_type == "core":
+                        self._init_page(font,proof_type,loca)
+                        min_size = self.get_smallest_core_scaler(txt)
+                        txt = self.draw_core_characters(txt,
+                                             font.path,
+                                             loca.location,
+                                             True,
+                                             min_size
+                                            )
+
+                    else:
+                        if len(point_sizes) > 1 and multi_size_page:
+                            self._init_page(font,proof_type,loca)
                             txt = self.draw_text_layout(txt,
                                                         font.path,
                                                         loca.location,
-                                                        1,
+                                                        len(point_sizes),
                                                         restrict_page,
-                                                        pt,
+                                                        point_sizes,
+                                                        True
                                                         )
+                        else:
+                            for pt in point_sizes:
+                                self._init_page(font,proof_type,loca)
+                                txt = self.draw_text_layout(txt,
+                                                            font.path,
+                                                            loca.location,
+                                                            columns,
+                                                            restrict_page,
+                                                            pt,
+                                                            )
 
 
     def draw_core_characters(self, txt, font_path, variable_location={}, will_draw=True, scale=None):
@@ -561,14 +621,30 @@ class proofDocument:
         else:
             return sf
 
-    def draw_text_layout(self, txt, font_path, variable_location={}, columns=1, overflow=True, font_size=None):
+
+    def draw_text_layout(self, txt, font_path, variable_location={}, columns=1, overflow=True, font_size=FONT_SIZE_MED, multi_size_page=False):
+        split_columns = grid.ColumnGrid((self._margin_left, self._margin_bottom, *self._text_box_size), subdivisions=columns)
+                            # (columns[0], columns.bottom, columns*1, columns.height),
+
         bot.fontVariations(**variable_location)
-        bot.font(
-            font_path,
-            font_size if font_size else FONT_SIZE_MED
-            )
-        txt = grid.columnTextBox(txt, (self._margin_left, self._margin_bottom, *self._text_box_size), subdivisions=columns, gutter=15, draw_grid=False)
-        txt = txt if not overflow else ""
+        bot.hyphenation(self.hyphenation)
+
+        if multi_size_page:
+            for il, size in enumerate(font_size):
+
+                bot.font(
+                    font_path,
+                    size
+                )
+                grid.columnTextBox(txt, (split_columns[il], split_columns.bottom, split_columns*1, self._text_box_size[1]), subdivisions=1, gutter=15, draw_grid=False)
+            txt = ""
+        else:
+            bot.font(
+                font_path,
+                font_size
+                )
+            txt = grid.columnTextBox(txt, (self._margin_left, self._margin_bottom, *self._text_box_size), subdivisions=columns, gutter=15, draw_grid=False)
+            txt = txt if not overflow else ""
         return txt
 
 
@@ -657,23 +733,11 @@ class proofDocument:
                 te = proofFont(p)
                 te.is_variable = True
                 te.operator = self.operator
-                # print(vf.axisSubsets)
 
-                # I dont know a better way right now but 
-                # this will check the subspaces within the operator
-                # and check if the names are the same and asign that op
-
-                uu = uop()
-                uu.read(d.path)
-                op = uu.getInterpolableUFOOperators(True)
-                for sub_op in op:
-                    name, processor = sub_op
-                    if name == vf.name:
-                        te.operator = processor
-
-                te.load_locations()
+                te.build_locations()
 
                 allVFs.append(te)
+
 
         return allVFs
 
@@ -703,7 +767,7 @@ class proofDocument:
         '''
         result = {}
         if limits:
-            for limitString in [limits]:
+            for limitString in limits.split(" "):
                 match = re.match(r"^(\w{1,4})=(?:(drop)|(?:([^:]+)(?:[:](.+))?))$", limitString)
                 if not match:
                     # raise ValueError("invalid location format: %r" % limitString)
@@ -742,14 +806,12 @@ class proofDocument:
         if zone:
             for font in self._fonts:
                 cropped = []
-                instances = font.instances
-                instances.extend(font.sources)
                 if isinstance(zone, dict):
-                    for inst in instances:
+                    for inst in font.locations:
                         check = []
                         for axis,value in zone.items():
                             a = inst.location.get(axis)
-                            if a:
+                            if a != None:
                                 valid = True
                                 if isinstance(value, float):
                                     if a == value:
@@ -765,13 +827,13 @@ class proofDocument:
                                             check.append(0)
                             else:
                                 valid = False
+
                         if 0 not in check:
                             inst.in_crop = True
                         else:
                             inst.in_crop = False
-            if valid:
-                self._crop = _zone
-
+        if valid:
+            self._crop = _zone
 
     def _get_use_instances(self):
         return self._use_instances
@@ -792,8 +854,8 @@ class proofDocument:
         bot.font(self.caption_font, 8)
 
 
-    def draw_header_footer(self, font, fileName, var, cover=False):
-        p = Path(fileName)
+    def draw_header_footer(self, font, proof_type, location=None, cover=False):
+        p = Path(proof_type)
         self.text_attributes()
 
         bot.text(f'Project: {self.name}', (self._margin_left, self.size[1]-(self._margin_left/2)), align='left')
@@ -802,15 +864,16 @@ class proofDocument:
             bot.text(f'Fontfile: {font.name}', (self._margin_left+((self.size[0]/5)*2), self.size[1]-(self._margin_left/2)), align="right")
             bot.text(f'Characterset: {p.stem}', (self._margin_left+((self.size[0]/5)*3), self.size[1]-(self._margin_left/2)))
         fw,fh = bot.textSize(f'Fontfile: {font.name}')
-        if fileName != "core" and var:
-            bot.linkRect(f"beginPage_{font}{var}", (self._margin_left + (self.size[0]/4)*2, self.size[1]-self._margin_left, fw, fh))
+        if proof_type != "core" and location:
+            bot.linkRect(f"beginPage_{font}{location.location}", (self._margin_left + (self.size[0]/4)*2, self.size[1]-self._margin_left, fw, fh))
 
         bot.text(f'© {self._now:%Y}' + ' ' + USER, (self._margin_left, self._margin_bottom/2))
-        # if instanceProof:
-        #     cs = 6
-        #     stroke(0.5819, 0.2157, 1.0, 1.0)
-        #     fill(0.5819, 0.2157, 1.0, .2)
-        #     oval(width() - (MARGIN_X1 + cs), MARGIN_BOTTOM/2, 10, 10)
+
+        if location and not location.is_source:
+            cs = 6
+            bot.stroke(0.5819, 0.2157, 1.0, 1.0)
+            bot.fill(0.5819, 0.2157, 1.0, .2)
+            bot.oval(self.size[0] - (self._margin_left + cs), self._margin_bottom/2, 10, 10)
 
         bot.fill(0)
         bot.stroke(None)
@@ -820,17 +883,16 @@ class proofDocument:
         # this function is biased and draws a custom cover page of all
         # locations / fonts and scales to fit them all
 
-        bot.newPage(*self.size)
-
-        self.text_attributes()
-        self.draw_header_footer(fonts[0],"",False,True)
+        self._init_page(fonts[0],"",False,True)
 
         _fonts = {}
         for font in fonts:
 
             if font.is_variable:
-                to_use = font.sources if self.use_instances == False else font.locations
-                _fonts[font] = [it for it in to_use if it.in_crop] 
+                to_use = font.locations if self.use_instances else [ss for ss in font.locations if ss.is_source]
+                locs = [it for it in to_use if it.in_crop]
+                if locs:
+                    _fonts[font] = locs
             else:
                 _fonts[font] = ""
 
@@ -838,6 +900,7 @@ class proofDocument:
         box_x, box_y = 50, 50
 
         fs = bot.FormattedString()
+
 
         for proof_font,locations in _fonts.items():
             if locations:
@@ -876,7 +939,10 @@ class proofDocument:
         txt_w = bot.textSize(fs)[0]
         txt_h = bot.textSize(fs)[1]
 
-        width_ratio = box_w/txt_w 
+        try:
+            width_ratio = box_w/txt_w 
+        except ZeroDivisionError:
+            width_ratio = 1
         mu = str(fs).count("\n") or 1
         height_ratio = box_h/(FONT_SIZE_DEFAULT * mu * 1.5)
 
@@ -890,31 +956,35 @@ class proofDocument:
 
 doc = proofDocument()
 
-# # load old settings
+"""load old settings"""
 # doc.load("/Users/connordavenport/Dropbox/Clients/Dinamo/03_DifferentTimes/Sources/variable_ttf/2025-0526-ABCDifferentTimes.proof")
 
-# add a font or designspace, only accepts path strings
+"""
+add a font or designspace, only accepts path strings
+    should it accept designspace objects? ufos?
+"""
 doc.add_object("/Users/connordavenport/Dropbox/Clients/Dinamo/03_DifferentTimes/Sources/Different-Times-v10.designspace")
 
+"""crop design-space to be proofed, using the varLib instantiator syntax"""
+doc.crop_space("wght=300:700 slnt=0")
 
-# crop design-space to be proofed, using the varLib instantiator syntax
-doc.crop_space("wght=0:320:600")
-
-# test an invalid or empty crop
-# an invalid crop will ignore if already set
-doc.crop = "asdas"
-doc.crop = None
-doc.crop = "fuck=420:666"
-print(doc.crop)
+"""
+test an invalid or empty crop
+an invalid crop will ignore if already set
+"""
+# doc.crop = "asdas"
+# doc.crop = None
+# doc.crop = "fuck=420:666"
 
 
-# test invalid sizes
+# test [in]valid sizes
 # doc.size = (100,100,20)
 # doc.size = "big paper size"
-# test valid size
 doc.size = "LetterLandscape"
 
-# we can see the loaded fonts and their locations
+"""
+we can see the loaded fonts and their locations
+"""
 # for font in doc.fonts:
     # print(font)
     # for s in font.instances[-5:-1]:
@@ -922,24 +992,47 @@ doc.size = "LetterLandscape"
         # print(s.location)
         # print(s.in_crop)
 
-# set font used in captions
+"""
+set font used in captions
+"""
 doc.caption_font = "ABCGaisyrMonoUnlicensedTrial-Regular"
-# auto will use some %s but can accept 1 int which will apply
-# to all or a tuple of 4 values in top, left, bottom, right order
+
+"""
+auto will use some %s but can accept 1 int which will apply
+to all or a tuple of 4 values in top, left, bottom, right order
+"""
 doc.margin = "auto"
-# we can turn this on and off whenever between new sections
-doc.use_instances = False
+
+"""
+we can turn this on and off whenever between new sections
+"""
+doc.use_instances = True
+
 doc.setup_proof() # setup newDrawing() and make a cover page
-# build new proof sections...not implemented yet
-doc.new_section("core")
 
+doc.new_section(
+                "core",
+               )
+doc.new_section(
+                "paragraph",
+                point_size=[12,20],
+                multi_size_page=True # if True and multi point sizes, adds multi-column page with no overflow
+               )
 
-doc.open_automatically = False
-# kwargs inside of save overwrite whatever the doc says
-# write to disk
+# doc.open_automatically = False
+"""
+kwargs inside of save overwrite whatever the doc says.
+path, compiles name for current proof, will override with given if used
+open, by default is `False`, open in Preview
+overwrite, save over older proofs, default is `True`. `False` will append + "1" until path is unique
+write to disk
+"""
 doc.save(open=True)
 
-# write to custom file format to save exact proof settings for later
-# doc and save both allow for overwriting the previous file on disk
-# overwrite is set to True by default
-doc.write(overwrite=True)
+"""
+write to custom file format to save exact proof settings for later
+doc and save both allow for overwriting the previous file on disk
+overwrite is set to True by default
+"""
+# doc.write(overwrite=True)
+
