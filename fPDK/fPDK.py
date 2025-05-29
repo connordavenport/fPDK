@@ -252,19 +252,15 @@ class proofLocation:
     def __init__(self, location):
 
         self.type = None
-
         self.is_instance = False
         self.is_source = False
+        self.tag_location = None
+        self.data_from = "TTFont" # DesignSpaceDocument or TTFont
 
+        self._in_crop = True
+        self._font = None
         self._name = "unnamed location"
         self._location = location
-        self.tag_location = None
-
-        # DesignSpaceDocument or TTFont
-        self.data_from = "TTFont"
-        self._in_crop = True
-
-        self._font = None
 
 
     def _get_in_crop(self):
@@ -412,26 +408,6 @@ class proofFont:
         self.locations.sort() # = self._sort_locations(list(_instances.values()))
 
 
-        #print(self.locations)
-                # 
-                # axis_map = {a.axisTag:(a.minValue,a.maxValue) for a in source["fvar"].axes}       
-                # _sources = []
-                # for _master in [master for master in operator.sources if not master.layerName]:
-
-                #     src = self._reformat_locations(operator,_master,axis_map,renamer)
-                #     built = proofLocation(src)
-                #     n = f"{_master.familyName} {_master.styleName}"
-                #     built.name = n
-                #     built.data_from = "DesignSpaceDocument"
-                #     built.type = "source"
-                #     built.origin = font_obj
-                #     _sources.append(built)
-
-                # self.locations.extend(self._sort_locations(_sources))
-
-        # self.update_locations()
-
-
 
 class proofDocument:
 
@@ -441,16 +417,11 @@ class proofDocument:
     def __init__(self):
 
         self._now = datetime.datetime.now()
-
         self._identifier = None
         self._fonts = proofObjectHandler([])
-
         self._operator = None
         self._crop = ""
         self._use_instances = False
-
-        self.hyphenation = True
-
         self._path = None
         self._name = None
 
@@ -471,6 +442,7 @@ class proofDocument:
 
         self._auto_open = False
         self._caption_font = "SFMono-Regular"
+        self.hyphenation = True
 
 
     # do we even need ids??-----------------------
@@ -545,8 +517,7 @@ class proofDocument:
     def _get_auto_open(self):
         return self._auto_open
 
-    # open pdf immediately after saving to disk
-    open_automatically = property(_get_auto_open, _set_auto_open)
+    open_automatically = property(_get_auto_open, _set_auto_open) # open pdf immediately after saving to disk
 
     def _set_path(self, new_path):
         self._path = new_path
@@ -569,7 +540,6 @@ class proofDocument:
 
     name = property(_get_name, _set_name)
 
-
     def _set_operator(self, new_operator):
         self._operator = new_operator
 
@@ -577,6 +547,63 @@ class proofDocument:
         return self._operator
 
     operator = property(_get_operator, _set_operator)
+
+    def _get_margin(self):
+        return (
+                self._margin_top,
+                self._margin_left, 
+                self._margin_bottom,
+                self._margin_right,
+                )
+
+    def _set_margin(self, new_margin):
+        # we can accept a tuple of 4 to set individual 
+        # or 1 value to apply across the board
+        if isinstance(new_margin, tuple):
+            if len(new_margin) == 4:
+                # counter clockwise from top
+                T,L,B,R = new_margin
+            else:
+                # if length isnt 4 we just use the first value
+                T = L = B = R = new_margin[0]
+        elif str(new_margin).lower() == "auto":
+            # this is a biased margin spacing based on page size
+            w,h = self.size
+            T = int(h * 0.09)
+            L = R = int(w * 0.085)
+            B = int(h * 0.12)
+
+        else:
+            # if we set the main margin, we also reset all margins and text box size
+            T = L = B = R = new_margin
+        self._margin        = new_margin
+        self._margin_left   = L
+        self._margin_right  = R
+        self._margin_top    = T
+        self._margin_bottom = B
+        self._text_box_size = (
+                               (self.size[0] - (self._margin_left + self._margin_right )),
+                               (self.size[1] - (self._margin_top  + self._margin_bottom))
+                              )
+
+    margin = property(_get_margin, _set_margin)
+
+    def _get_use_instances(self):
+        return self._use_instances
+
+    def _set_use_instances(self, bool):
+        self._use_instances = bool
+
+    use_instances = property(_get_use_instances, _set_use_instances)
+
+    def _get_crop(self):
+        return self._crop
+
+    def _set_crop(self, fence=""):
+        # self._crop = fence
+        self.crop_space(fence, True)
+
+    crop = property(_get_crop, _set_crop)
 
     def uniquify(self, path):
         # https://stackoverflow.com/a/57896232
@@ -742,9 +769,7 @@ class proofDocument:
 
 
     def draw_text_layout(self, txt, font_path, variable_location={}, columns=1, overflow=True, font_size=FONT_SIZE_MED, multi_size_page=False):
-        split_columns = grid.ColumnGrid((self._margin_left, self._margin_bottom, *self._text_box_size), subdivisions=columns)
-                            # (columns[0], columns.bottom, columns*1, columns.height),
-
+        sub_columns = grid.ColumnGrid((self._margin_left, self._margin_bottom, *self._text_box_size), subdivisions=columns)
         bot.fontVariations(**variable_location)
         bot.hyphenation(self.hyphenation)
 
@@ -755,7 +780,7 @@ class proofDocument:
                     font_path,
                     size
                 )
-                grid.columnTextBox(txt, (split_columns[il], split_columns.bottom, split_columns*1, self._text_box_size[1]), subdivisions=1, gutter=15, draw_grid=False)
+                grid.columnTextBox(txt, (sub_columns[il], sub_columns.bottom, sub_columns*1, self._text_box_size[1]), subdivisions=1, gutter=15, draw_grid=False)
             txt = ""
         else:
             bot.font(
@@ -765,47 +790,6 @@ class proofDocument:
             txt = grid.columnTextBox(txt, (self._margin_left, self._margin_bottom, *self._text_box_size), subdivisions=columns, gutter=15, draw_grid=False)
             txt = txt if not overflow else ""
         return txt
-
-
-    def _get_margin(self):
-        return (
-                self._margin_top,
-                self._margin_left, 
-                self._margin_bottom,
-                self._margin_right,
-                )
-
-    def _set_margin(self, new_margin):
-        # we can accept a tuple of 4 to set individual 
-        # or 1 value to apply across the board
-        if isinstance(new_margin, tuple):
-            if len(new_margin) == 4:
-                # counter clockwise from top
-                T,L,B,R = new_margin
-            else:
-                # if length isnt 4 we just use the first value
-                T = L = B = R = new_margin[0]
-        elif str(new_margin).lower() == "auto":
-            # this is a biased margin spacing based on page size
-            w,h = self.size
-            T = int(h * 0.09)
-            L = R = int(w * 0.085)
-            B = int(h * 0.12)
-
-        else:
-            # if we set the main margin, we also reset all margins
-            T = L = B = R = new_margin
-        self._margin        = new_margin
-        self._margin_left   = L
-        self._margin_right  = R
-        self._margin_top    = T
-        self._margin_bottom = B
-        self._text_box_size = (
-                               (self.size[0] - (self._margin_left + self._margin_right )),
-                               (self.size[1] - (self._margin_top  + self._margin_bottom))
-                              )
-
-    margin = property(_get_margin, _set_margin)
 
 
 
@@ -910,15 +894,6 @@ class proofDocument:
         else:
             return {}
 
-    def _get_crop(self):
-        return self._crop
-
-    def _set_crop(self, fence=""):
-        # self._crop = fence
-        self.crop_space(fence, True)
-
-    crop = property(_get_crop, _set_crop)
-
     def crop_space(self, _zone="",inf_loop=False):
         zone = self.reformat_limits(_zone)
         valid = False
@@ -954,13 +929,6 @@ class proofDocument:
         if valid:
             self._crop = _zone
 
-    def _get_use_instances(self):
-        return self._use_instances
-
-    def _set_use_instances(self, bool):
-        self._use_instances = bool
-
-    use_instances = property(_get_use_instances, _set_use_instances)
 
     def setup_proof(self, cover_page=True):
         bot.newDrawing()
@@ -977,14 +945,13 @@ class proofDocument:
         p = Path(proof_type)
         self.text_attributes()
 
-        split_columns = grid.ColumnGrid((self._margin_left, self._margin_bottom, *self._text_box_size), subdivisions=4)
+        header_columns = grid.ColumnGrid((self._margin_left, self._margin_bottom, *self._text_box_size), subdivisions=4)
 
-
-        bot.text(f'Project: {self.name}', (split_columns[0], self.size[1]-(self._margin_left/2)))
-        bot.text(f'Date: {self._now:%Y-%m-%d %H:%M}', (split_columns[3], self.size[1]-(self._margin_left/2)))
+        bot.text(f'Project: {self.name}', (header_columns[0], self.size[1]-(self._margin_left/2)))
+        bot.text(f'Date: {self._now:%Y-%m-%d %H:%M}', (header_columns[3], self.size[1]-(self._margin_left/2)))
         if not cover:
-            bot.text(f'Fontfile: {font.name}', (split_columns[1], self.size[1]-(self._margin_left/2)))
-            bot.text(f'Characterset: {p.stem}', (split_columns[2], self.size[1]-(self._margin_left/2)))
+            bot.text(f'Fontfile: {font.name}', (header_columns[1], self.size[1]-(self._margin_left/2)))
+            bot.text(f'Characterset: {p.stem}', (header_columns[2], self.size[1]-(self._margin_left/2)))
         fw,fh = bot.textSize(f'Fontfile: {font.name}')
         if proof_type != "core" and location:
             bot.linkRect(f"beginPage_{font}{location.location}", (self._margin_left + (self.size[0]/4)*2, self.size[1]-self._margin_left, fw, fh))
@@ -992,10 +959,9 @@ class proofDocument:
         bot.text(f'© {self._now:%Y}' + ' ' + USER, (self._margin_left, self._margin_bottom/2))
 
         if location and not location.is_source:
-            cs = 6
             bot.stroke(0.5819, 0.2157, 1.0, 1.0)
             bot.fill(0.5819, 0.2157, 1.0, .2)
-            bot.oval(self.size[0] - (self._margin_left + cs), self._margin_bottom/2, 10, 10)
+            bot.oval(self.size[0] - self._margin_left, self._margin_bottom/2, 10, 10)
 
         bot.fill(0)
         bot.stroke(None)
@@ -1010,8 +976,7 @@ class proofDocument:
         _fonts = {}
         for font in fonts:
             if font.is_variable:
-                locs = font.locations if self.use_instances else font.locations.find(is_source=True)
-                locs = locs.find(in_crop=True)
+                locs = font.locations.find(in_crop=True) if self.use_instances else font.locations.find(is_source=True, in_crop=True)
                 if locs:
                     _fonts[font] = locs
             else:
@@ -1021,8 +986,6 @@ class proofDocument:
         box_x, box_y = 50, 50
 
         fs = bot.FormattedString()
-
-
 
         for proof_font,locations in _fonts.items():
             if locations:
@@ -1138,7 +1101,7 @@ if __name__ == "__main__":
                    )
     doc.new_section(
                     "paragraph",
-                    point_size=[12,20],
+                    point_size=[12,20,24],
                     multi_size_page=True # if True and multi point sizes, adds multi-column page with no overflow
                    )
 
