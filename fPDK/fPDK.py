@@ -21,6 +21,7 @@ from ufoProcessor.ufoOperator import UFOOperator as uop
 import plistlib
 import inspect
 from random import randint
+from collections.abc import MutableSequence
 
 # fPDK, font Proofing Development Kit
 
@@ -122,6 +123,120 @@ def italicVal(slnt_user_value) -> Union[int, float]:
 
 ###################################
 
+class proofObjectHandler(List):
+    """
+    https://stackoverflow.com/questions/6560354/how-would-i-create-a-custom-list-class-in-python
+    An extensive user-defined wrapper around list objects.
+
+    Inspiration:
+        https://github.com/python/cpython/blob/208a7e957b812ad3b3733791845447677a704f3e/Lib/collections/__init__.py#L1174https://github.com/python/cpython/blob/208a7e957b812ad3b3733791845447677a704f3e/Lib/collections/__init__.py#L1174
+    """
+
+    def __init__(self, initlist=None):
+        super().__init__()
+        self.data = []
+        if initlist is not None:
+            if isinstance(initlist, list):
+                self.data[:] = initlist
+            elif isinstance(initlist, proofObjectHandler):
+                self.data[:] = initlist.data[:]
+            else:
+                self.data = list(initlist)
+
+    def __repr__(self):
+        return f"""<{self.__class__.__name__} @ {hash(tuple(self.data))}>"""
+
+    def __contains__(self, value):
+        return value in self.data
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, idx):
+        if isinstance(idx, slice):
+            return self.__class__(self.data[idx])
+        else:
+            return self.data[idx]
+
+    def __setitem__(self, idx, value):
+        # optional: self._acl_check(val)
+        self.data[idx] = value
+
+    def __delitem__(self, idx):
+        del self.data[idx]
+
+    def __iter__(self):
+        for item in self.data:
+            yield item
+
+    def __add__(self, other):
+        if isinstance(other, proofObjectHandler):
+            return self.__class__(self.data + other.data)
+        elif isinstance(other, type(self.data)):
+            return self.__class__(self.data + other)
+        return self.__class__(self.data + list(other))
+
+    def __copy__(self):
+        inst = self.__class__.__new__(self.__class__)
+        inst.__dict__.update(self.__dict__)
+
+        # Create a copy and avoid triggering descriptors
+        inst.__dict__["data"] = self.__dict__["data"][:]
+
+        return inst
+        
+    def find(self, **kwargs):
+        # getter that finds items in object that have the given attributes
+        found = self.__class__()    
+        for item in self.data:
+            for attr, value in kwargs.items():
+                if getattr(item, attr, None) == value:
+                    found.append(item)
+        return found
+        
+    def append(self, value):
+        self.data.append(value)
+
+    def insert(self, idx, value):
+        self.data.insert(idx, value)
+
+    def pop(self, idx=-1):
+        return self.data.pop(idx)
+
+    def remove(self, value):
+        self.data.remove(value)
+
+    def clear(self):
+        self.data.clear()
+
+    def copy(self):
+        return self.__class__(self)
+
+    def index(self, idx, *args):
+        return self.data.index(idx, *args)
+
+    def reverse(self):
+        self.data.reverse()
+
+    def sort(self, /, *args, **kwds):
+        # sort a list of instances by locations
+        # knows how to sort different subclass types
+        test = self.data[0]
+        if isinstance(test, proofLocation):
+            self.data.sort(key=lambda d: (-widthClass(d.location.get("wdth",0)), -italicVal(d.location.get("slnt",0)), weightClass(d.location.get("wght",0))))
+        elif isinstance(test, proofFont):
+            self.data.sort(key=lambda d: (-f.font_object["OS_2"].usWidthClass, -f.font_object["post"].italicAngle, f.font_object["OS_2"].usWeightClass))
+        else:
+            self.data.sort(*args, **kwds)
+
+    def extend(self, other, clear=False):
+        if clear:
+            self.data.clear()
+        if isinstance(other, proofObjectHandler):
+            self.data.extend(other.data)
+        else:
+            self.data.extend(other)
+
 class proofLocation:
 
     def __repr__(self):
@@ -212,7 +327,7 @@ class proofFont:
         self.font_object        = None
         self.load_font()
         self.is_variable        = False
-        self.locations          = []
+        self.locations          = proofObjectHandler([])
         self.operator           = None
         self._name              = self._compile_name()
 
@@ -234,8 +349,8 @@ class proofFont:
 
     name = property(_get_name, _set_name)
 
-    def _sort_locations(self, instances):
-        return sorted(instances, key=lambda d: (-widthClass(d.location.get("wdth",0)), -italicVal(d.location.get("slnt",0)), weightClass(d.location.get("wght",0))))
+    # def _sort_locations(self):
+    #     return sorted(self.loc, key=lambda d: (-widthClass(d.location.get("wdth",0)), -italicVal(d.location.get("slnt",0)), weightClass(d.location.get("wght",0))))
 
     def _reformat_locations(self,designspace,instance,axis_map,renamer):
         parsed = {}
@@ -293,7 +408,10 @@ class proofFont:
             else:
                 _instances = {}
 
-        self.locations = self._sort_locations(list(_instances.values()))
+        self.locations.extend(list(_instances.values()), clear=True)
+        self.locations.sort() # = self._sort_locations(list(_instances.values()))
+
+
         #print(self.locations)
                 # 
                 # axis_map = {a.axisTag:(a.minValue,a.maxValue) for a in source["fvar"].axes}       
@@ -318,14 +436,14 @@ class proofFont:
 class proofDocument:
 
     def __repr__(self):
-        return f"<proofDocument @ {self.identifier} : {len(self._fonts)}>"
+        return f"<proofDocument @ {self.identifier} : {hash(self._fonts)}>"
 
     def __init__(self):
 
         self._now = datetime.datetime.now()
 
         self._identifier = None
-        self._fonts = []
+        self._fonts = proofObjectHandler([])
 
         self._operator = None
         self._crop = ""
@@ -516,7 +634,8 @@ class proofDocument:
     def get_smallest_core_scaler(self, text):
         temp_holder = []
         for font in self._fonts:
-            loc = font.locations if self.use_instances else [ss for ss in font.locations if ss.is_source]
+
+            loc = font.locations if self.use_instances else font.locations.find(is_source=True)
             for l in loc:
                 temp_holder.append(
                                     self.draw_core_characters(
@@ -858,11 +977,14 @@ class proofDocument:
         p = Path(proof_type)
         self.text_attributes()
 
-        bot.text(f'Project: {self.name}', (self._margin_left, self.size[1]-(self._margin_left/2)), align='left')
-        bot.text(f'Date: {self._now:%Y-%m-%d %H:%M}', (self.size[0] - self._margin_right, self.size[1]-(self._margin_left/2)), align='right')
+        split_columns = grid.ColumnGrid((self._margin_left, self._margin_bottom, *self._text_box_size), subdivisions=4)
+
+
+        bot.text(f'Project: {self.name}', (split_columns[0], self.size[1]-(self._margin_left/2)))
+        bot.text(f'Date: {self._now:%Y-%m-%d %H:%M}', (split_columns[3], self.size[1]-(self._margin_left/2)))
         if not cover:
-            bot.text(f'Fontfile: {font.name}', (self._margin_left+((self.size[0]/5)*2), self.size[1]-(self._margin_left/2)), align="right")
-            bot.text(f'Characterset: {p.stem}', (self._margin_left+((self.size[0]/5)*3), self.size[1]-(self._margin_left/2)))
+            bot.text(f'Fontfile: {font.name}', (split_columns[1], self.size[1]-(self._margin_left/2)))
+            bot.text(f'Characterset: {p.stem}', (split_columns[2], self.size[1]-(self._margin_left/2)))
         fw,fh = bot.textSize(f'Fontfile: {font.name}')
         if proof_type != "core" and location:
             bot.linkRect(f"beginPage_{font}{location.location}", (self._margin_left + (self.size[0]/4)*2, self.size[1]-self._margin_left, fw, fh))
@@ -887,10 +1009,9 @@ class proofDocument:
 
         _fonts = {}
         for font in fonts:
-
             if font.is_variable:
-                to_use = font.locations if self.use_instances else [ss for ss in font.locations if ss.is_source]
-                locs = [it for it in to_use if it.in_crop]
+                locs = font.locations if self.use_instances else font.locations.find(is_source=True)
+                locs = locs.find(in_crop=True)
                 if locs:
                     _fonts[font] = locs
             else:
@@ -900,6 +1021,7 @@ class proofDocument:
         box_x, box_y = 50, 50
 
         fs = bot.FormattedString()
+
 
 
         for proof_font,locations in _fonts.items():
@@ -967,7 +1089,7 @@ if __name__ == "__main__":
     doc.add_object("/Users/connordavenport/Dropbox/Clients/Dinamo/03_DifferentTimes/Sources/Different-Times-v10.designspace")
 
     """crop design-space to be proofed, using the varLib instantiator syntax"""
-    doc.crop_space("wght=300:700 slnt=0")
+    doc.crop_space("slnt=0")
 
     """
     test an invalid or empty crop
@@ -1036,4 +1158,7 @@ if __name__ == "__main__":
     overwrite is set to True by default
     """
     # doc.write(overwrite=True)
+
+
+
 
