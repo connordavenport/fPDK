@@ -10,7 +10,8 @@ font Proofing Development Kit
 </p>
 
 Nobody wants to proof their fonts, firing up inDesign is time consuming and archaic...  
-The fPDK is a **free and open-source** library for building font proofs using a designspace, OTF, TTF, or TTFs.  
+The fPDK is a **free and open-source** library for building font proofs using a designspace, OTF, TTF, or VFs.  
+
 
 ## Table of Contents
 
@@ -37,6 +38,7 @@ This is early development version. I am currently considering:
 
 - [x] Custom file-handler  
 - [ ] Storing actual proof data to memory  
+- [ ] Support UFO & Glyphs files
 
 ## Usage
 
@@ -110,7 +112,6 @@ doc.new_section(
                 # if there are multiple values with `multi_size_page` == False
                 # there will be one page for each point size
                 point_size=[12,20],
-
                 multi_size_page=True # if True and multiple point sizes, adds multi-column page with no overflow
                )
 
