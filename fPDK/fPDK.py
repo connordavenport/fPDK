@@ -953,86 +953,87 @@ class proofDocument:
             bot.textBox(fs, (box_x/sf, box_y/sf, box_w/sf, box_h/sf))   
 
 
+if __name__ == "__main__":
 
-doc = proofDocument()
+    doc = proofDocument()
 
-"""load old settings"""
-# doc.load("/Users/connordavenport/Dropbox/Clients/Dinamo/03_DifferentTimes/Sources/variable_ttf/2025-0526-ABCDifferentTimes.proof")
+    """load old settings"""
+    # doc.load("/Users/connordavenport/Dropbox/Clients/Dinamo/03_DifferentTimes/Sources/variable_ttf/2025-0526-ABCDifferentTimes.proof")
 
-"""
-add a font or designspace, only accepts path strings
-    should it accept designspace objects? ufos?
-"""
-doc.add_object("/Users/connordavenport/Dropbox/Clients/Dinamo/03_DifferentTimes/Sources/Different-Times-v10.designspace")
+    """
+    add a font or designspace, only accepts path strings
+        should it accept designspace objects? ufos?
+    """
+    doc.add_object("/Users/connordavenport/Dropbox/Clients/Dinamo/03_DifferentTimes/Sources/Different-Times-v10.designspace")
 
-"""crop design-space to be proofed, using the varLib instantiator syntax"""
-doc.crop_space("wght=300:700 slnt=0")
+    """crop design-space to be proofed, using the varLib instantiator syntax"""
+    doc.crop_space("wght=300:700 slnt=0")
 
-"""
-test an invalid or empty crop
-an invalid crop will ignore if already set
-"""
-# doc.crop = "asdas"
-# doc.crop = None
-# doc.crop = "fuck=420:666"
+    """
+    test an invalid or empty crop
+    an invalid crop will ignore if already set
+    """
+    # doc.crop = "asdas"
+    # doc.crop = None
+    # doc.crop = "fuck=420:666"
 
 
-# test [in]valid sizes
-# doc.size = (100,100,20)
-# doc.size = "big paper size"
-doc.size = "LetterLandscape"
+    # test [in]valid sizes
+    # doc.size = (100,100,20)
+    # doc.size = "big paper size"
+    doc.size = "LetterLandscape"
 
-"""
-we can see the loaded fonts and their locations
-"""
-# for font in doc.fonts:
-    # print(font)
-    # for s in font.instances[-5:-1]:
-        # print(s.name)
-        # print(s.location)
-        # print(s.in_crop)
+    """
+    we can see the loaded fonts and their locations
+    """
+    # for font in doc.fonts:
+        # print(font)
+        # for s in font.instances[-5:-1]:
+            # print(s.name)
+            # print(s.location)
+            # print(s.in_crop)
 
-"""
-set font used in captions
-"""
-doc.caption_font = "ABCGaisyrMonoUnlicensedTrial-Regular"
+    """
+    set font used in captions
+    """
+    doc.caption_font = "ABCGaisyrMonoUnlicensedTrial-Regular"
 
-"""
-auto will use some %s but can accept 1 int which will apply
-to all or a tuple of 4 values in top, left, bottom, right order
-"""
-doc.margin = "auto"
+    """
+    auto will use some %s but can accept 1 int which will apply
+    to all or a tuple of 4 values in top, left, bottom, right order
+    """
+    doc.margin = "auto"
 
-"""
-we can turn this on and off whenever between new sections
-"""
-doc.use_instances = True
+    """
+    we can turn this on and off whenever between new sections
+    """
+    doc.use_instances = True
 
-doc.setup_proof() # setup newDrawing() and make a cover page
+    doc.setup_proof() # setup newDrawing() and make a cover page
 
-doc.new_section(
-                "core",
-               )
-doc.new_section(
-                "paragraph",
-                point_size=[12,20],
-                multi_size_page=True # if True and multi point sizes, adds multi-column page with no overflow
-               )
+    doc.new_section(
+                    "core",
+                   )
+    doc.new_section(
+                    "paragraph",
+                    point_size=[12,20],
+                    multi_size_page=True # if True and multi point sizes, adds multi-column page with no overflow
+                   )
 
-# doc.open_automatically = False
-"""
-kwargs inside of save overwrite whatever the doc says.
-path, compiles name for current proof, will override with given if used
-open, by default is `False`, open in Preview
-overwrite, save over older proofs, default is `True`. `False` will append + "1" until path is unique
-write to disk
-"""
-doc.save(open=True)
+    # doc.open_automatically = False
+    """
+    kwargs inside of save overwrite whatever the doc says.
+    path, compiles name for current proof, will override with given if used
+    open, by default is `False`, open in Preview
+    overwrite, save over older proofs, default is `True`. `False` will append + "1" until path is unique
+    write to disk
+    """
+    doc.save(open=True)
 
-"""
-write to custom file format to save exact proof settings for later
-doc and save both allow for overwriting the previous file on disk
-overwrite is set to True by default
-"""
-# doc.write(overwrite=True)
+    """
+    write to custom file format to save exact proof settings for later
+    doc and save both allow for overwriting the previous file on disk
+    overwrite is set to True by default
+    """
+    # doc.write(overwrite=True)
 
