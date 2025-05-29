@@ -9,10 +9,13 @@ font Proofing Development Kit
 </picture>
 </p>
 
+Nobody wants to proof their fonts, firing up inDesign is time consuming and archaic...  
+The fPDK is a **free and open-source** library for building font proofs using a designspace, OTF, TTF, or TTFs.  
 
 ## Table of Contents
 
 - [Installation](#installation)
+- [Roadmap](#Roadmap)
 - [Usage](#usage)
 - [Support](#support)
 - [Contributing](#contributing)
@@ -24,9 +27,16 @@ In RoboFont, open the package manager with the menu Python -> Install Python Pac
 Enter the following url `git+https://github.com/connordavenport/fpdk` and press `go`.
 
 To use as a commandline module, just enter the following terminal command: 
-`pip install git+https://github.com/connordavenport/drawbotlab`
+`pip install git+https://github.com/connordavenport/fpdk`
 
 Install instructions are based on Mathieu Reguer's setup for <a href="https://github.com/mathieureguer/drawbotgrid">drawBotGrid</a>
+
+## Roadmap
+
+This is early development version. I am currently considering:
+
+- [x] Custom file-handler  
+- [ ] Storing actual proof data to memory  
 
 ## Usage
 
