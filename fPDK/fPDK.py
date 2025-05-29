@@ -190,11 +190,16 @@ class proofObjectHandler(List):
         
     def find(self, **kwargs):
         # getter that finds items in object that have the given attributes
+        # this *must* pass all the kwarg values to be valid item
         found = self.__class__()    
         for item in self.data:
+            test = []
             for attr, value in kwargs.items():
                 if getattr(item, attr, None) == value:
-                    found.append(item)
+                    test.append(True)
+                else:
+                    test.append(False)
+            if False not in test: found.append(item)
         return found
         
     def append(self, value):
@@ -415,10 +420,11 @@ class proofFont:
 class proofDocument:
 
     def __repr__(self):
-        return f"<proofDocument @ {self.identifier} : {hash(self._fonts)}>"
+        return f"<proofDocument @ {self.identifier} : {hash(tuple(self._fonts))}>"
 
     def __init__(self):
 
+        self.storage = []
         self._now = datetime.datetime.now()
         self._identifier = None
         self._fonts = proofObjectHandler([])
@@ -446,6 +452,8 @@ class proofDocument:
         self._auto_open = False
         self._caption_font = "SFMono-Regular"
         self.hyphenation = True
+
+
 
 
     # do we even need ids??-----------------------
@@ -665,7 +673,7 @@ class proofDocument:
         temp_holder = []
         for font in self._fonts:
 
-            loc = font.locations if self.use_instances else font.locations.find(is_source=True)
+            loc = font.locations.find(in_crop=True) if self.use_instances else font.locations.find(is_source=True, in_crop=True)
             for l in loc:
                 temp_holder.append(
                                     self.draw_core_characters(
@@ -932,7 +940,11 @@ class proofDocument:
             self._crop = _zone
 
 
+    def move_to_storage(self, locals):
+        self.storage.append(locals)
+
     def setup_proof(self, cover_page=True):
+        self.move_to_storage(locals())
         bot.newDrawing()
         if cover_page:
             self._cover_page(self._fonts)
@@ -944,6 +956,7 @@ class proofDocument:
 
 
     def draw_header_footer(self, font, proof_type, location=None, cover=False):
+        self.move_to_storage(locals())
         p = Path(proof_type)
         self.text_attributes()
 
@@ -952,7 +965,8 @@ class proofDocument:
         bot.text(f'Project: {self.name}', (header_columns[0], self.size[1]-(self._margin_left/2)))
         bot.text(f'Date: {self._now:%Y-%m-%d %H:%M}', (header_columns[3], self.size[1]-(self._margin_left/2)))
         if not cover:
-            bot.text(f'Fontfile: {font.name}', (header_columns[1], self.size[1]-(self._margin_left/2)))
+
+            bot.text(f'Fontfile: {location.name if location else font.name}', (header_columns[1], self.size[1]-(self._margin_left/2)))
             bot.text(f'Characterset: {p.stem}', (header_columns[2], self.size[1]-(self._margin_left/2)))
         fw,fh = bot.textSize(f'Fontfile: {font.name}')
         if proof_type != "core" and location:
@@ -983,6 +997,7 @@ class proofDocument:
                     _fonts[font] = locs
             else:
                 _fonts[font] = ""
+
 
         box_w, box_h = self.size[0]-100, self.size[1]-150
         box_x, box_y = 50, 50
@@ -1054,7 +1069,7 @@ if __name__ == "__main__":
     doc.add_object("/Users/connordavenport/Dropbox/Clients/Dinamo/03_DifferentTimes/Sources/Different-Times-v10.designspace")
 
     """crop design-space to be proofed, using the varLib instantiator syntax"""
-    doc.crop_space("slnt=0")
+    # doc.crop_space("wght=500:900 slnt=0")
 
     """
     test an invalid or empty crop
@@ -1094,18 +1109,18 @@ if __name__ == "__main__":
     """
     we can turn this on and off whenever between new sections
     """
-    doc.use_instances = True
+    doc.use_instances = False
 
     doc.setup_proof() # setup newDrawing() and make a cover page
 
     doc.new_section(
                     "core",
                    )
-    doc.new_section(
-                    "paragraph",
-                    point_size=[12,20,24],
-                    multi_size_page=True # if True and multi point sizes, adds multi-column page with no overflow
-                   )
+    # doc.new_section(
+    #                 "paragraph",
+    #                 point_size=[12,20,24],
+    #                 multi_size_page=True # if True and multi point sizes, adds multi-column page with no overflow
+    #                )
 
     # doc.open_automatically = False
     """
