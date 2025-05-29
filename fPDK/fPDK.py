@@ -86,6 +86,7 @@ PAGE_SIZE_DEFAULT = "LetterLandscape"
 
 
 def find_proof_directory(start_location, target):
+    # I don't think I wrote this function but I can't remember where I got it...
     start_location = os.path.abspath(start_location)
     closest_directory = save_path = None
     closest_distance = float('inf')  # Initialize to positive infinity
@@ -102,10 +103,10 @@ def find_proof_directory(start_location, target):
     return save_path
 
 
-###################################
-################################### taken from fontMake instancistator
-
-def widthClass(wdth_user_value) -> int:
+def width_class(wdth_user_value) -> int:
+    '''
+    function taken from fontMake's instancistator
+    '''
     WDTH_VALUE_TO_OS2_WIDTH_CLASS = { 50:1, 62.5:2, 75:3, 87.5:4, 100:5, 112.5:6, 125:7, 150:8, 200:9}
     width_user_value = min(max(wdth_user_value, 50), 200)
     width_user_value_mapped = varLib.models.piecewiseLinearMap(
@@ -113,23 +114,25 @@ def widthClass(wdth_user_value) -> int:
     )
     return otRound(width_user_value_mapped)
 
-def weightClass(wght_user_value) -> int:
+def weight_class(wght_user_value) -> int:
+    '''
+    function taken from fontMake's instancistator
+    '''
     weight_user_value = min(max(wght_user_value, 1), 1000)
     return otRound(weight_user_value)
 
-def italicVal(slnt_user_value) -> Union[int, float]:
+def italic_value(slnt_user_value) -> Union[int, float]:
+    '''
+    function taken from fontMake's instancistator
+    '''
     slant_user_value = min(max(slnt_user_value, -90), 90)
     return slant_user_value
 
-###################################
 
 class proofObjectHandler(List):
     """
     https://stackoverflow.com/questions/6560354/how-would-i-create-a-custom-list-class-in-python
     An extensive user-defined wrapper around list objects.
-
-    Inspiration:
-        https://github.com/python/cpython/blob/208a7e957b812ad3b3733791845447677a704f3e/Lib/collections/__init__.py#L1174https://github.com/python/cpython/blob/208a7e957b812ad3b3733791845447677a704f3e/Lib/collections/__init__.py#L1174
     """
 
     def __init__(self, initlist=None):
@@ -223,7 +226,7 @@ class proofObjectHandler(List):
         # knows how to sort different subclass types
         test = self.data[0]
         if isinstance(test, proofLocation):
-            self.data.sort(key=lambda d: (-widthClass(d.location.get("wdth",0)), -italicVal(d.location.get("slnt",0)), weightClass(d.location.get("wght",0))))
+            self.data.sort(key=lambda d: (-width_class(d.location.get("wdth",0)), -italic_value(d.location.get("slnt",0)), weight_class(d.location.get("wght",0))))
         elif isinstance(test, proofFont):
             self.data.sort(key=lambda d: (-f.font_object["OS_2"].usWidthClass, -f.font_object["post"].italicAngle, f.font_object["OS_2"].usWeightClass))
         else:
@@ -346,7 +349,7 @@ class proofFont:
     name = property(_get_name, _set_name)
 
     # def _sort_locations(self):
-    #     return sorted(self.loc, key=lambda d: (-widthClass(d.location.get("wdth",0)), -italicVal(d.location.get("slnt",0)), weightClass(d.location.get("wght",0))))
+    #     return sorted(self.loc, key=lambda d: (-width_class(d.location.get("wdth",0)), -italic_value(d.location.get("slnt",0)), weight_class(d.location.get("wght",0))))
 
     def _reformat_locations(self,designspace,instance,axis_map,renamer):
         parsed = {}
@@ -775,7 +778,6 @@ class proofDocument:
 
         if multi_size_page:
             for il, size in enumerate(font_size):
-
                 bot.font(
                     font_path,
                     size
