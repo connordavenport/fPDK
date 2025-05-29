@@ -2,9 +2,12 @@
 font Proofing Development Kit
 =============================
 
-<p align="center">
-<img src="assets/images/fpdk_logo_light.png" alt="fPDK Logo" width="300">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/images/fpdk_logo_dark.png">
+  <img alt="fPDK Logo" src="assets/images/fpdk_logo_light.png" width="300">
+</picture>
 </p>
+
 
 ## Table of Contents
 
@@ -15,8 +18,14 @@ font Proofing Development Kit
 
 ## Installation
 
-Download to your project directory, add `README.md`, and commit:
+In RoboFont, open the package manager with the menu Python -> Install Python Packages...
 
+Enter the following url `git+https://github.com/connordavenport/fpdk` and press `go`.
+
+To use as a commandline module, just enter the following terminal command: 
+`pip install git+https://github.com/connordavenport/drawbotlab`
+
+Install instructions are based on Mathieu Reguer's setup for <a href="https://github.com/mathieureguer/drawbotgrid">drawBotGrid</a>
 
 ## Usage
 
