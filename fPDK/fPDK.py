@@ -334,6 +334,7 @@ class proofFont:
         self.locations          = proofObjectHandler([])
         self.operator           = None
         self._name              = self._compile_name()
+        self.features           = {}
 
     def load_font(self):
         if self.path:
@@ -342,7 +343,11 @@ class proofFont:
     # get font objects best possible name
     def _compile_name(self):
         f = self.font_object
-        best_name = f["name"].getBestFullName()
+        try:
+            best_name = f["name"].getBestFullName()
+        except TypeError:
+            best_name = ""
+
         return best_name
 
     def _get_name(self):
@@ -363,6 +368,38 @@ class proofFont:
             a = renamer.get(axis)
             parsed[a]=val
         return parsed
+
+
+    def get_OT(self):
+
+        font = self.font_object
+        _gsub = font["GSUB"]
+        i = []
+
+        for r in _gsub.table.FeatureList.FeatureRecord:
+            name = ""
+            fp = r.Feature.FeatureParams
+            if fp:
+                name = font["name"].getName(fp.UINameID,1,0,0)
+                if not name:
+                    name = font["name"].getName(fp.UINameID,3,1,0x409)
+            if r.Feature.LookupListIndex:
+                i.append((r.FeatureTag, name, r.Feature.LookupListIndex[0]))
+
+        i = sorted(list(set(i)), key=lambda x: x[0])
+        _features = {}
+
+        if i:
+            for _temp in i:
+                tag, desc, LookupID = _temp
+                Lookup = GSUB.table.LookupList.Lookup[LookupID]
+                mapping = None
+                for subtable in Lookup.SubTable:
+                    if subtable.LookupType == 1:
+                        mapping = subtable.mapping
+                _features[tag] = ((desc,LookupID,mapping))
+        self.features = _features
+
 
     def build_locations(self):
         font_obj   = self.font_object
@@ -453,6 +490,9 @@ class proofDocument:
         self._caption_font = "SFMono-Regular"
         self.hyphenation = True
 
+        self.grid = None
+        self.instance_color = (0.58, 0.22, 1, 1)
+
 
 
 
@@ -503,6 +543,16 @@ class proofDocument:
                                (self.size[0] - (self._margin_left + self._margin_right )),
                                (self.size[1] - (self._margin_top  + self._margin_bottom))
                               )
+
+        # keep a stored grid for reference
+        self.grid = grid.ColumnGrid(
+                                    (   
+                                        self._margin_left,
+                                        self._margin_bottom,
+                                        *self._text_box_size
+                                    ),
+                                    subdivisions=5
+                                   )
 
     size = property(_get_page_size, _set_page_size)
 
@@ -664,6 +714,7 @@ class proofDocument:
         _save_path = path if path else self.path
         _auto = open if open != "_" else self.open_automatically
 
+        self.paginate()
         bot.saveImage(_save_path)
         if _auto:
             os.system(f"open -a Preview '{_save_path}'")
@@ -685,10 +736,43 @@ class proofDocument:
                                   )
         return min(temp_holder)
 
-    def _init_page(self, font, proof_type, location, cover=False):
+    def _init_page(self,**kwargs):
         bot.newPage(*self.size)
         self.text_attributes()
-        self.draw_header_footer(font,proof_type,location,cover)
+        self.draw_header_footer(**kwargs)
+
+
+    def draw_header_footer(self,**kwargs):
+        font       = kwargs.get("font", proofFont(""))
+        proof_type = kwargs.get("proof_type", "")
+        location   = kwargs.get("location", proofLocation({}))
+        cover      = kwargs.get("cover", False)
+
+
+        self.move_to_storage(locals())
+        p = Path(proof_type)
+        self.text_attributes()
+
+        header_y_pos = self.size[1]-(self._margin_left/2)
+
+        bot.text(f'Project: {self.name}', (self.grid[0], header_y_pos))
+        bot.text(f'Date: {self._now:%Y-%m-%d %H:%M}', (self.grid[1], header_y_pos))
+        if not cover:
+            if location and not location.is_source:
+                bot.fill(*self.instance_color)
+                o_s = 8
+                bot.oval(self.grid[2]-(o_s + (o_s/2)), header_y_pos-(o_s/4), o_s, o_s)
+
+            bot.fill(0)
+            bot.text(f'Style: {location.name if location else font.name}', (self.grid[2], header_y_pos))
+            bot.text(f'Type: {p.stem}', (self.size[0]-self._margin_right, header_y_pos), align="right")
+        fw,fh = bot.textSize(f'Style: {font.name}')
+        if proof_type != "core" and location:
+            bot.linkRect(f"beginPage_{font}{location.location}", (self._margin_left + (self.size[0]/4)*2, self.size[1]-self._margin_left, fw, fh))
+
+        bot.text(f'© {self._now:%Y}' + ' ' + USER, (self._margin_left, self._margin_bottom/2))
+        bot.fill(0)
+        bot.stroke(None)
 
 
     def new_section(self,
@@ -698,54 +782,62 @@ class proofDocument:
                     sources=True,
                     instances=False,
                     multi_size_page=False,
-                    restrict_page=True # if set to False the overflow will add new pages
+                    restrict_page=True, # if set to False the overflow will add new pages
+                    openType={}, # the only snake case :) a dict for activating specific OT on this page
                     ):
 
         # accept a list of point sizes or a single point size
         point_sizes = list(mit.always_iterable(point_size))
 
-        for font in self._fonts:
-            to_process = font.locations if self.use_instances else [ss for ss in font.locations if ss.is_source]
-            to_process = [loca for loca in to_process if loca.in_crop]
-            for loca in to_process:
+        if proof_type == "gradient":
+            txt = self.get_gradient_strings()
+            while txt:
+                self._init_page(font=self._fonts[0],proof_type=proof_type)
+                txt = self.draw_text_layout(txt)
+                
+        else:
+            for font in self._fonts:
+                to_process = font.locations.find(in_crop=True) if self.use_instances else font.locations.find(is_source=True, in_crop=True)
+                for loca in to_process:
+                    txt = PROOF_DATA[proof_type]
 
-                txt = PROOF_DATA[proof_type]
-
-                while txt:
-                    if proof_type == "core":
-                        self._init_page(font,proof_type,loca)
-                        min_size = self.get_smallest_core_scaler(txt)
-                        txt = self.draw_core_characters(txt,
-                                             font.path,
-                                             loca.location,
-                                             True,
-                                             min_size
-                                            )
-
-                    else:
-                        if len(point_sizes) > 1 and multi_size_page:
-                            self._init_page(font,proof_type,loca)
-                            txt = self.draw_text_layout(txt,
-                                                        font.path,
-                                                        loca.location,
-                                                        len(point_sizes),
-                                                        restrict_page,
-                                                        point_sizes,
-                                                        True
-                                                        )
+                    while txt:
+                        if proof_type == "core":
+                            self._init_page(font=font,proof_type=proof_type,location=loca)
+                            min_size = self.get_smallest_core_scaler(txt)
+                            txt = self.draw_core_characters(txt,
+                                                 font.path,
+                                                 loca.location,
+                                                 True,
+                                                 min_size
+                                                )
                         else:
-                            for pt in point_sizes:
-                                self._init_page(font,proof_type,loca)
+                            if len(point_sizes) > 1 and multi_size_page:
+                                self._init_page(font=font,proof_type=proof_type,location=loca)
                                 txt = self.draw_text_layout(txt,
                                                             font.path,
                                                             loca.location,
-                                                            columns,
+                                                            len(point_sizes),
                                                             restrict_page,
-                                                            pt,
+                                                            point_sizes,
+                                                            True,
+                                                            openType
                                                             )
+                            else:
+                                for pt in point_sizes:
+                                    self._init_page(font=font,proof_type=proof_type,location=loca)
+                                    txt = self.draw_text_layout(txt,
+                                                                font.path,
+                                                                loca.location,
+                                                                columns,
+                                                                restrict_page,
+                                                                pt,
+                                                                False,
+                                                                openType
+                                                                )
 
 
-    def draw_core_characters(self, txt, font_path, variable_location={}, will_draw=True, scale=None):
+    def draw_core_characters(self, txt, font_path, variable_location={}, will_draw=True, scale=None, openType={"resetFeatures":True}):
         box_w, box_h = self._text_box_size
         box_x, box_y = self._margin_left, self._margin_bottom
 
@@ -779,10 +871,63 @@ class proofDocument:
             return sf
 
 
-    def draw_text_layout(self, txt, font_path, variable_location={}, columns=1, overflow=True, font_size=FONT_SIZE_MED, multi_size_page=False):
+    # def get_gradient_strings(self, allFiles, copy):
+    def get_gradient_strings(self, level="ascii", font_size=40):
+
+        # if self.interpolate:
+        #     fauxInstance = reformatLimits(self.interpolate)
+        #     fonts = insertFauxInstances(allFiles,fauxInstance)
+        # else:
+        #     fonts = allFiles
+
+        fonts = self._fonts
+
+        if level == "all":
+            chars = sorted(
+                    self.find_common_elements(
+                            [ff.getGlyphOrder() for ff in fonts]
+                        )
+                    )
+        elif level == "ascii":
+            _unis = [65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 32, 46, 44, 58, 59, 33, 63, 42, 35, 47, 92, 45, 95, 40, 41, 123, 125, 91, 93, 34, 39, 64, 38, 124, 36, 43, 61, 62, 60, 94, 37, 96]
+            names = [table.cmap.get(cs) for cs in _unis for table in fonts[0].font_object["cmap"].tables]
+            chars = []
+            for n in names:
+                if n not in chars:
+                    chars.append(n)
+            # chars=" ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz&`.,:;!?/\\|-()[]{}*^~_'\"@$#0123456789%+=<>"
+        elif level in [None, "none", "None"]:
+            chars = ""
+        else:
+            _unis = [ord(a) for a in level]
+            names = [table.cmap.get(cs) for cs in _unis for table in fonts[0].font_object["cmap"].tables]
+            chars = []
+            for n in names:
+                if n not in chars:
+                    chars.append(n)    
+
+        txt = bot.FormattedString()
+
+        for l in chars:
+            for font in fonts:
+                for loca in font.locations:
+                    if loca.location:
+                        txt.fontVariations(**loca.location)
+                    txt.font(font.path)
+                    txt.append("", tracking=(font_size*20/1000), lineHeight=font_size*1.1, fontSize=font_size)
+                    txt.appendGlyph(l)
+            txt.append("\n")
+
+        # txt = grid.columnTextBox(txt, (self._margin_left, self._margin_bottom, *self._text_box_size), subdivisions=1, gutter=15, draw_grid=False)
+        return txt
+
+
+
+    def draw_text_layout(self, txt="", font_path="", variable_location={}, columns=1, overflow=True, font_size=FONT_SIZE_MED, multi_size_page=False, openType={"resetFeatures":True}):
         sub_columns = grid.ColumnGrid((self._margin_left, self._margin_bottom, *self._text_box_size), subdivisions=columns)
         bot.fontVariations(**variable_location)
         bot.hyphenation(self.hyphenation)
+        bot.openTypeFeatures(**openType)
 
         if multi_size_page:
             for il, size in enumerate(font_size):
@@ -798,9 +943,22 @@ class proofDocument:
                 font_size
                 )
             txt = grid.columnTextBox(txt, (self._margin_left, self._margin_bottom, *self._text_box_size), subdivisions=columns, gutter=15, draw_grid=False)
-            txt = txt if not overflow else ""
+            txt = txt if overflow else ""
         return txt
 
+
+    def paginate(self):
+        allPages = bot.pages()
+        totalPages = len(allPages)
+
+        self.text_attributes()
+        tw,th = bot.textSize(f'Page {totalPages}/{totalPages}') 
+
+        for pp, page in enumerate(allPages):
+            with page:
+                self.text_attributes()
+                page_string = f'Page {str(pp+1).zfill(len(str(totalPages)))}/{totalPages}'
+                bot.text(page_string, ((self.size[0] - self._margin_left)-tw, self._margin_bottom/2))
 
 
     def find_close(self, root_dir, target_filename):
@@ -904,6 +1062,73 @@ class proofDocument:
         else:
             return {}
 
+
+    def draw_feature_proofs(self):
+        # word_site = "https://www.mit.edu/~ecprice/wordlist.10000"
+
+        # response = requests.get(word_site)
+        # WORDS = [w.decode("utf-8") for w in response.content.splitlines()]
+        # temp_ = WORDS
+        # WORDS.extend([w.upper() for w in temp_])
+        # WORDS.extend([w.title() for w in temp_])
+
+        font_OT = font.get_OT()
+        if font_OT:
+            for tag, (desc,LookupID,mapping) in font_OT.items():
+                fs = bot.FormattedString()
+                cs = 1
+                if desc:
+                    fs.append(f"{tag} : {desc}\n", font=MONOSPACE, fontSize=12)
+                else:
+                    fs.append(f"{tag}\n", font=MONOSPACE, fontSize=12)
+                fs.append("", font=postscriptFontName, fontSize=42)
+                
+                if tag in ["c2sc", "smcp"]:
+                    fs.append("The Quick Brown Fox Jumps Over The Lazy Dog", font=postscriptFontName, fontSize=42, openTypeFeatures={tag:True,})            
+                    # textBox(fs, (10, 10, width()-20, height()-20))
+                else:
+                    
+                    contains_all = lambda word, letters: all(letter in word for letter in letters)
+                    contains = [word for word in WORDS if contains_all(word, list(mapping.keys())[:2])]
+
+                    if contains:
+                        if tag.startswith("ss"):
+                            
+                            rd = choice(contains)
+                        
+                            for gg in rd:
+                                if gg in list(mapping.keys())[:2]:
+                                    fs.fill(0,0,0,.3)
+                                else:
+                                    fs.fill(0,0,0,1)
+                                fs.append(gg, openTypeFeatures={tag:False})
+                
+                            #fs.append(rd, fill=(0,0,0,1), openTypeFeatures={tag:False})
+                            fs.append("→", fill=(0,0,0,.2), openTypeFeatures={tag:False})
+                            fs.fill(0)
+                            fs.append(rd, fill=(0,0,0,1), openTypeFeatures={tag:True})
+                            fs.append("\n")
+                            cs = 1
+                            # fs = textBox(fs, (10, 10, width()-20, height()-20))
+                    else:
+                        for fr,to in mapping.items():
+                            fs.fill(0,0,0,.3)            
+                            fs.appendGlyph(fr)
+                            fs.append("→", fill=(0,0,0,.2))
+                            fs.fill(0)
+                            fs.appendGlyph(to)
+                            fs.append("\n")
+                
+                    # fs = Grid.columnTextBox(fs, (10, 10, width()-20, height()-20), subdivisions=3, gutter=15, draw_grid=False)
+        
+
+            bot.newPage(PAGE_FORMAT)
+            bot.fill(0)
+            self.drawHeaderFooter(postscriptFontName, "", False)
+            fs = Grid.columnTextBox(fs, LARGE, subdivisions=cs, gutter=15, draw_grid=False)
+
+
+
     def crop_space(self, _zone="",inf_loop=False):
         zone = self.reformat_limits(_zone)
         valid = False
@@ -955,39 +1180,11 @@ class proofDocument:
         bot.font(self.caption_font, 8)
 
 
-    def draw_header_footer(self, font, proof_type, location=None, cover=False):
-        self.move_to_storage(locals())
-        p = Path(proof_type)
-        self.text_attributes()
-
-        header_columns = grid.ColumnGrid((self._margin_left, self._margin_bottom, *self._text_box_size), subdivisions=4)
-
-        bot.text(f'Project: {self.name}', (header_columns[0], self.size[1]-(self._margin_left/2)))
-        bot.text(f'Date: {self._now:%Y-%m-%d %H:%M}', (header_columns[3], self.size[1]-(self._margin_left/2)))
-        if not cover:
-
-            bot.text(f'Fontfile: {location.name if location else font.name}', (header_columns[1], self.size[1]-(self._margin_left/2)))
-            bot.text(f'Characterset: {p.stem}', (header_columns[2], self.size[1]-(self._margin_left/2)))
-        fw,fh = bot.textSize(f'Fontfile: {font.name}')
-        if proof_type != "core" and location:
-            bot.linkRect(f"beginPage_{font}{location.location}", (self._margin_left + (self.size[0]/4)*2, self.size[1]-self._margin_left, fw, fh))
-
-        bot.text(f'© {self._now:%Y}' + ' ' + USER, (self._margin_left, self._margin_bottom/2))
-
-        if location and not location.is_source:
-            bot.stroke(0.5819, 0.2157, 1.0, 1.0)
-            bot.fill(0.5819, 0.2157, 1.0, .2)
-            bot.oval(self.size[0] - self._margin_left, self._margin_bottom/2, 10, 10)
-
-        bot.fill(0)
-        bot.stroke(None)
-
-
     def _cover_page(self, fonts):
         # this function is biased and draws a custom cover page of all
         # locations / fonts and scales to fit them all
 
-        self._init_page(fonts[0],"",False,True)
+        self._init_page(font=fonts[0],cover=True)
 
         _fonts = {}
         for font in fonts:
@@ -1068,59 +1265,40 @@ if __name__ == "__main__":
     """
     doc.add_object("/Users/connordavenport/Dropbox/Clients/Dinamo/03_DifferentTimes/Sources/Different-Times-v10.designspace")
 
-    """crop design-space to be proofed, using the varLib instantiator syntax"""
-    # doc.crop_space("wght=500:900 slnt=0")
-
-    """
-    test an invalid or empty crop
-    an invalid crop will ignore if already set
-    """
-    # doc.crop = "asdas"
-    # doc.crop = None
-    # doc.crop = "fuck=420:666"
-
-
-    # test [in]valid sizes
-    # doc.size = (100,100,20)
-    # doc.size = "big paper size"
+    doc.crop_space("wght=500:900 slnt=1")
     doc.size = "LetterLandscape"
-
-    """
-    we can see the loaded fonts and their locations
-    """
-    # for font in doc.fonts:
-        # print(font)
-        # for s in font.instances[-5:-1]:
-            # print(s.name)
-            # print(s.location)
-            # print(s.in_crop)
-
-    """
-    set font used in captions
-    """
-    doc.caption_font = "ABCGaisyrMonoUnlicensedTrial-Regular"
-
-    """
-    auto will use some %s but can accept 1 int which will apply
-    to all or a tuple of 4 values in top, left, bottom, right order
-    """
+    doc.caption_font = "CoreMono-Regular"
     doc.margin = "auto"
-
-    """
-    we can turn this on and off whenever between new sections
-    """
     doc.use_instances = False
 
-    doc.setup_proof() # setup newDrawing() and make a cover page
-
-    doc.new_section(
-                    "core",
-                   )
+    doc.setup_proof()
+    # doc.new_section(
+    #                 "core",
+    #                )
     # doc.new_section(
     #                 "paragraph",
-    #                 point_size=[12,20,24],
-    #                 multi_size_page=True # if True and multi point sizes, adds multi-column page with no overflow
+    #                 point_size=[12,20],
+    #                 multi_size_page=True, # if True and multi point sizes, adds multi-column page with no overflow
     #                )
+    doc.new_section(
+                    "gradient",
+                   )
+
+    """
+    proofml is an experimental proofing language
+    that is inspried by Tal Leming's ezui.
+    """
+    proofml_data = '''
+    * proof
+    [][][] @top
+    [ ][ ] @middle
+    '''
+
+    # doc.new_section(
+    #                 "proofml",
+    #                 data=proofml_data
+    #                )
+
 
     # doc.open_automatically = False
     """
