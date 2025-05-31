@@ -496,6 +496,7 @@ class proofDocument:
 
         self.grid = None
         self.instance_color = (0.58, 0.22, 1, 1)
+        self.WORDS = []
 
 
 
@@ -801,8 +802,17 @@ class proofDocument:
 
         elif proof_type == "features":
             for font in self._fonts:
-                self._init_page(font=font,proof_type=proof_type)
-                self.draw_feature_proofs(font=font)
+
+                # get the front most location if it is in the crop
+                # otherwise just get the first locaiton in a sorted stack
+
+                front_most = font.locations.find(in_crop=True)
+                if not front_most:
+                    front_most = font.locations[0]
+                else:
+                    front_most.sort()
+                    front_most = front_most[0]
+                self.draw_feature_proofs(font=font, location=front_most)
 
         else:
             for font in self._fonts:
@@ -847,14 +857,17 @@ class proofDocument:
 
 
 
-    def draw_feature_proofs(self, font=None):
+    def draw_feature_proofs(self, font=None, location=None):
         font_OT = font.get_OT()
-        # WORDS = get_english_words_set(['web2'], lower=True)
+
+        if self.WORDS == []:
+            self.WORDS = get_english_words_set(['web2'], lower=True)
 
         if font_OT:
             for tag, (desc,LookupID,mapping) in font_OT.items():
                 
                 string = bot.FormattedString()
+                string.fontVariations(**location.location)
                 cols = 1
                 if desc:
                     string.append(f"{tag} : {desc}\n", font=self.caption_font, fontSize=12)
@@ -866,28 +879,27 @@ class proofDocument:
                     string.append("The Quick Brown Fox Jumps Over The Lazy Dog", font=font.path, fontSize=42, openTypeFeatures={tag:True,})            
                 else:
 
-                    pass 
                     """
                     come up with a much faster word finder algo
                     """
                     
-                    # contains_all = lambda word, letters: all(letter in word for letter in letters)
-                    # contains = [word for word in WORDS if contains_all(word, list(mapping.keys())[:2])]
-                    # if contains:
-                    #     if tag.startswith("ss"):
-                    #         rd = choice(contains)
-                    #         for gg in rd:
-                    #             if gg in list(mapping.keys())[:2]:
-                    #                 string.fill(0,0,0,.3)
-                    #             else:
-                    #                 string.fill(0,0,0,1)
-                    #             string.append(gg, openTypeFeatures={tag:False})
+                    contains_all = lambda word, letters: all(letter in word for letter in letters)
+                    contains = [word for word in self.WORDS if contains_all(word, list(mapping.keys())[:2])]
+                    if contains:
+                        if tag.startswith("ss"):
+                            rd = choice(contains)
+                            for gg in rd:
+                                if gg in list(mapping.keys())[:2]:
+                                    string.fill(0,0,0,.3)
+                                else:
+                                    string.fill(0,0,0,1)
+                                string.append(gg, openTypeFeatures={tag:False})
                 
-                    #         string.append("→", fill=(0,0,0,.2), openTypeFeatures={tag:False})
-                    #         string.fill(0)
-                    #         string.append(rd, fill=(0,0,0,1), openTypeFeatures={tag:True})
-                    #         string.append("\n")
-                    #         cols = 1
+                            string.append("→", fill=(0,0,0,.2), openTypeFeatures={tag:False})
+                            string.fill(0)
+                            string.append(rd, fill=(0,0,0,1), openTypeFeatures={tag:True})
+                            string.append("\n")
+                            cols = 1
                     else:
                         for fr,to in mapping.items():
                             string.fill(0,0,0,.3)            
@@ -900,7 +912,7 @@ class proofDocument:
                     # string = Grid.columnTextBox(string, (10, 10, width()-20, height()-20), subdivisions=3, gutter=15, draw_grid=False)
 
 
-                self._init_page(font=font,proof_type="features",location={})
+                self._init_page(font=font,proof_type="features",location=location)
                 grid.columnTextBox(string, (self._margin_left, self._margin_bottom, *self._text_box_size), subdivisions=cols, gutter=15, draw_grid=False)
 
 
