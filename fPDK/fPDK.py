@@ -23,7 +23,7 @@ import plistlib
 import inspect
 from random import randint, choice
 from collections.abc import MutableSequence
-
+from pprint import pprint
 from english_words import get_english_words_set
 
 # fPDK, font Proofing Development Kit
@@ -517,6 +517,8 @@ class proofDocument:
 
     def __init__(self):
 
+        self._counter = 0
+
         self.storage = []
         self._now = datetime.datetime.now()
         self._identifier = None
@@ -548,7 +550,7 @@ class proofDocument:
 
         self.grid = None
         self.instance_color = (0.58, 0.22, 1, 1)
-        self.WORDS = []
+        self.words = []
 
 
 
@@ -806,7 +808,6 @@ class proofDocument:
         cover      = kwargs.get("cover", False)
 
 
-        self.move_to_storage(locals())
         p = Path(proof_type)
         self.text_attributes()
 
@@ -841,37 +842,43 @@ class proofDocument:
                     multi_size_page=False,
                     restrict_page=True, # if set to False the overflow will add new pages
                     openType={}, # the only snake case :) a dict for activating specific OT on this page
+                    group_sections=True, # for select proof types we will group all the files.
                     ):
 
-        # accept a list of point sizes or a single point size
-        point_sizes = list(mit.always_iterable(point_size))
+        to_store = { 
+                    item[0]:item[1]
+                    for item in inspect.getmembers(self)
+                    if not item[0].startswith("_")
+                    and not inspect.ismethod(item[1])
+                    and item[0] != "storage"
+                   }
 
-        if proof_type == "gradient":
-            txt = self.get_gradient_strings()
-            while txt:
-                self._init_page(font=self._fonts[0],proof_type=proof_type)
-                txt = self.draw_text_layout(txt)
+        self.move_to_storage(proof_type, locals(), to_store)
 
-        elif proof_type == "features":
-            for font in self._fonts:
+        # new_section is just a moving company...
+        # build_proofs is the new house but
+        # we get our data from the storage 
 
-                # get the front most location if it is in the crop
-                # otherwise just get the first locaiton in a sorted stack
 
-                front_most = font.locations.find(in_crop=True)
-                if not front_most:
-                    front_most = font.locations[0]
-                else:
-                    front_most.sort()
-                    front_most = front_most[0]
-                self.draw_feature_proofs(font=font, location=front_most)
+    def _build_proofs(self):
+        fonts = self._fonts
 
-        else:
-            for font in self._fonts:
-                to_process = font.locations.find(in_crop=True) if self.use_instances else font.locations.find(is_source=True, in_crop=True)
+
+        # hard code a few of these proof types
+        storage = self.storage
+
+        if storage[0][0] == "cover":
+            storage.pop(0)
+                                    # name
+        co = [c for c in storage if c[0] == "core"]
+        if co:
+            id = storage.index(co[0])
+            storage.pop(id)
+            proof_type, local_data, class_data = co[0]
+            for font in fonts:
+                to_process = font.locations.find(in_crop=True) if class_data.get("use_instances") else font.locations.find(is_source=True, in_crop=True)
                 for loca in to_process:
                     txt = PROOF_DATA[proof_type]
-
                     while txt:
                         if proof_type == "core":
                             self._init_page(font=font,proof_type=proof_type,location=loca)
@@ -882,39 +889,80 @@ class proofDocument:
                                                  True,
                                                  min_size
                                                 )
+
+
+        use_instances = storage[0][-1].get("use_instances")
+        for font in fonts:
+            to_process = font.locations.find(in_crop=True) if use_instances else font.locations.find(is_source=True, in_crop=True)
+            for loca in to_process:
+                for iir, (proof_type, local_data, class_data) in enumerate(storage):
+
+                    point_size      = local_data.get("point_size", FONT_SIZE_MED)
+                    columns         = local_data.get("columns", 1)
+                    sources         = local_data.get("sources", True)
+                    instances       = local_data.get("instances", False)
+                    multi_size_page = local_data.get("multi_size_page", False)
+                    restrict_page   = local_data.get("restrict_page", True)
+                    openType        = local_data.get("openType", {})
+                    group_sections  = local_data.get("group_sections", True)
+                    class_data      = local_data.get("to_store", {})
+                    point_sizes     = list(mit.always_iterable(point_size))
+
+                    txt = PROOF_DATA.get(proof_type)
+                    while txt:
+                        if len(point_sizes) > 1 and multi_size_page:
+                            self._init_page(font=font,proof_type=proof_type,location=loca)
+                            txt = self.draw_text_layout(txt,
+                                                        font.path,
+                                                        loca.location,
+                                                        len(point_sizes),
+                                                        restrict_page,
+                                                        point_sizes,
+                                                        True,
+                                                        openType
+                                                        )
                         else:
-                            if len(point_sizes) > 1 and multi_size_page:
+                            for pt in point_sizes:
                                 self._init_page(font=font,proof_type=proof_type,location=loca)
                                 txt = self.draw_text_layout(txt,
                                                             font.path,
                                                             loca.location,
-                                                            len(point_sizes),
+                                                            columns,
                                                             restrict_page,
-                                                            point_sizes,
-                                                            True,
+                                                            pt,
+                                                            False,
                                                             openType
                                                             )
-                            else:
-                                for pt in point_sizes:
-                                    self._init_page(font=font,proof_type=proof_type,location=loca)
-                                    txt = self.draw_text_layout(txt,
-                                                                font.path,
-                                                                loca.location,
-                                                                columns,
-                                                                restrict_page,
-                                                                pt,
-                                                                False,
-                                                                openType
-                                                                )
 
+        for item in storage:
+            proof_type = item[0]
+            if proof_type == "gradient":
+                txt = self.get_gradient_strings()
+                while txt:
+                    self._init_page(font=fonts[0],proof_type=proof_type)
+                    txt = self.draw_text_layout(txt)
+            if proof_type == "features":
+                for font in fonts:
+                    front_most = font.locations.find(in_crop=True)
+                    if not front_most:
+                        front_most = font.locations[0]
+                    else:
+                        front_most.sort()
+                        front_most = front_most[0]
+                    self.draw_feature_proofs(font=font, location=front_most)
+
+
+
+    def build(self):
+        self._build_proofs()
 
 
     def draw_feature_proofs(self, font=None, location=None):
         font_OT = font.get_OT()
         if font_OT:
 
-            if self.WORDS == []:
-                self.WORDS = get_english_words_set(['web2'], lower=True)
+            if self.words == []:
+                self.words = get_english_words_set(['web2'], lower=True)
 
             for tag, (desc,LookupID,mapping) in font_OT.items():
                 
@@ -936,7 +984,7 @@ class proofDocument:
                     """
                     
                     contains_all = lambda word, letters: all(letter in word for letter in letters)
-                    contains = [word for word in self.WORDS if contains_all(word, list(mapping.keys())[:2])]
+                    contains = [word for word in self.words if contains_all(word, list(mapping.keys())[:2])]
                     if contains:
                         if tag.startswith("ss"):
                             rd = choice(contains)
@@ -962,7 +1010,6 @@ class proofDocument:
                             string.append("\n")
                         cols = 3
                     # string = Grid.columnTextBox(string, (10, 10, width()-20, height()-20), subdivisions=3, gutter=15, draw_grid=False)
-
 
                 self._init_page(font=font,proof_type="features",location=location)
                 grid.columnTextBox(string, (self._margin_left, self._margin_bottom, *self._text_box_size), subdivisions=cols, gutter=15, draw_grid=False)
@@ -1217,7 +1264,6 @@ class proofDocument:
                                             check.append(0)
                             else:
                                 valid = False
-
                         if 0 not in check:
                             inst.in_crop = True
                         else:
@@ -1226,11 +1272,16 @@ class proofDocument:
             self._crop = _zone
 
 
-    def move_to_storage(self, locals):
-        self.storage.append(locals)
+    def move_to_storage(self, proof_type, locals, class_attrs={}):
+        self._counter += 1
+        self.storage.append((proof_type,locals,class_attrs))
+
+    def empty_storage(self):
+        self._counter = 0
+        self.storage = []
 
     def setup_proof(self, cover_page=True):
-        self.move_to_storage(locals())
+        self.move_to_storage("cover",locals())
         bot.newDrawing()
         if cover_page:
             self._cover_page(self._fonts)
@@ -1240,7 +1291,6 @@ class proofDocument:
         bot.stroke(None)
         bot.font(self.caption_font, 8)
         bot.fontVariations(None)
-
 
     def _cover_page(self, fonts):
         # this function is biased and draws a custom cover page of all
@@ -1344,10 +1394,23 @@ if __name__ == "__main__":
                     multi_size_page=True, # if True and multi point sizes, adds multi-column page with no overflow
                    )
 
+    doc.new_section(
+                    "paragraph",
+                    point_size=[12],
+                    multi_size_page=False, # if True and multi point sizes, adds multi-column page with no overflow
+                    restrict_page=True,
+                   )
 
-    # doc.new_section(
-    #                 "features",
-    #                )
+    doc.new_section(
+                    "gradient",
+                   )
+    doc.new_section(
+                    "features",
+                   )
+    # actually compile the proof data becuase new_section isnt seperating it all rn
+    doc.build()
+
+
 
     """
     proofml is an experimental proofing language
@@ -1355,6 +1418,8 @@ if __name__ == "__main__":
     """
     proofml_data = '''
     * proof
+    [         ]|--|
+    [         ]|--|
     '''
 
     # doc.new_section(
