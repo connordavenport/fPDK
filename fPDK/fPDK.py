@@ -2,11 +2,12 @@ from fontTools.ttLib import TTFont
 import os
 from fontTools.designspaceLib import DesignSpaceDocument as dsp_doc
 from fontTools.designspaceLib import DiscreteAxisDescriptor, AxisDescriptor
-from fontTools.designspaceLib.split import *
+from fontTools.designspaceLib.split import _extractSubSpace, defaultMakeInstanceFilename, MakeInstanceFilenameCallable, getVFUserRegion
 import fontTools.varLib as varLib
 from fontTools.misc.fixedTools import otRound, strToFixedToFloat, floatToFixedToFloat
 import fnmatch
-from typing import Union
+from typing import Union, Any, Callable, Dict, Iterator, List, Tuple, cast
+
 import re
 import drawBot as bot
 import drawBotGrid as grid
@@ -131,7 +132,7 @@ def italic_value(slnt_user_value) -> Union[int, float]:
     return slant_user_value
 
 
-class proofObjectHandler(List):
+class proofObjectHandler(list):
     """
     https://stackoverflow.com/questions/6560354/how-would-i-create-a-custom-list-class-in-python
     An extensive user-defined wrapper around list objects.
@@ -373,36 +374,80 @@ class proofFont:
 
 
     def get_OT(self):
-
         font = self.font_object
-        _gsub = font["GSUB"]
-        i = []
+        if "GSUB" in font:
+            _gsub = font["GSUB"]
+            i = []
 
-        for r in _gsub.table.FeatureList.FeatureRecord:
-            name = ""
-            fp = r.Feature.FeatureParams
-            if fp:
-                name = font["name"].getName(fp.UINameID,1,0,0)
-                if not name:
-                    name = font["name"].getName(fp.UINameID,3,1,0x409)
-            if r.Feature.LookupListIndex:
-                i.append((r.FeatureTag, name, r.Feature.LookupListIndex[0]))
+            for r in _gsub.table.FeatureList.FeatureRecord:
+                name = ""
+                fp = r.Feature.FeatureParams
+                if fp:
+                    name = font["name"].getName(fp.UINameID,1,0,0)
+                    if not name:
+                        name = font["name"].getName(fp.UINameID,3,1,0x409)
+                if r.Feature.LookupListIndex:
+                    i.append((r.FeatureTag, name, r.Feature.LookupListIndex[0]))
 
-        i = sorted(list(set(i)), key=lambda x: x[0])
-        _features = {}
+            i = sorted(list(set(i)), key=lambda x: x[0])
+            _features = {}
 
-        if i:
-            for _temp in i:
-                tag, desc, LookupID = _temp
-                Lookup = _gsub.table.LookupList.Lookup[LookupID]
-                mapping = None
-                for subtable in Lookup.SubTable:
-                    if subtable.LookupType == 1:
-                        mapping = subtable.mapping
-                _features[tag] = ((desc,LookupID,mapping))
+            if i:
+                for _temp in i:
+                    tag, desc, LookupID = _temp
+                    Lookup = _gsub.table.LookupList.Lookup[LookupID]
+                    mapping = None
+                    for subtable in Lookup.SubTable:
+                        if subtable.LookupType == 1:
+                            mapping = subtable.mapping
+                    _features[tag] = ((desc,LookupID,mapping))
 
-        self.features = _features
-        return _features
+            self.features = _features
+            return _features
+
+
+    """
+    I would prefer not to do this but we need
+    to keep the old vf paths in order to find the fonts
+    accuretly so we need to override the
+    `keepVFs` attr in the function
+    """
+    def splitVariableFonts(
+        self,
+        doc : dsp_doc,
+        makeNames: bool = False,
+        expandLocations: bool = False,
+        makeInstanceFilename: MakeInstanceFilenameCallable = defaultMakeInstanceFilename,
+    ) -> Iterator[Tuple[str, dsp_doc]]:
+        """Convert each variable font listed in this document into a standalone
+        designspace. This can be used to compile all the variable fonts from a
+        format 5 designspace using tools that can only deal with 1 VF at a time.
+
+        Args:
+          - ``makeNames``: Whether to compute the instance family and style
+            names using the STAT data.
+          - ``expandLocations``: Whether to turn all locations into "full"
+            locations, including implicit default axis values where missing.
+          - ``makeInstanceFilename``: Callable to synthesize an instance filename
+            when makeNames=True, for instances that don't specify an instance name
+            in the designspace. This part of the name generation can be overridden
+            because it's not specified by the STAT table.
+
+        .. versionadded:: 5.0
+        """
+        # Make one DesignspaceDoc v5 for each variable font
+        for vf in self.operator.getVariableFonts():
+            vfUserRegion = getVFUserRegion(doc, vf)
+            vfDoc = _extractSubSpace(
+                doc,
+                vfUserRegion,
+                keepVFs=True,
+                makeNames=makeNames,
+                expandLocations=expandLocations,
+                makeInstanceFilename=makeInstanceFilename,
+            )
+            vfDoc.lib = {**vfDoc.lib, **vf.lib}
+            yield vf.name, vfDoc
 
 
     def build_locations(self):
@@ -413,9 +458,16 @@ class proofFont:
         renamer = {a.name:a.tag for a in operator.axes}
 
         if operator:
-            for v in splitVariableFonts(operator, expandLocations=True):
+            for v in self.splitVariableFonts(operator, expandLocations=True, makeInstanceFilename=True):
                 sub_space, split_op = v
-                if sub_space == os.path.splitext(os.path.basename(self.path))[0]:
+                # this is the only way to split the vfs and still keep the paths 
+                # we can assume that post-split we will only have 1 vf to extract
+                extracted_path = split_op.variableFonts[0].filename
+                name = sub_space
+                if extracted_path:
+                    name = os.path.splitext(extracted_path)[0]
+
+                if name == os.path.splitext(os.path.basename(self.path))[0]:
                     self.operator = split_op
                     for item in ["source", "instance"]:
                         i = getattr(split_op, f"{item}s")
@@ -859,11 +911,11 @@ class proofDocument:
 
     def draw_feature_proofs(self, font=None, location=None):
         font_OT = font.get_OT()
-
-        if self.WORDS == []:
-            self.WORDS = get_english_words_set(['web2'], lower=True)
-
         if font_OT:
+
+            if self.WORDS == []:
+                self.WORDS = get_english_words_set(['web2'], lower=True)
+
             for tag, (desc,LookupID,mapping) in font_OT.items():
                 
                 string = bot.FormattedString()
@@ -1065,12 +1117,17 @@ class proofDocument:
                             pass
                         else:
                             file_name = f"variable_ttf/{file_name}"
+
                         p = os.path.join(di,file_name)
                         if not os.path.exists(p):
                             continue 
                 else:
                     if name:
-                        p = self.find_close(di,f"{name}.ttf")
+                        pp = os.path.join(di,"variable_ttf",f"{name}.ttf")
+                        if os.path.exists(pp):
+                            p = pp
+                        else:
+                            p = self.find_close(di,f"{name}.ttf")
                 if p:
                     te = proofFont(p)
                     te.is_variable = True
@@ -1182,6 +1239,7 @@ class proofDocument:
         bot.fill(0)
         bot.stroke(None)
         bot.font(self.caption_font, 8)
+        bot.fontVariations(None)
 
 
     def _cover_page(self, fonts):
@@ -1269,7 +1327,7 @@ if __name__ == "__main__":
     """
     doc.add_object("/Users/connordavenport/Code/Typefaces/Beaujon-Typeface/Beaujon.designspace")
 
-    # doc.crop_space("wght=500:900 slnt=1")
+    # doc.crop_space("ital=0")
     doc.size = "LetterLandscape"
     doc.caption_font = "CoreMono-Regular"
     doc.margin = "auto"
@@ -1279,11 +1337,14 @@ if __name__ == "__main__":
     doc.new_section(
                     "core",
                    )
+
     doc.new_section(
                     "paragraph",
                     point_size=[12,20],
                     multi_size_page=True, # if True and multi point sizes, adds multi-column page with no overflow
                    )
+
+
     # doc.new_section(
     #                 "features",
     #                )
@@ -1294,8 +1355,6 @@ if __name__ == "__main__":
     """
     proofml_data = '''
     * proof
-    [][][] @top
-    [ ][ ] @middle
     '''
 
     # doc.new_section(
@@ -1312,6 +1371,7 @@ if __name__ == "__main__":
     overwrite, save over older proofs, default is `True`. `False` will append + "1" until path is unique
     write to disk
     """
+
     doc.save(open=True)
 
     """
