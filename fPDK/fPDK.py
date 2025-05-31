@@ -849,7 +849,7 @@ class proofDocument:
 
     def draw_feature_proofs(self, font=None):
         font_OT = font.get_OT()
-        WORDS = get_english_words_set(['web2'], lower=True)
+        # WORDS = get_english_words_set(['web2'], lower=True)
 
         if font_OT:
             for tag, (desc,LookupID,mapping) in font_OT.items():
@@ -865,23 +865,29 @@ class proofDocument:
                 if tag in ["c2sc", "smcp"]:
                     string.append("The Quick Brown Fox Jumps Over The Lazy Dog", font=font.path, fontSize=42, openTypeFeatures={tag:True,})            
                 else:
-                    contains_all = lambda word, letters: all(letter in word for letter in letters)
-                    contains = [word for word in WORDS if contains_all(word, list(mapping.keys())[:2])]
-                    if contains:
-                        if tag.startswith("ss"):
-                            rd = choice(contains)
-                            for gg in rd:
-                                if gg in list(mapping.keys())[:2]:
-                                    string.fill(0,0,0,.3)
-                                else:
-                                    string.fill(0,0,0,1)
-                                string.append(gg, openTypeFeatures={tag:False})
+
+                    pass 
+                    """
+                    come up with a much faster word finder algo
+                    """
+                    
+                    # contains_all = lambda word, letters: all(letter in word for letter in letters)
+                    # contains = [word for word in WORDS if contains_all(word, list(mapping.keys())[:2])]
+                    # if contains:
+                    #     if tag.startswith("ss"):
+                    #         rd = choice(contains)
+                    #         for gg in rd:
+                    #             if gg in list(mapping.keys())[:2]:
+                    #                 string.fill(0,0,0,.3)
+                    #             else:
+                    #                 string.fill(0,0,0,1)
+                    #             string.append(gg, openTypeFeatures={tag:False})
                 
-                            string.append("→", fill=(0,0,0,.2), openTypeFeatures={tag:False})
-                            string.fill(0)
-                            string.append(rd, fill=(0,0,0,1), openTypeFeatures={tag:True})
-                            string.append("\n")
-                            cols = 1
+                    #         string.append("→", fill=(0,0,0,.2), openTypeFeatures={tag:False})
+                    #         string.fill(0)
+                    #         string.append(rd, fill=(0,0,0,1), openTypeFeatures={tag:True})
+                    #         string.append("\n")
+                    #         cols = 1
                     else:
                         for fr,to in mapping.items():
                             string.fill(0,0,0,.3)            
@@ -894,9 +900,8 @@ class proofDocument:
                     # string = Grid.columnTextBox(string, (10, 10, width()-20, height()-20), subdivisions=3, gutter=15, draw_grid=False)
 
 
-                self._init_page(font=font,proof_type="feature",location={})
+                self._init_page(font=font,proof_type="features",location={})
                 grid.columnTextBox(string, (self._margin_left, self._margin_bottom, *self._text_box_size), subdivisions=cols, gutter=15, draw_grid=False)
-
 
 
     def draw_core_characters(self, txt, font_path, variable_location={}, will_draw=True, scale=None, openType={"resetFeatures":True}):
