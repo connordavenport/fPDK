@@ -20,8 +20,10 @@ import datetime
 from ufoProcessor.ufoOperator import UFOOperator as uop
 import plistlib
 import inspect
-from random import randint
+from random import randint, choice
 from collections.abc import MutableSequence
+
+from english_words import get_english_words_set
 
 # fPDK, font Proofing Development Kit
 
@@ -392,13 +394,15 @@ class proofFont:
         if i:
             for _temp in i:
                 tag, desc, LookupID = _temp
-                Lookup = GSUB.table.LookupList.Lookup[LookupID]
+                Lookup = _gsub.table.LookupList.Lookup[LookupID]
                 mapping = None
                 for subtable in Lookup.SubTable:
                     if subtable.LookupType == 1:
                         mapping = subtable.mapping
                 _features[tag] = ((desc,LookupID,mapping))
+
         self.features = _features
+        return _features
 
 
     def build_locations(self):
@@ -794,7 +798,12 @@ class proofDocument:
             while txt:
                 self._init_page(font=self._fonts[0],proof_type=proof_type)
                 txt = self.draw_text_layout(txt)
-                
+
+        elif proof_type == "features":
+            for font in self._fonts:
+                self._init_page(font=font,proof_type=proof_type)
+                self.draw_feature_proofs(font=font)
+
         else:
             for font in self._fonts:
                 to_process = font.locations.find(in_crop=True) if self.use_instances else font.locations.find(is_source=True, in_crop=True)
@@ -837,6 +846,59 @@ class proofDocument:
                                                                 )
 
 
+
+    def draw_feature_proofs(self, font=None):
+        font_OT = font.get_OT()
+        WORDS = get_english_words_set(['web2'], lower=True)
+
+        if font_OT:
+            for tag, (desc,LookupID,mapping) in font_OT.items():
+                
+                string = bot.FormattedString()
+                cols = 1
+                if desc:
+                    string.append(f"{tag} : {desc}\n", font=self.caption_font, fontSize=12)
+                else:
+                    string.append(f"{tag}\n", font=self.caption_font, fontSize=12)
+                string.append("", font=font.path, fontSize=42)
+                
+                if tag in ["c2sc", "smcp"]:
+                    string.append("The Quick Brown Fox Jumps Over The Lazy Dog", font=font.path, fontSize=42, openTypeFeatures={tag:True,})            
+                else:
+                    contains_all = lambda word, letters: all(letter in word for letter in letters)
+                    contains = [word for word in WORDS if contains_all(word, list(mapping.keys())[:2])]
+                    if contains:
+                        if tag.startswith("ss"):
+                            rd = choice(contains)
+                            for gg in rd:
+                                if gg in list(mapping.keys())[:2]:
+                                    string.fill(0,0,0,.3)
+                                else:
+                                    string.fill(0,0,0,1)
+                                string.append(gg, openTypeFeatures={tag:False})
+                
+                            string.append("→", fill=(0,0,0,.2), openTypeFeatures={tag:False})
+                            string.fill(0)
+                            string.append(rd, fill=(0,0,0,1), openTypeFeatures={tag:True})
+                            string.append("\n")
+                            cols = 1
+                    else:
+                        for fr,to in mapping.items():
+                            string.fill(0,0,0,.3)            
+                            string.appendGlyph(fr)
+                            string.append("→", fill=(0,0,0,.2))
+                            string.fill(0)
+                            string.appendGlyph(to)
+                            string.append("\n")
+                        cols = 3
+                    # string = Grid.columnTextBox(string, (10, 10, width()-20, height()-20), subdivisions=3, gutter=15, draw_grid=False)
+
+
+                self._init_page(font=font,proof_type="feature",location={})
+                grid.columnTextBox(string, (self._margin_left, self._margin_bottom, *self._text_box_size), subdivisions=cols, gutter=15, draw_grid=False)
+
+
+
     def draw_core_characters(self, txt, font_path, variable_location={}, will_draw=True, scale=None, openType={"resetFeatures":True}):
         box_w, box_h = self._text_box_size
         box_x, box_y = self._margin_left, self._margin_bottom
@@ -871,15 +933,7 @@ class proofDocument:
             return sf
 
 
-    # def get_gradient_strings(self, allFiles, copy):
     def get_gradient_strings(self, level="ascii", font_size=40):
-
-        # if self.interpolate:
-        #     fauxInstance = reformatLimits(self.interpolate)
-        #     fonts = insertFauxInstances(allFiles,fauxInstance)
-        # else:
-        #     fonts = allFiles
-
         fonts = self._fonts
 
         if level == "all":
@@ -1063,72 +1117,6 @@ class proofDocument:
             return {}
 
 
-    def draw_feature_proofs(self):
-        # word_site = "https://www.mit.edu/~ecprice/wordlist.10000"
-
-        # response = requests.get(word_site)
-        # WORDS = [w.decode("utf-8") for w in response.content.splitlines()]
-        # temp_ = WORDS
-        # WORDS.extend([w.upper() for w in temp_])
-        # WORDS.extend([w.title() for w in temp_])
-
-        font_OT = font.get_OT()
-        if font_OT:
-            for tag, (desc,LookupID,mapping) in font_OT.items():
-                fs = bot.FormattedString()
-                cs = 1
-                if desc:
-                    fs.append(f"{tag} : {desc}\n", font=MONOSPACE, fontSize=12)
-                else:
-                    fs.append(f"{tag}\n", font=MONOSPACE, fontSize=12)
-                fs.append("", font=postscriptFontName, fontSize=42)
-                
-                if tag in ["c2sc", "smcp"]:
-                    fs.append("The Quick Brown Fox Jumps Over The Lazy Dog", font=postscriptFontName, fontSize=42, openTypeFeatures={tag:True,})            
-                    # textBox(fs, (10, 10, width()-20, height()-20))
-                else:
-                    
-                    contains_all = lambda word, letters: all(letter in word for letter in letters)
-                    contains = [word for word in WORDS if contains_all(word, list(mapping.keys())[:2])]
-
-                    if contains:
-                        if tag.startswith("ss"):
-                            
-                            rd = choice(contains)
-                        
-                            for gg in rd:
-                                if gg in list(mapping.keys())[:2]:
-                                    fs.fill(0,0,0,.3)
-                                else:
-                                    fs.fill(0,0,0,1)
-                                fs.append(gg, openTypeFeatures={tag:False})
-                
-                            #fs.append(rd, fill=(0,0,0,1), openTypeFeatures={tag:False})
-                            fs.append("→", fill=(0,0,0,.2), openTypeFeatures={tag:False})
-                            fs.fill(0)
-                            fs.append(rd, fill=(0,0,0,1), openTypeFeatures={tag:True})
-                            fs.append("\n")
-                            cs = 1
-                            # fs = textBox(fs, (10, 10, width()-20, height()-20))
-                    else:
-                        for fr,to in mapping.items():
-                            fs.fill(0,0,0,.3)            
-                            fs.appendGlyph(fr)
-                            fs.append("→", fill=(0,0,0,.2))
-                            fs.fill(0)
-                            fs.appendGlyph(to)
-                            fs.append("\n")
-                
-                    # fs = Grid.columnTextBox(fs, (10, 10, width()-20, height()-20), subdivisions=3, gutter=15, draw_grid=False)
-        
-
-            bot.newPage(PAGE_FORMAT)
-            bot.fill(0)
-            self.drawHeaderFooter(postscriptFontName, "", False)
-            fs = Grid.columnTextBox(fs, LARGE, subdivisions=cs, gutter=15, draw_grid=False)
-
-
-
     def crop_space(self, _zone="",inf_loop=False):
         zone = self.reformat_limits(_zone)
         valid = False
@@ -1281,7 +1269,7 @@ if __name__ == "__main__":
     #                 multi_size_page=True, # if True and multi point sizes, adds multi-column page with no overflow
     #                )
     doc.new_section(
-                    "gradient",
+                    "features",
                    )
 
     """
