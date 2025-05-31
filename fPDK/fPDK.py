@@ -1071,15 +1071,14 @@ class proofDocument:
                 else:
                     if name:
                         p = self.find_close(di,f"{name}.ttf")
+                if p:
+                    te = proofFont(p)
+                    te.is_variable = True
+                    te.operator = self.operator
 
-                te = proofFont(p)
-                te.is_variable = True
-                te.operator = self.operator
+                    te.build_locations()
 
-                te.build_locations()
-
-                allVFs.append(te)
-
+                    allVFs.append(te)
 
         return allVFs
 
@@ -1268,26 +1267,26 @@ if __name__ == "__main__":
     add a font or designspace, only accepts path strings
         should it accept designspace objects? ufos?
     """
-    doc.add_object("/Users/connordavenport/Dropbox/Clients/Dinamo/03_DifferentTimes/Sources/Different-Times-v10.designspace")
+    doc.add_object("/Users/connordavenport/Code/Typefaces/Beaujon-Typeface/Beaujon.designspace")
 
-    doc.crop_space("wght=500:900 slnt=1")
+    # doc.crop_space("wght=500:900 slnt=1")
     doc.size = "LetterLandscape"
     doc.caption_font = "CoreMono-Regular"
     doc.margin = "auto"
-    doc.use_instances = False
+    doc.use_instances = True
 
     doc.setup_proof()
-    # doc.new_section(
-    #                 "core",
-    #                )
-    # doc.new_section(
-    #                 "paragraph",
-    #                 point_size=[12,20],
-    #                 multi_size_page=True, # if True and multi point sizes, adds multi-column page with no overflow
-    #                )
     doc.new_section(
-                    "features",
+                    "core",
                    )
+    doc.new_section(
+                    "paragraph",
+                    point_size=[12,20],
+                    multi_size_page=True, # if True and multi point sizes, adds multi-column page with no overflow
+                   )
+    # doc.new_section(
+    #                 "features",
+    #                )
 
     """
     proofml is an experimental proofing language
