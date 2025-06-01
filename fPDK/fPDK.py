@@ -25,6 +25,9 @@ from random import randint, choice
 from collections.abc import MutableSequence
 from pprint import pprint
 from english_words import get_english_words_set
+from itertools import groupby
+import uuid
+
 
 # fPDK, font Proofing Development Kit
 
@@ -518,16 +521,17 @@ class proofDocument:
     def __init__(self):
 
         self._counter = 0
+        self._group_count = 0
 
-        self.storage = []
-        self._now = datetime.datetime.now()
-        self._identifier = None
-        self._fonts = proofObjectHandler([])
-        self._operator = None
-        self._crop = ""
+        self.storage        = []
+        self._now           = datetime.datetime.now()
+        self._identifier    = None
+        self._fonts         = proofObjectHandler([])
+        self._operator      = None
+        self._crop          = ""
         self._use_instances = False
-        self._path = None
-        self._name = None
+        self._path          = None
+        self._name          = None
 
         # proof UI settings
         # size can either be a tuple of ints or a DrawBot
@@ -551,7 +555,7 @@ class proofDocument:
         self.grid = None
         self.instance_color = (0.58, 0.22, 1, 1)
         self.words = []
-        self.in_group = False
+        self.in_group = None
 
 
 
@@ -845,7 +849,6 @@ class proofDocument:
                     multi_size_page=False,
                     restrict_page=True, # if set to False the overflow will add new pages
                     openType={}, # the only snake case :) a dict for activating specific OT on this page
-                    group_sections=True, # for select proof types we will group all the files.
                     ):
 
         to_store = { 
@@ -863,6 +866,67 @@ class proofDocument:
         # we get our data from the storage 
 
 
+    def _draw_paragraph(self, data=None, fonts=None):
+
+        for font in fonts:
+            to_process = font.locations.find(in_crop=True) if data[0][-1].get("use_instances") else font.locations.find(is_source=True, in_crop=True)
+            for loca in to_process:
+                for sub_sec in data:
+
+                    proof_type, local_data, class_data = sub_sec
+
+                    point_size      = local_data.get("point_size", FONT_SIZE_MED)
+                    columns         = local_data.get("columns", 1)
+                    sources         = local_data.get("sources", True)
+                    instances       = local_data.get("instances", False)
+                    multi_size_page = local_data.get("multi_size_page", False)
+                    restrict_page   = local_data.get("restrict_page", True)
+                    openType        = local_data.get("openType", {})
+                    class_data      = local_data.get("to_store", {})
+                    point_sizes     = list(mit.always_iterable(point_size))
+
+                    txt = PROOF_DATA.get(proof_type)
+                    while txt:
+                        if len(point_sizes) > 1 and multi_size_page:
+                            self._init_page(font=font,proof_type=proof_type,location=loca)
+                            txt = self.draw_text_layout(txt,
+                                                        font.path,
+                                                        loca.location,
+                                                        len(point_sizes),
+                                                        restrict_page,
+                                                        point_sizes,
+                                                        multi_size_page,
+                                                        openType
+                                                        )
+                        else:
+                            for pt in point_sizes:
+                                self._init_page(font=font,proof_type=proof_type,location=loca)
+                                txt = self.draw_text_layout(txt,
+                                                            font.path,
+                                                            loca.location,
+                                                            columns,
+                                                            restrict_page,
+                                                            pt,
+                                                            multi_size_page,
+                                                            openType
+                                                            )
+    def _draw_core(self, data=None, fonts=None):
+        for font in fonts:
+            to_process = font.locations.find(in_crop=True) if data[-1].get("use_instances") else font.locations.find(is_source=True, in_crop=True)
+            for loca in to_process:
+                # for sub_sec in data:
+                self._init_page(font=font,proof_type="core",location=loca)
+                txt = PROOF_DATA["core"]
+
+                min_size = self.get_smallest_core_scaler(txt)
+                txt = self.draw_core_characters(txt,
+                                     font.path,
+                                     loca.location,
+                                     True,
+                                     min_size
+                                    )
+
+
     def _build_proofs(self):
 
         fonts = self._fonts
@@ -873,34 +937,38 @@ class proofDocument:
         # grouped = [it for it in storage if it[-1].get("in_group") == True]
         # pprint(grouped)
 
-        def run_on_grouped():
-            pass
+        def grouper(data):
+            result = []
+            current = [data[0]]
+            for prev, curr in zip(data, data[1:]):
+                if curr[-1].get("in_group") and (curr[-1].get("in_group") == prev[-1].get("in_group")):
+                    current.append(curr)
+                else:
+                    result.append(tuple(current))
+                    current = [curr]
+            result.append(tuple(current))
+            return result
+        subs = grouper(storage)
 
-        all_storage = {}
-        for ii, data in enumerate(storage):
-            (pp,ll,cd) = data
-            all_storage[(ii, pp)] = (ll,cd,cd.get("in_group", False))
+        if subs[0][0][0] == "cover":
+            subs.pop(0)
 
-        grouped = {}
-        for (index, name), data in all_storage.items():
-            if data[-1]:
-                grouped[index] = (name,data)
+        for section in subs:
+            if len(section) == 1:
+                section = section[0]
+                name = section[0]
+                if name == "paragraph":
+                    self._draw_paragraph([section], fonts)
+                elif name == "core":
+                    self._draw_core(section, fonts)
+            else:
+                for font in fonts:
+                    self._draw_paragraph(section,[font])
 
-
-        next_bool = all_storage[list(all_storage.keys())[0]][-1]
-
-        while next_bool == False:
-            for (index,name),data in all_storage.items():
-                if index+1 >= len(all_storage.keys()):
-                    break
-
-                next_bool = all_storage[list(all_storage.keys())[index+1]][-1]
-                print(next_bool)
         """
         get a solid context manager / while loop going that checks what the next proof 
         will be and keep drawing normal proofs unless the next one(s) is/are a group
         if so, we will draw the groupping and then go back to drawing via single
-
         """ 
 
 
@@ -912,20 +980,7 @@ class proofDocument:
         #     id = storage.index(co[0])
         #     storage.pop(id)
         #     proof_type, local_data, class_data = co[0]
-        #     for font in fonts:
-        #         to_process = font.locations.find(in_crop=True) if class_data.get("use_instances") else font.locations.find(is_source=True, in_crop=True)
-        #         for loca in to_process:
-        #             txt = PROOF_DATA[proof_type]
-        #             while txt:
-        #                 if proof_type == "core":
-        #                     self._init_page(font=font,proof_type=proof_type,location=loca)
-        #                     min_size = self.get_smallest_core_scaler(txt)
-        #                     txt = self.draw_core_characters(txt,
-        #                                          font.path,
-        #                                          loca.location,
-        #                                          True,
-        #                                          min_size
-        #                                         )
+
 
 
         # use_instances = storage[0][-1].get("use_instances")
@@ -941,7 +996,6 @@ class proofDocument:
         #             multi_size_page = local_data.get("multi_size_page", False)
         #             restrict_page   = local_data.get("restrict_page", True)
         #             openType        = local_data.get("openType", {})
-        #             group_sections  = local_data.get("group_sections", True)
         #             class_data      = local_data.get("to_store", {})
         #             point_sizes     = list(mit.always_iterable(point_size))
 
@@ -1010,7 +1064,6 @@ class proofDocument:
                 if tag in ["c2sc", "smcp"]:
                     string.append("The Quick Brown Fox Jumps Over The Lazy Dog", font=font.path, fontSize=42, openTypeFeatures={tag:True,})            
                 else:
-
                     """
                     come up with a much faster word finder algo
                     """
@@ -1395,17 +1448,16 @@ class proofDocument:
             bot.scale(sf)
             bot.textBox(fs, (box_x/sf, box_y/sf, box_w/sf, box_h/sf))   
 
+
     @contextmanager
     def grouping(self, group_type="font"):
+        self._group_count += 1
+        self.in_group = str(uuid.uuid4())
 
-        self.in_group = True
         try:
             yield
         finally:
-            self.in_group = False
-
-
-
+            self.in_group = None
 
 
 if __name__ == "__main__":
@@ -1432,7 +1484,7 @@ if __name__ == "__main__":
     # prepare the proof
     doc.setup()
 
-    # doc.new_section("core")
+    doc.new_section("core")
 
     """custom context manager that allows us to
     group specific proof sections by specific
@@ -1459,7 +1511,9 @@ if __name__ == "__main__":
                     restrict_page=False, # if True and multi point sizes, adds multi-column page with no overflow
                    )
 
-    doc._build_proofs()
+
+
+    # doc._build_proofs()
     # doc.new_section(
     #                 "gradient",
     #                )
@@ -1493,7 +1547,7 @@ if __name__ == "__main__":
     write to disk
     """
 
-    # doc.save(open=True)
+    doc.save(open=True)
 
     """
     write to custom file format to save exact proof settings for later
