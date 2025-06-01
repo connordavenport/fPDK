@@ -961,6 +961,22 @@ class proofDocument:
                     self._draw_paragraph([section], fonts)
                 elif name == "core":
                     self._draw_core(section, fonts)
+                elif name == "gradient":
+                    txt = self.get_gradient_strings()
+                    while txt:
+                        self._init_page(font=fonts[0],proof_type=name)
+                        txt = self.draw_text_layout(txt)
+                else:
+                    pass
+                # elif proof_type == "features":
+                #     for font in fonts:
+                #         front_most = font.locations.find(in_crop=True)
+                #         if not front_most:
+                #             front_most = font.locations[0]
+                #         else:
+                #             front_most.sort()
+                #             front_most = front_most[0]
+                #         self.draw_feature_proofs(font=font, location=front_most)
             else:
                 for font in fonts:
                     self._draw_paragraph(section,[font])
@@ -1025,22 +1041,6 @@ class proofDocument:
         #                                                     openType
         #                                                     )
 
-        # for item in storage:
-        #     proof_type = item[0]
-        #     if proof_type == "gradient":
-        #         txt = self.get_gradient_strings()
-        #         while txt:
-        #             self._init_page(font=fonts[0],proof_type=proof_type)
-        #             txt = self.draw_text_layout(txt)
-        #     if proof_type == "features":
-        #         for font in fonts:
-        #             front_most = font.locations.find(in_crop=True)
-        #             if not front_most:
-        #                 front_most = font.locations[0]
-        #             else:
-        #                 front_most.sort()
-        #                 front_most = front_most[0]
-        #             self.draw_feature_proofs(font=font, location=front_most)
 
 
     def draw_feature_proofs(self, font=None, location=None):
@@ -1472,7 +1472,6 @@ if __name__ == "__main__":
         should it accept designspace objects? ufos?
     """
     doc.add_object("/Users/connordavenport/Code/Typefaces/Beaujon-Typeface/Beaujon.designspace")
-
     doc.crop_space("opsz=10")
 
     doc.size = "LetterLandscape"
@@ -1480,10 +1479,7 @@ if __name__ == "__main__":
     doc.margin = "auto"
     doc.use_instances = True
 
-
-    # prepare the proof
     doc.setup()
-
     doc.new_section("core")
 
     """custom context manager that allows us to
@@ -1492,31 +1488,20 @@ if __name__ == "__main__":
     """
 
     with doc.grouping() as group:
-
-        doc.new_section(
-                        "paragraph",
-                        point_size=[12,20],
-                        multi_size_page=True, # if True and multi point sizes, adds multi-column page with no overflow
-                       )
-        doc.new_section(
-                        "paragraph",
-                        point_size=[12],
-                        multi_size_page=False, # if True and multi point sizes, adds multi-column page with no overflow
-                        restrict_page=True,
-                       )
+        """enter context manager
+        anything that happens in here will recompile the order
+        and generate pages in the font grouping and not the section order
+        """
+        doc.new_section("paragraph", point_size=[12,20], multi_size_page=True,) # if True and multi point sizes, adds multi-column page with no overflow
+        doc.new_section("paragraph", point_size=[12], multi_size_page=False, restrict_page=True,)  # if True and multi point sizes, adds multi-column page with no overflow 
+    """exit context manager"""
 
     doc.new_section(
                     "paragraph",
                     point_size=20,
                     restrict_page=False, # if True and multi point sizes, adds multi-column page with no overflow
                    )
-
-
-
-    # doc._build_proofs()
-    # doc.new_section(
-    #                 "gradient",
-    #                )
+    doc.new_section("gradient")
     # doc.new_section(
     #                 "features",
     #                )
