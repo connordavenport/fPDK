@@ -39,6 +39,8 @@ OPENTYPE     = ()
 GRADIENT     = ()
 INSPECTOR    = ()
 
+VALID_XML_TYPES = ["str", "bool", "int", "float", "dict", "bytes", "datetime.datetime", "tuple", "list"]
+
 SECTION_TYPES = [CORE, RUNNING_TEXT, OPENTYPE, GRADIENT, INSPECTOR]
 
 PROOF_DATA = {
@@ -151,9 +153,6 @@ class proofObjectHandler(list):
                 self.data[:] = initlist.data[:]
             else:
                 self.data = list(initlist)
-
-    def __repr__(self):
-        return f"""<{self.__class__.__name__} @ {hash(tuple(self.data))}>"""
 
     def __contains__(self, value):
         return value in self.data
@@ -316,8 +315,6 @@ class proofLocation:
         if "fvar" in f:
             for i in f["fvar"].instances: 
                 l = self._location
-                # print(l)
-                #l = {a:v for a,v in self._location.items() if a in [a.axisTag for a in f["fvar"].axes]}
                 if i.coordinates == l:   
                     for name in f["name"].names:
                         if name.nameID == i.subfamilyNameID:
@@ -328,19 +325,18 @@ class proofLocation:
 
 class proofFont:
 
-    def __repr__(self):
-        return f"<proofFont @ {self.name}>"
-
     def __init__(self, path):
-
         self.path               = path
         self.font_object        = None
         self.load_font()
         self.is_variable        = False
         self.locations          = proofObjectHandler([])
-        self.operator           = None
+        self.operator           = dsp_doc
         self._name              = self._compile_name()
         self.features           = {}
+
+    def __repr__(self):
+        return repr(self.path)
 
     def load_font(self):
         if self.path:
@@ -374,7 +370,6 @@ class proofFont:
             a = renamer.get(axis)
             parsed[a]=val
         return parsed
-
 
     def get_OT(self):
         font = self.font_object
@@ -439,6 +434,7 @@ class proofFont:
         .. versionadded:: 5.0
         """
         # Make one DesignspaceDoc v5 for each variable font
+
         for vf in self.operator.getVariableFonts():
             vfUserRegion = getVFUserRegion(doc, vf)
             vfDoc = _extractSubSpace(
@@ -491,8 +487,6 @@ class proofFont:
                             built.origin = font_obj
                             _instances[str(built.location)] = built
 
-                
-                        #print(built.location, built.is_instance, built.is_source)
         if not _instances:
         # we dont want to rely on the fvar instances because there is no source data to proof
             if "fvar" in font_obj:
@@ -516,23 +510,26 @@ class proofFont:
 class proofDocument:
 
     def __repr__(self):
-        return f"<proofDocument @ {self.identifier} : {hash(tuple(self._fonts))}>"
+        return f"<proofDocument @ {self.identifier} : {hash(tuple(self.fonts))}>"
 
     def __init__(self):
 
         self._counter = 0
         self._group_count = 0
+        self._compiling = False
 
         self.storage        = []
+        self.packaged       = []
         self._now           = datetime.datetime.now()
         self._identifier    = None
-        self._fonts         = proofObjectHandler([])
         self._operator      = None
         self._crop          = ""
         self._use_instances = False
         self._path          = None
         self._name          = None
 
+        self.fonts          = proofObjectHandler([])
+        self.objects        = []
         # proof UI settings
         # size can either be a tuple of ints or a DrawBot
         # compatible paper size name string
@@ -552,10 +549,10 @@ class proofDocument:
         self._caption_font = "SFMono-Regular"
         self.hyphenation = True
 
-        self.grid = None
+        self._grid = None
         self.instance_color = (0.58, 0.22, 1, 1)
         self.words = []
-        self.in_group = None
+        self.in_group = 0
 
 
 
@@ -607,9 +604,8 @@ class proofDocument:
                                (self.size[0] - (self._margin_left + self._margin_right )),
                                (self.size[1] - (self._margin_top  + self._margin_bottom))
                               )
-
         # keep a stored grid for reference
-        self.grid = grid.ColumnGrid(
+        self._grid = grid.ColumnGrid(
                                     (   
                                         self._margin_left,
                                         self._margin_bottom,
@@ -658,20 +654,20 @@ class proofDocument:
         self._name = new_name
 
     def _get_name(self):
-        if not self._name and self._fonts:
+        if not self._name and self.fonts:
             # return family name for top level font
-            self._name = self._fonts[0].font_object["name"].getBestFamilyName().replace(" ","")
+            self._name = self.fonts[0].font_object["name"].getBestFamilyName().replace(" ","")
         return self._name
 
     name = property(_get_name, _set_name)
 
-    def _set_operator(self, new_operator):
-        self._operator = new_operator
+    # def _set_operator(self, new_operator):
+    #     self._operator = new_operator
 
-    def _get_operator(self):
-        return self._operator
+    # def _get_operator(self):
+    #     return self._operator
 
-    operator = property(_get_operator, _set_operator)
+    # operator = property(_get_operator, _set_operator)
 
     def _get_margin(self):
         return (
@@ -684,7 +680,7 @@ class proofDocument:
     def _set_margin(self, new_margin):
         # we can accept a tuple of 4 to set individual 
         # or 1 value to apply across the board
-        if isinstance(new_margin, tuple):
+        if isinstance(new_margin, (tuple, list)):
             if len(new_margin) == 4:
                 # counter clockwise from top
                 T,L,B,R = new_margin
@@ -740,7 +736,7 @@ class proofDocument:
         return path
 
     def generate_path_base(self, suffix=".pdf", overwrite=True):
-        cd = os.path.split(self._fonts[0].path)[0]
+        cd = os.path.split(self.fonts[0].path)[0]
         directory = find_proof_directory(cd, "proofs") 
         if not directory:
             directory = cd
@@ -749,46 +745,84 @@ class proofDocument:
 
         # make sure file names are unique if have overwrite flag on
         path = self.uniquify(path) if not overwrite else path
-
         return path
+
 
     def load(self, proof_data_path):
         with open(proof_data_path, "rb") as proof_settings:
             data = plistlib.load(proof_settings)
-            for name, val in data.items():
-                if val:
-                    attr = setattr(self, name, val)
+            for key, value in data.items():
+                if key in ["fonts","objects","crop"]:
+                    pass
+                else:
+                    setattr(self, key, value)
+
+        unpacked = []
+        if self.packaged:
+            for temp in self.packaged:
+                for page in temp:
+                    unpacked.append(page)
+
+
+        self.add_objects(data["objects"])
+        self.crop_space(data["crop"])
+
+        # self.crop_space(self.crop)
+
+        self.storage = unpacked
+        self.packaged = []
+
+        # call setup directly
+        self.setup()
+
 
     def write(self, path=None, overwrite=True):
-        to_store = [item[0] for item in inspect.getmembers(self) if not item[0].startswith("_") and not inspect.ismethod(item[1])]
+        if self._compiling:
+            pass
+        else:
+            self.packaged = self._group_data(self.storage, flatten_objects=True)
+
+        _storing = [item[0] for item in inspect.getmembers(self) if not item[0].startswith("_") and not inspect.ismethod(item[1])]
         data = {}
-        for item in to_store:
+
+        for item in _storing:
             comp = getattr(self, item)
+            if item in ["storage", "fonts"]:
+                continue
+            # if item == "fonts":
+            #     comp = [str(f.path) for f in comp]
             data[item] = comp
             if hasattr(comp, "path"):
                 data[item] = getattr(self,item).path
 
+            if item == "packaged":
+                for group in comp:
+                    for page in group:
+                        stored = page[-1].get("to_store", {})
+                        if "fonts" in stored.keys():
+                            del stored["fonts"]
+
+        # pprint(data)
         dump_path = path if path else self.generate_path_base(".proof", overwrite)
         with open(dump_path, "wb") as proof_settings:
             plistlib.dump(data, proof_settings)
-        # pass
+
 
     def save(self, path=None, open="_", overwrite=True):
 
         _save_path = path if path else self.path
         _auto = open if open != "_" else self.open_automatically
 
-        self._build_proofs()
-
+        self._compile_proof()
         self.paginate()
         bot.saveImage(_save_path)
         if _auto:
             os.system(f"open -a Preview '{_save_path}'")
 
 
-    def get_smallest_core_scaler(self, text):
+    def get_smallest_core_scaler(self, text, fonts=[]):
         temp_holder = []
-        for font in self._fonts:
+        for font in fonts:
 
             loc = font.locations.find(in_crop=True) if self.use_instances else font.locations.find(is_source=True, in_crop=True)
             for l in loc:
@@ -820,16 +854,16 @@ class proofDocument:
 
         header_y_pos = self.size[1]-(self._margin_left/2)
 
-        bot.text(f'Project: {self.name}', (self.grid[0], header_y_pos))
-        bot.text(f'Date: {self._now:%Y-%m-%d %H:%M}', (self.grid[1], header_y_pos))
+        bot.text(f'Project: {self.name}', (self._grid[0], header_y_pos))
+        bot.text(f'Date: {self._now:%Y-%m-%d %H:%M}', (self._grid[1], header_y_pos))
         if not cover:
             if location and not location.is_source:
                 bot.fill(*self.instance_color)
                 o_s = 8
-                bot.oval(self.grid[2]-(o_s + (o_s/2)), header_y_pos-(o_s/4), o_s, o_s)
+                bot.oval(self._grid[2]-(o_s + (o_s/2)), header_y_pos-(o_s/4), o_s, o_s)
 
             bot.fill(0)
-            bot.text(f'Style: {location.name if location else font.name}', (self.grid[2], header_y_pos))
+            bot.text(f'Style: {location.name if location else font.name}', (self._grid[2], header_y_pos))
             bot.text(f'Type: {p.stem}', (self.size[0]-self._margin_right, header_y_pos), align="right")
         fw,fh = bot.textSize(f'Style: {font.name}')
         if proof_type != "core" and location:
@@ -858,8 +892,14 @@ class proofDocument:
                     and not inspect.ismethod(item[1])
                     and item[0] != "storage"
                    }
+        # # i wish we didnt need to do this....
+        # for kk,vv in to_store.items():
+        #     if kk == "fonts":
+        #         to_store[kk] = [v.path for v in vv]
+        # to_store = to_store
 
-        self.move_to_storage(proof_type, locals(), to_store)
+        cleaned = {k:v for k,v in locals().items() if k != "self"}
+        self.move_to_storage(proof_type, cleaned)
 
         # new_section is just a moving company...
         # build_proofs is the new house but
@@ -867,13 +907,12 @@ class proofDocument:
 
 
     def _draw_paragraph(self, data=None, fonts=None):
-
         for font in fonts:
-            to_process = font.locations.find(in_crop=True) if data[0][-1].get("use_instances") else font.locations.find(is_source=True, in_crop=True)
+            to_process = font.locations.find(in_crop=True) if data[0][-1].get("to_store", {}).get("use_instances") else font.locations.find(is_source=True, in_crop=True)
             for loca in to_process:
                 for sub_sec in data:
 
-                    proof_type, local_data, class_data = sub_sec
+                    proof_type, local_data = sub_sec
 
                     point_size      = local_data.get("point_size", FONT_SIZE_MED)
                     columns         = local_data.get("columns", 1)
@@ -910,6 +949,15 @@ class proofDocument:
                                                             multi_size_page,
                                                             openType
                                                             )
+
+    def _draw_gradient(self, data=None, fonts=None):
+        proof_type,local_data = data
+        level = local_data.get("level", "ascii")
+        txt = self.get_gradient_strings(level=level)
+        while txt:
+            self._init_page(font=fonts[0],proof_type="gradient")
+            txt = self.draw_text_layout(txt)
+
     def _draw_core(self, data=None, fonts=None):
         for font in fonts:
             to_process = font.locations.find(in_crop=True) if data[-1].get("use_instances") else font.locations.find(is_source=True, in_crop=True)
@@ -918,7 +966,7 @@ class proofDocument:
                 self._init_page(font=font,proof_type="core",location=loca)
                 txt = PROOF_DATA["core"]
 
-                min_size = self.get_smallest_core_scaler(txt)
+                min_size = self.get_smallest_core_scaler(txt, fonts)
                 txt = self.draw_core_characters(txt,
                                      font.path,
                                      loca.location,
@@ -926,34 +974,56 @@ class proofDocument:
                                      min_size
                                     )
 
-
-    def _build_proofs(self):
-
-        fonts = self._fonts
-        storage = self.storage
-
+    def _group_data(self, data=None, flatten_objects=False):
         # using the context manager we find the grouped sections
         # we need to update this so we can group it only in subsections of clusters
         # grouped = [it for it in storage if it[-1].get("in_group") == True]
         # pprint(grouped)
 
-        def grouper(data):
-            result = []
-            current = [data[0]]
-            for prev, curr in zip(data, data[1:]):
-                if curr[-1].get("in_group") and (curr[-1].get("in_group") == prev[-1].get("in_group")):
-                    current.append(curr)
-                else:
-                    result.append(tuple(current))
-                    current = [curr]
-            result.append(tuple(current))
-            return result
-        subs = grouper(storage)
+        # def flatten(c):
+        #     c[-1]["to_store"]["fonts"]
+        #     fonts = c[-1]["to_store"].get("fonts", [])
+        #     return [str(f.path) for f in fonts]
+
+        result = []
+        # if flatten_objects:
+        #     data[0][-1]["to_store"]["fonts"] = flatten(data[0])
+
+        current = [data[0]]
+
+        for prev, curr in zip(data, data[1:]):
+
+            # if flatten_objects: 
+            #     curr[-1]["to_store"]["fonts"] = flatten(curr)
+
+            if curr[-1]["to_store"].get("in_group") and (curr[-1]["to_store"].get("in_group") == prev[-1]["to_store"].get("in_group")):
+                current.append(curr)
+            else:
+                result.append(tuple(current))
+                current = [curr]
+        result.append(tuple(current))
+
+        return result
+
+
+    def _compile_proof(self):
+
+        self._compiling = True
+        fonts = self.fonts
+        storage = self.storage
+
+        self.packaged = subs = self._group_data(storage)
 
         if subs[0][0][0] == "cover":
+            """we can safely assume that the 
+            first item will always be cover because 
+            it is drawn when we initiate a new proof
+            with the setup function
+            """
             subs.pop(0)
 
         for section in subs:
+
             if len(section) == 1:
                 section = section[0]
                 name = section[0]
@@ -962,142 +1032,86 @@ class proofDocument:
                 elif name == "core":
                     self._draw_core(section, fonts)
                 elif name == "gradient":
-                    txt = self.get_gradient_strings()
-                    while txt:
-                        self._init_page(font=fonts[0],proof_type=name)
-                        txt = self.draw_text_layout(txt)
+                    self._draw_gradient(section, fonts)
+                elif name == "features":
+                    self._draw_features(section,fonts)
                 else:
                     pass
-                # elif proof_type == "features":
-                #     for font in fonts:
-                #         front_most = font.locations.find(in_crop=True)
-                #         if not front_most:
-                #             front_most = font.locations[0]
-                #         else:
-                #             front_most.sort()
-                #             front_most = front_most[0]
-                #         self.draw_feature_proofs(font=font, location=front_most)
             else:
                 for font in fonts:
                     self._draw_paragraph(section,[font])
 
-        """
-        get a solid context manager / while loop going that checks what the next proof 
-        will be and keep drawing normal proofs unless the next one(s) is/are a group
-        if so, we will draw the groupping and then go back to drawing via single
-        """ 
 
+    def _draw_features(self, data=None,fonts=None):
 
-        # if storage[0][0] == "cover":
-        #     storage.pop(0)
-        #                             # name
-        # co = [c for c in storage if c[0] == "core"]
-        # if co:
-        #     id = storage.index(co[0])
-        #     storage.pop(id)
-        #     proof_type, local_data, class_data = co[0]
+        proof_type, local_data = data
 
+        caption_font   = local_data["to_store"].get("caption_font", "SFMono-Regular")
+        _margin_left   = local_data["to_store"].get("margin", (50)*4)[1]
+        _margin_bottom = local_data["to_store"].get("margin", (50)*4)[2]
+        _text_box_size = local_data["to_store"].get("size", PAGE_SIZE_DEFAULT)
 
+        for font in fonts:
+            _to_use = font.locations.find(in_crop=True)
+            if not _to_use:
+                _to_use = font.locations[0]
+            else:
+                _to_use.sort()
+                _to_use = _to_use[0]
+            location = _to_use.location
 
-        # use_instances = storage[0][-1].get("use_instances")
-        # for font in fonts:
-        #     to_process = font.locations.find(in_crop=True) if use_instances else font.locations.find(is_source=True, in_crop=True)
-        #     for loca in to_process:
-        #         for iir, (proof_type, local_data, class_data) in enumerate(storage):
+            font_OT = font.get_OT()
+            if not font_OT:
+                print(f"""ERROR: {font.name} does not contain a GSUB table, skipping `feature` proof""")
+            else:
+                if self.words == []:
+                    self.words = get_english_words_set(['web2'], lower=True)
 
-        #             point_size      = local_data.get("point_size", FONT_SIZE_MED)
-        #             columns         = local_data.get("columns", 1)
-        #             sources         = local_data.get("sources", True)
-        #             instances       = local_data.get("instances", False)
-        #             multi_size_page = local_data.get("multi_size_page", False)
-        #             restrict_page   = local_data.get("restrict_page", True)
-        #             openType        = local_data.get("openType", {})
-        #             class_data      = local_data.get("to_store", {})
-        #             point_sizes     = list(mit.always_iterable(point_size))
-
-        #             txt = PROOF_DATA.get(proof_type)
-        #             while txt:
-        #                 if len(point_sizes) > 1 and multi_size_page:
-        #                     self._init_page(font=font,proof_type=proof_type,location=loca)
-        #                     txt = self.draw_text_layout(txt,
-        #                                                 font.path,
-        #                                                 loca.location,
-        #                                                 len(point_sizes),
-        #                                                 restrict_page,
-        #                                                 point_sizes,
-        #                                                 True,
-        #                                                 openType
-        #                                                 )
-        #                 else:
-        #                     for pt in point_sizes:
-        #                         self._init_page(font=font,proof_type=proof_type,location=loca)
-        #                         txt = self.draw_text_layout(txt,
-        #                                                     font.path,
-        #                                                     loca.location,
-        #                                                     columns,
-        #                                                     restrict_page,
-        #                                                     pt,
-        #                                                     False,
-        #                                                     openType
-        #                                                     )
-
-
-
-    def draw_feature_proofs(self, font=None, location=None):
-        font_OT = font.get_OT()
-        if font_OT:
-
-            if self.words == []:
-                self.words = get_english_words_set(['web2'], lower=True)
-
-            for tag, (desc,LookupID,mapping) in font_OT.items():
-                
-                string = bot.FormattedString()
-                string.fontVariations(**location.location)
-                cols = 1
-                if desc:
-                    string.append(f"{tag} : {desc}\n", font=self.caption_font, fontSize=12)
-                else:
-                    string.append(f"{tag}\n", font=self.caption_font, fontSize=12)
-                string.append("", font=font.path, fontSize=42)
-                
-                if tag in ["c2sc", "smcp"]:
-                    string.append("The Quick Brown Fox Jumps Over The Lazy Dog", font=font.path, fontSize=42, openTypeFeatures={tag:True,})            
-                else:
-                    """
-                    come up with a much faster word finder algo
-                    """
+                for tag, (desc,LookupID,mapping) in font_OT.items():
                     
-                    contains_all = lambda word, letters: all(letter in word for letter in letters)
-                    contains = [word for word in self.words if contains_all(word, list(mapping.keys())[:2])]
-                    if contains:
-                        if tag.startswith("ss"):
-                            rd = choice(contains)
-                            for gg in rd:
-                                if gg in list(mapping.keys())[:2]:
-                                    string.fill(0,0,0,.3)
-                                else:
-                                    string.fill(0,0,0,1)
-                                string.append(gg, openTypeFeatures={tag:False})
-                
-                            string.append("→", fill=(0,0,0,.2), openTypeFeatures={tag:False})
-                            string.fill(0)
-                            string.append(rd, fill=(0,0,0,1), openTypeFeatures={tag:True})
-                            string.append("\n")
-                            cols = 1
+                    string = bot.FormattedString()
+                    string.fontVariations(**location.location)
+                    cols = 1
+                    if desc:
+                        string.append(f"{tag} : {desc}\n", font=caption_font, fontSize=12)
                     else:
-                        for fr,to in mapping.items():
-                            string.fill(0,0,0,.3)            
-                            string.appendGlyph(fr)
-                            string.append("→", fill=(0,0,0,.2))
-                            string.fill(0)
-                            string.appendGlyph(to)
-                            string.append("\n")
-                        cols = 3
-                    # string = Grid.columnTextBox(string, (10, 10, width()-20, height()-20), subdivisions=3, gutter=15, draw_grid=False)
+                        string.append(f"{tag}\n", font=caption_font, fontSize=12)
+                    string.append("", font=font.path, fontSize=42)
+                    
+                    if tag in ["c2sc", "smcp"]:
+                        string.append("The Quick Brown Fox Jumps Over The Lazy Dog", font=font.path, fontSize=42, openTypeFeatures={tag:True,})            
+                    else:
+                        #come up with a much faster word finder algo
+                        contains_all = lambda word, letters: all(letter in word for letter in letters)
+                        contains = [word for word in self.words if contains_all(word, list(mapping.keys())[:2])]
+                        if contains:
+                            if tag.startswith("ss"):
+                                rd = choice(contains)
+                                for gg in rd:
+                                    if gg in list(mapping.keys())[:2]:
+                                        string.fill(0,0,0,.3)
+                                    else:
+                                        string.fill(0,0,0,1)
+                                    string.append(gg, openTypeFeatures={tag:False})
+                    
+                                string.append("→", fill=(0,0,0,.2), openTypeFeatures={tag:False})
+                                string.fill(0)
+                                string.append(rd, fill=(0,0,0,1), openTypeFeatures={tag:True})
+                                string.append("\n")
+                                cols = 1
+                        else:
+                            for fr,to in mapping.items():
+                                string.fill(0,0,0,.3)            
+                                string.appendGlyph(fr)
+                                string.append("→", fill=(0,0,0,.2))
+                                string.fill(0)
+                                string.appendGlyph(to)
+                                string.append("\n")
+                            cols = 3
+                        # string = Grid.columnTextBox(string, (10, 10, width()-20, height()-20), subdivisions=3, gutter=15, draw_grid=False)
 
-                self._init_page(font=font,proof_type="features",location=location)
-                grid.columnTextBox(string, (self._margin_left, self._margin_bottom, *self._text_box_size), subdivisions=cols, gutter=15, draw_grid=False)
+                    self._init_page(font=font,proof_type="features",location=location)
+                    grid.columnTextBox(string, (_margin_left, _margin_bottom, *_text_box_size), subdivisions=cols, gutter=15, draw_grid=False)
 
 
     def draw_core_characters(self, txt, font_path, variable_location={}, will_draw=True, scale=None, openType={"resetFeatures":True}):
@@ -1135,8 +1149,7 @@ class proofDocument:
 
 
     def get_gradient_strings(self, level="ascii", font_size=40):
-        fonts = self._fonts
-
+        fonts = self.fonts
         if level == "all":
             chars = sorted(
                     self.find_common_elements(
@@ -1165,7 +1178,8 @@ class proofDocument:
 
         for l in chars:
             for font in fonts:
-                for loca in font.locations:
+                locations = font.locations.find(in_crop=True) if self.use_instances else font.locations.find(is_source=True, in_crop=True)
+                for loca in locations:
                     if loca.location:
                         txt.fontVariations(**loca.location)
                     txt.font(font.path)
@@ -1232,10 +1246,9 @@ class proofDocument:
         return closest_file
 
 
-    def get_variable_fonts_from_op(self):
-        d = self.operator
-        var = d.variableFonts
-        di,fi = os.path.split(os.path.abspath(d.path))
+    def get_variable_fonts_from_op(self, designspace):
+        var = designspace.variableFonts
+        di,fi = os.path.split(os.path.abspath(designspace.path))
         allVFs = []
         if var:
             for vf in var:
@@ -1263,11 +1276,10 @@ class proofDocument:
                 if p:
                     te = proofFont(p)
                     te.is_variable = True
-                    te.operator = self.operator
-
+                    te.operator = designspace
                     te.build_locations()
-
                     allVFs.append(te)
+
 
         return allVFs
 
@@ -1277,18 +1289,18 @@ class proofDocument:
         suff = os.path.splitext(path)[-1]
         if suff in suffixes.split(" "):
             o = proofFont(path)        
-            self._fonts.append(o)
+            self.fonts.append(o)
         elif suff == ".designspace":
-            self.operator = dsp_doc.fromfile(path)
-            vfs = self.get_variable_fonts_from_op()
-            self._fonts.extend(vfs)
-
+            operator = dsp_doc.fromfile(path)
+            vfs = self.get_variable_fonts_from_op(operator)
+            self.fonts.extend(vfs)
+        if path not in self.objects:
+            self.objects.append(path)
 
     #convience function to add multiple paths at once
     def add_objects(self, paths=[]):
         for path in paths:
             self.add_object(path)
-
 
     def reformat_limits(self, limits):
         '''
@@ -1326,7 +1338,7 @@ class proofDocument:
         zone = self.reformat_limits(_zone)
         valid = False
         if zone:
-            for font in self._fonts:
+            for font in self.fonts:
                 cropped = []
                 if isinstance(zone, dict):
                     for inst in font.locations:
@@ -1359,17 +1371,17 @@ class proofDocument:
 
     def move_to_storage(self, proof_type, locals, class_attrs={}):
         self._counter += 1
-        self.storage.append((proof_type,locals,class_attrs))
+        self.storage.append((proof_type,locals))
 
     def empty_storage(self):
         self._counter = 0
         self.storage = []
 
     def setup(self, cover_page=True):
-        self.move_to_storage("cover",locals())
+        # self.move_to_storage("cover",locals()) # i think we can turn this off for now
         bot.newDrawing()
         if cover_page:
-            self._cover_page(self._fonts)
+            self._cover_page(self.fonts)
 
     def text_attributes(self):
         bot.fill(0)
@@ -1453,93 +1465,100 @@ class proofDocument:
     def grouping(self, group_type="font"):
         self._group_count += 1
         self.in_group = str(uuid.uuid4())
-
         try:
             yield
         finally:
-            self.in_group = None
+            self.in_group = 0
 
 
 if __name__ == "__main__":
 
     doc = proofDocument()
-
     """load old settings"""
-    # doc.load("/Users/connordavenport/Dropbox/Clients/Dinamo/03_DifferentTimes/Sources/variable_ttf/2025-0526-ABCDifferentTimes.proof")
 
     """
     add a font or designspace, only accepts path strings
         should it accept designspace objects? ufos?
     """
-    doc.add_object("/Users/connordavenport/Code/Typefaces/Beaujon-Typeface/Beaujon.designspace")
-    doc.crop_space("opsz=10")
+    loading_test = False
 
-    doc.size = "LetterLandscape"
-    doc.caption_font = "CoreMono-Regular"
-    doc.margin = "auto"
-    doc.use_instances = True
+    if loading_test:
+        doc.load("/Users/connordavenport/Code/Typefaces/Beaujon-Typeface/variable_ttf/2025-0602-Beaujon.proof")
+        # if you want to remove a section from the old proof doc
+        # del doc.storage[2]
+        doc.save(open=True)
+    else:
 
-    doc.setup()
-    doc.new_section("core")
 
-    """custom context manager that allows us to
-    group specific proof sections by specific
-    styling instead ofproof
-    """
+        doc.add_object("/Users/connordavenport/Code/Typefaces/Beaujon-Typeface/Beaujon.designspace")
+        doc.crop_space("opsz=10 ital=0")
 
-    with doc.grouping() as group:
-        """enter context manager
-        anything that happens in here will recompile the order
-        and generate pages in the font grouping and not the section order
+        doc.size = "LetterLandscape"
+        doc.caption_font = "CoreMono-Regular"
+        doc.margin = "auto"
+        doc.use_instances = True
+
+        doc.setup()
+        # doc.new_section("core")
+
+        """custom context manager that allows us to
+        group specific proof sections by specific
+        styling instead ofproof
         """
-        doc.new_section("paragraph", point_size=[12,20], multi_size_page=True,) # if True and multi point sizes, adds multi-column page with no overflow
-        doc.new_section("paragraph", point_size=[12], multi_size_page=False, restrict_page=True,)  # if True and multi point sizes, adds multi-column page with no overflow 
-    """exit context manager"""
 
-    doc.new_section(
-                    "paragraph",
-                    point_size=20,
-                    restrict_page=False, # if True and multi point sizes, adds multi-column page with no overflow
-                   )
-    doc.new_section("gradient")
-    # doc.new_section(
-    #                 "features",
-    #                )
+        with doc.grouping() as group:
+            """enter context manager
+            anything that happens in here will recompile the order
+            and generate pages in the font grouping and not the section order
+            """
+            doc.new_section("paragraph", point_size=[12,20], multi_size_page=True,) # if True and multi point sizes, adds multi-column page with no overflow
+            doc.new_section("paragraph", point_size=[12], multi_size_page=False, restrict_page=True,)  # if True and multi point sizes, adds multi-column page with no overflow 
 
+        """exit context manager"""
 
-    """
-    proofml is an experimental proofing language
-    that is inspried by Tal Leming's ezui.
-    """
-    proofml_data = '''
-    * proof
-    [         ]|--|
-    [         ]|--|
-    '''
+        doc.new_section(
+                        "paragraph",
+                        point_size=20,
+                        restrict_page=False, # if True and multi point sizes, adds multi-column page with no overflow
+                       )
 
-    # doc.new_section(
-    #                 "proofml",
-    #                 data=proofml_data
-    #                )
+        # doc.new_section("gradient")
+        # doc.new_section("features")
 
 
-    # doc.open_automatically = False
-    """
-    kwargs inside of save overwrite whatever the doc says.
-    path, compiles name for current proof, will override with given if used
-    open, by default is `False`, open in Preview
-    overwrite, save over older proofs, default is `True`. `False` will append + "1" until path is unique
-    write to disk
-    """
+        """
+        proofml is an experimental proofing language
+        that is inspried by Tal Leming's ezui.
+        """
+        proofml_data = '''
+        * proof
+        [         ]|--|
+        [         ]|--|
+        '''
 
-    doc.save(open=True)
+        # doc.new_section(
+        #                 "proofml",
+        #                 data=proofml_data
+        #                )
 
-    """
-    write to custom file format to save exact proof settings for later
-    doc and save both allow for overwriting the previous file on disk
-    overwrite is set to True by default
-    """
-    # doc.write(overwrite=True)
+
+        # doc.open_automatically = False
+        """
+        kwargs inside of save overwrite whatever the doc says.
+        path, compiles name for current proof, will override with given if used
+        open, by default is `False`, open in Preview
+        overwrite, save over older proofs, default is `True`. `False` will append + "1" until path is unique
+        write to disk
+        """
+
+        doc.save(open=True)
+
+        """
+        write to custom file format to save exact proof settings for later
+        doc and save both allow for overwriting the previous file on disk
+        overwrite is set to True by default
+        """
+        doc.write(overwrite=True)
 
 
 
