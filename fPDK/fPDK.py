@@ -93,25 +93,7 @@ PAGE_SIZES = bot.sizes()
 PAGE_SIZE_DEFAULT = "LetterLandscape"
 
 
-def find_proof_directory(start_location, target):
-    # I don't think I wrote this function but I can't remember where I got it...
-    start_location = os.path.abspath(start_location)
-    closest_directory = save_path = None
-    closest_distance = float('inf')  # Initialize to positive infinity
-    current_path = start_location
-    while current_path != os.path.sep:
-        for filename in os.listdir(current_path):
-            if target in filename:
-                distance = len(os.path.relpath(current_path, start_location).split(os.path.sep))
-                if distance < closest_distance:
-                    closest_directory = current_path
-                    closest_distance = distance
-                    save_path = os.path.join(closest_directory, filename)
-        current_path = os.path.dirname(current_path)
-    return save_path
-
-
-def width_class(wdth_user_value) -> int:
+def width_class(wdth_user_value: int) -> int:
     '''
     function taken from fontMake's instancistator
     '''
@@ -122,14 +104,14 @@ def width_class(wdth_user_value) -> int:
     )
     return otRound(width_user_value_mapped)
 
-def weight_class(wght_user_value) -> int:
+def weight_class(wght_user_value: int) -> int:
     '''
     function taken from fontMake's instancistator
     '''
     weight_user_value = min(max(wght_user_value, 1), 1000)
     return otRound(weight_user_value)
 
-def italic_value(slnt_user_value) -> Union[int, float]:
+def italic_value(slnt_user_value: int) -> int | float:
     '''
     function taken from fontMake's instancistator
     '''
@@ -210,13 +192,13 @@ class proofObjectHandler(list):
     def append(self, value):
         self.data.append(value)
 
-    def insert(self, idx, value):
+    def insert(self, idx: int, value: proofFont | proofLocation):
         self.data.insert(idx, value)
 
-    def pop(self, idx=-1):
+    def pop(self, idx: int=-1) -> self.__class__(self):
         return self.data.pop(idx)
 
-    def remove(self, value):
+    def remove(self, value: proofFont | proofLocation):
         self.data.remove(value)
 
     def clear(self):
@@ -225,7 +207,7 @@ class proofObjectHandler(list):
     def copy(self):
         return self.__class__(self)
 
-    def index(self, idx, *args):
+    def index(self, idx: int, *args: int) -> proofFont | proofLocation:
         return self.data.index(idx, *args)
 
     def reverse(self):
@@ -242,7 +224,7 @@ class proofObjectHandler(list):
         else:
             self.data.sort(*args, **kwds)
 
-    def extend(self, other, clear=False):
+    def extend(self, other: self.__class__(self), clear:bool=False):
         if clear:
             self.data.clear()
         if isinstance(other, proofObjectHandler):
@@ -262,7 +244,7 @@ class proofLocation:
             name = "both"
         return f"<proofLocation.{name} @ {self.name}>"
 
-    def __init__(self, location):
+    def __init__(self, location:dict):
 
         self.type = None
         self.is_instance = False
@@ -276,56 +258,55 @@ class proofLocation:
         self._location = location
 
 
-    def _get_in_crop(self):
+    def _get_in_crop(self) -> bool:
         return self._in_crop
 
-    def _set_in_crop(self, new_in_crop):
+    def _set_in_crop(self, new_in_crop:bool):
         self._in_crop = new_in_crop
 
     in_crop = property(_get_in_crop, _set_in_crop)
 
-    def _get_origin(self):
+    def _get_origin(self) -> TTFont:
         return self._origin
 
-    def _set_origin(self, new_origin):
+    def _set_origin(self, new_origin: TTFont):
         self._origin = new_origin
 
     origin = property(_get_origin, _set_origin)
 
-    def _get_name(self):
+    def _get_name(self) -> str:
         return self._name
 
-    def _set_name(self, new_name):
+    def _set_name(self, new_name: str):
         self._name = new_name
 
     name = property(_get_name, _set_name)
 
-    def _get_location(self):
+    def _get_location(self) -> dict:
         return self._location
 
-    def _set_location(self, new_location):
+    def _set_location(self, new_location: dict):
         self._location = new_location
 
     location = property(_get_location, _set_location)
 
 
-    def generate_name(self, TTFont):
-        f = TTFont
-        best_name = f["name"].getBestFullName()
-        if "fvar" in f:
-            for i in f["fvar"].instances: 
+    def generate_name(self, font_obj: TTFont) -> str:
+        best_name = font_obj["name"].getBestFullName()
+        if "fvar" in font_obj:
+            for i in font_obj["fvar"].instances: 
                 l = self._location
                 if i.coordinates == l:   
-                    for name in f["name"].names:
+                    for name in font_obj["name"].names:
                         if name.nameID == i.subfamilyNameID:
-                            best_name = f'{f["name"].getBestFamilyName()} {name}'
+                            best_name = f'{font_obj["name"].getBestFamilyName()} {name}'
         return best_name
 
 
 
 class proofFont:
 
-    def __init__(self, path):
+    def __init__(self, path: str):
         self.path               = path
         self.font_object        = None
         self.load_font()
@@ -335,7 +316,7 @@ class proofFont:
         self._name              = self._compile_name()
         self.features           = {}
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return repr(self.path)
 
     def load_font(self):
@@ -343,7 +324,7 @@ class proofFont:
             self.font_object = TTFont(self.path)
 
     # get font objects best possible name
-    def _compile_name(self):
+    def _compile_name(self) -> str:
         f = self.font_object
         try:
             best_name = f["name"].getBestFullName()
@@ -352,10 +333,10 @@ class proofFont:
 
         return best_name
 
-    def _get_name(self):
+    def _get_name(self) -> str:
         return self._name
 
-    def _set_name(self, new_name=None):
+    def _set_name(self, new_name:str):
         self._name = new_name
 
     name = property(_get_name, _set_name)
@@ -363,7 +344,7 @@ class proofFont:
     # def _sort_locations(self):
     #     return sorted(self.loc, key=lambda d: (-width_class(d.location.get("wdth",0)), -italic_value(d.location.get("slnt",0)), weight_class(d.location.get("wght",0))))
 
-    def _reformat_locations(self,designspace,instance,axis_map,renamer):
+    def _reformat_locations(self, designspace:dsp_doc, instance:dict, axis_map:dict, renamer:dict) -> dict:
         parsed = {}
         instance = designspace.map_backward(instance.location)
         for axis,val in instance.items():
@@ -371,7 +352,7 @@ class proofFont:
             parsed[a]=val
         return parsed
 
-    def get_OT(self):
+    def get_OT(self) -> dict:
         font = self.font_object
         if "GSUB" in font:
             _gsub = font["GSUB"]
@@ -509,7 +490,7 @@ class proofFont:
 
 class proofDocument:
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<proofDocument @ {self.identifier} : {hash(tuple(self.fonts))}>"
 
     def __init__(self):
@@ -555,24 +536,39 @@ class proofDocument:
         self.in_group = 0
 
 
-
+    def find_proof_directory(self, root_dir:str, target_filename:str) -> str:
+        # I don't think I wrote this function but I can't remember where I got it...
+        root_dir = os.path.abspath(root_dir)
+        closest_directory = save_path = None
+        closest_distance = float('inf')  # Initialize to positive infinity
+        current_path = root_dir
+        while current_path != os.path.sep:
+            for filename in os.listdir(current_path):
+                if target_filename in filename:
+                    distance = len(os.path.relpath(current_path, root_dir).split(os.path.sep))
+                    if distance < closest_distance:
+                        closest_directory = current_path
+                        closest_distance = distance
+                        save_path = os.path.join(closest_directory, filename)
+            current_path = os.path.dirname(current_path)
+        return save_path
 
     # do we even need ids??-----------------------
-    def _get_identifier(self):
+    def _get_identifier(self) -> str:
         if not self._identifier:
             self._identifier = self.generate_identifier()
         return self._identifier
 
-    def _set_identifier(self, new_id):
+    def _set_identifier(self, new_id: str):
         self._identifier = new_id
 
     identifier = property(_get_identifier, _set_identifier)
 
-    def generate_identifier(self):
+    def generate_identifier(self) -> str:
         return makeRandomIdentifier(existing=[])
     # ----------------------------------------------
 
-    def _get_page_size(self):
+    def _get_page_size(self) -> tuple[int,float]:
         if isinstance(self._size, str):
             size = PAGE_SIZES[self._size]
         else:
@@ -580,7 +576,7 @@ class proofDocument:
 
         return size
 
-    def _set_page_size(self, new_page_size):
+    def _set_page_size(self, new_page_size: Optional[str, tuple]):
         if isinstance(new_page_size, str):
             if new_page_size in list(PAGE_SIZES.keys()):
                 self._size = new_page_size
@@ -616,7 +612,7 @@ class proofDocument:
 
     size = property(_get_page_size, _set_page_size)
 
-    def _set_caption_font(self, new_font):
+    def _set_caption_font(self, new_font: str):
         import errno
         if new_font in bot.installedFonts():
             self._caption_font = new_font
@@ -627,33 +623,33 @@ class proofDocument:
                         new_font
                         )
 
-    def _get_caption_font(self):
+    def _get_caption_font(self) -> str:
         return self._caption_font
 
     caption_font = property(_get_caption_font, _set_caption_font)
 
-    def _set_auto_open(self, bool):
-        self._auto_open = bool
+    def _set_auto_open(self, value: bool):
+        self._auto_open = value
 
-    def _get_auto_open(self):
+    def _get_auto_open(self) -> bool:
         return self._auto_open
 
     open_automatically = property(_get_auto_open, _set_auto_open) # open pdf immediately after saving to disk
 
-    def _set_path(self, new_path):
+    def _set_path(self, new_path: str):
         self._path = new_path
 
-    def _get_path(self):
+    def _get_path(self) -> str:
         if not self._path:
             self._path = self.generate_path_base()
         return self._path
 
     path = property(_get_path, _set_path)
 
-    def _set_name(self, new_name):
+    def _set_name(self, new_name: str):
         self._name = new_name
 
-    def _get_name(self):
+    def _get_name(self) -> str:
         if not self._name and self.fonts:
             # return family name for top level font
             self._name = self.fonts[0].font_object["name"].getBestFamilyName().replace(" ","")
@@ -669,7 +665,7 @@ class proofDocument:
 
     # operator = property(_get_operator, _set_operator)
 
-    def _get_margin(self):
+    def _get_margin(self) -> list[int]:
         return (
                 self._margin_top,
                 self._margin_left, 
@@ -677,7 +673,7 @@ class proofDocument:
                 self._margin_right,
                 )
 
-    def _set_margin(self, new_margin):
+    def _set_margin(self, new_margin: int | tuple[int]):
         # we can accept a tuple of 4 to set individual 
         # or 1 value to apply across the board
         if isinstance(new_margin, (tuple, list)):
@@ -709,24 +705,24 @@ class proofDocument:
 
     margin = property(_get_margin, _set_margin)
 
-    def _get_use_instances(self):
+    def _get_use_instances(self) -> bool:
         return self._use_instances
 
-    def _set_use_instances(self, bool):
-        self._use_instances = bool
+    def _set_use_instances(self, value: bool):
+        self._use_instances = value
 
     use_instances = property(_get_use_instances, _set_use_instances)
 
-    def _get_crop(self):
+    def _get_crop(self) -> str:
         return self._crop
 
-    def _set_crop(self, fence=""):
+    def _set_crop(self, fence: str = ""):
         # self._crop = fence
         self.crop_space(fence, True)
 
     crop = property(_get_crop, _set_crop)
 
-    def uniquify(self, path):
+    def uniquify(self, path: str) -> str:
         # https://stackoverflow.com/a/57896232
         filename, extension = os.path.splitext(path)
         counter = 1
@@ -735,9 +731,9 @@ class proofDocument:
             counter += 1
         return path
 
-    def generate_path_base(self, suffix=".pdf", overwrite=True):
+    def generate_path_base(self, suffix: str=".pdf", overwrite: bool=True) -> str:
         cd = os.path.split(self.fonts[0].path)[0]
-        directory = find_proof_directory(cd, "proofs") 
+        directory = self.find_proof_directory(cd, "proofs") 
         if not directory:
             directory = cd
         type = "-Proof" if suffix == ".pdf" else ""
@@ -748,7 +744,7 @@ class proofDocument:
         return path
 
 
-    def load(self, proof_data_path):
+    def load(self, proof_data_path: str):
         with open(proof_data_path, "rb") as proof_settings:
             data = plistlib.load(proof_settings)
             for key, value in data.items():
@@ -776,7 +772,7 @@ class proofDocument:
         self.setup()
 
 
-    def write(self, path=None, overwrite=True):
+    def write(self, path=Optional[str], overwrite:bool=True):
         if self._compiling:
             pass
         else:
@@ -808,7 +804,7 @@ class proofDocument:
             plistlib.dump(data, proof_settings)
 
 
-    def save(self, path=None, open="_", overwrite=True):
+    def save(self, path=Optional[str], open="_", overwrite:bool=True):
 
         _save_path = path if path else self.path
         _auto = open if open != "_" else self.open_automatically
@@ -820,7 +816,7 @@ class proofDocument:
             os.system(f"open -a Preview '{_save_path}'")
 
 
-    def get_smallest_core_scaler(self, text, fonts=[]):
+    def get_smallest_core_scaler(self, text:str | bot.FormattedString, fonts:list[proofFont]) -> float:
         temp_holder = []
         for font in fonts:
 
@@ -875,14 +871,14 @@ class proofDocument:
 
 
     def new_section(self,
-                    proof_type=None,
-                    point_size=FONT_SIZE_MED, # can accept list to generate section at different sizes
-                    columns=1,
-                    sources=True,
-                    instances=False,
-                    multi_size_page=False,
-                    restrict_page=True, # if set to False the overflow will add new pages
-                    openType={}, # the only snake case :) a dict for activating specific OT on this page
+                    proof_type:str,
+                    point_size:int=FONT_SIZE_MED, # can accept list to generate section at different sizes
+                    columns:int=1,
+                    sources:bool=True,
+                    instances:bool=False,
+                    multi_size_page:bool=False,
+                    restrict_page:bool=True, # if set to False the overflow will add new pages
+                    openType:dict, # the only camel case :) a dict for activating specific OT on this page
                     ):
 
         to_store = { 
@@ -906,7 +902,7 @@ class proofDocument:
         # we get our data from the storage 
 
 
-    def _draw_paragraph(self, data=None, fonts=None):
+    def _draw_paragraph(self, data=list, fonts:list[proofFont]):
         for font in fonts:
             to_process = font.locations.find(in_crop=True) if data[0][-1].get("to_store", {}).get("use_instances") else font.locations.find(is_source=True, in_crop=True)
             for loca in to_process:
@@ -950,7 +946,7 @@ class proofDocument:
                                                             openType
                                                             )
 
-    def _draw_gradient(self, data=None, fonts=None):
+    def _draw_gradient(self, data=list, fonts:list[proofFont]):
         proof_type,local_data = data
         level = local_data.get("level", "ascii")
         txt = self.get_gradient_strings(level=level)
@@ -958,7 +954,7 @@ class proofDocument:
             self._init_page(font=fonts[0],proof_type="gradient")
             txt = self.draw_text_layout(txt)
 
-    def _draw_core(self, data=None, fonts=None):
+    def _draw_core(self, data=list, fonts:list[proofFont]):
         for font in fonts:
             to_process = font.locations.find(in_crop=True) if data[-1].get("use_instances") else font.locations.find(is_source=True, in_crop=True)
             for loca in to_process:
@@ -974,21 +970,12 @@ class proofDocument:
                                      min_size
                                     )
 
-    def _group_data(self, data=None, flatten_objects=False):
+    def _group_data(self, data=list, flatten_objects:bool=False) -> list:
         # using the context manager we find the grouped sections
         # we need to update this so we can group it only in subsections of clusters
         # grouped = [it for it in storage if it[-1].get("in_group") == True]
         # pprint(grouped)
-
-        # def flatten(c):
-        #     c[-1]["to_store"]["fonts"]
-        #     fonts = c[-1]["to_store"].get("fonts", [])
-        #     return [str(f.path) for f in fonts]
-
         result = []
-        # if flatten_objects:
-        #     data[0][-1]["to_store"]["fonts"] = flatten(data[0])
-
         current = [data[0]]
 
         for prev, curr in zip(data, data[1:]):
@@ -1042,7 +1029,7 @@ class proofDocument:
                     self._draw_paragraph(section,[font])
 
 
-    def _draw_features(self, data=None,fonts=None):
+    def _draw_features(self, data=list, fonts:list[proofFont]):
 
         proof_type, local_data = data
 
@@ -1114,7 +1101,7 @@ class proofDocument:
                     grid.columnTextBox(string, (_margin_left, _margin_bottom, *_text_box_size), subdivisions=cols, gutter=15, draw_grid=False)
 
 
-    def draw_core_characters(self, txt, font_path, variable_location={}, will_draw=True, scale=None, openType={"resetFeatures":True}):
+    def draw_core_characters(self, txt:str | bot.FormattedString, font_path:str, variable_location:dict, will_draw:bool=True, scale:Optional[float], openType:dict={"resetFeatures":True}):
         box_w, box_h = self._text_box_size
         box_x, box_y = self._margin_left, self._margin_bottom
 
@@ -1148,7 +1135,7 @@ class proofDocument:
             return sf
 
 
-    def get_gradient_strings(self, level="ascii", font_size=40):
+    def get_gradient_strings(self, level:Optional[str]="ascii", font_size:int=40) -> str | bot.FormattedString:
         fonts = self.fonts
         if level == "all":
             chars = sorted(
@@ -1191,8 +1178,7 @@ class proofDocument:
         return txt
 
 
-
-    def draw_text_layout(self, txt="", font_path="", variable_location={}, columns=1, overflow=True, font_size=FONT_SIZE_MED, multi_size_page=False, openType={"resetFeatures":True}):
+    def draw_text_layout(self, txt:str | bot.FormattedString, font_path:str, variable_location:dict, columns:int=1, overflow:bool=False, font_size:int=FONT_SIZE_MED, multi_size_page:bool=False, openType:dict={"resetFeatures":True}):  -> str | bot.FormattedString
         sub_columns = grid.ColumnGrid((self._margin_left, self._margin_bottom, *self._text_box_size), subdivisions=columns)
         bot.fontVariations(**variable_location)
         bot.hyphenation(self.hyphenation)
@@ -1230,7 +1216,7 @@ class proofDocument:
                 bot.text(page_string, ((self.size[0] - self._margin_left)-tw, self._margin_bottom/2))
 
 
-    def find_close(self, root_dir, target_filename):
+    def find_close(self, root_dir:str, target_filename:str) -> str:
         closest_file = None
         closest_mtime = float('inf')
 
@@ -1246,7 +1232,7 @@ class proofDocument:
         return closest_file
 
 
-    def get_variable_fonts_from_op(self, designspace):
+    def get_variable_fonts_from_op(self, designspace:dsp_doc) -> list[proofFont]:
         var = designspace.variableFonts
         di,fi = os.path.split(os.path.abspath(designspace.path))
         allVFs = []
@@ -1284,7 +1270,7 @@ class proofDocument:
         return allVFs
 
 
-    def add_object(self, path=None):
+    def add_object(self, path:str):
         suffixes = ".ttf .otf .woff .woff2"
         suff = os.path.splitext(path)[-1]
         if suff in suffixes.split(" "):
@@ -1298,11 +1284,12 @@ class proofDocument:
             self.objects.append(path)
 
     #convience function to add multiple paths at once
-    def add_objects(self, paths=[]):
+    def add_objects(self, paths:list[str]):
         for path in paths:
             self.add_object(path)
 
-    def reformat_limits(self, limits):
+
+    def _reformat_limits(self, limits:str) -> dict:
         '''
         use fontTools.varLib model for extracting the CLI data into a dictionary item
         taken from the source code ^
@@ -1334,8 +1321,8 @@ class proofDocument:
             return {}
 
 
-    def crop_space(self, _zone="",inf_loop=False):
-        zone = self.reformat_limits(_zone)
+    def crop_space(self, _zone:str):
+        zone = self._reformat_limits(_zone)
         valid = False
         if zone:
             for font in self.fonts:
@@ -1369,7 +1356,7 @@ class proofDocument:
             self._crop = _zone
 
 
-    def move_to_storage(self, proof_type, locals, class_attrs={}):
+    def move_to_storage(self, proof_type:str, locals:dict):
         self._counter += 1
         self.storage.append((proof_type,locals))
 
@@ -1377,7 +1364,7 @@ class proofDocument:
         self._counter = 0
         self.storage = []
 
-    def setup(self, cover_page=True):
+    def setup(self, cover_page:bool=True):
         # self.move_to_storage("cover",locals()) # i think we can turn this off for now
         bot.newDrawing()
         if cover_page:
@@ -1389,7 +1376,7 @@ class proofDocument:
         bot.font(self.caption_font, 8)
         bot.fontVariations(None)
 
-    def _cover_page(self, fonts):
+    def _cover_page(self, fonts:list[proofFont]):
         # this function is biased and draws a custom cover page of all
         # locations / fonts and scales to fit them all
 
