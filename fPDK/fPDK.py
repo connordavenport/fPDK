@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from fontTools.ttLib import TTFont
 import os
 from fontTools.designspaceLib import DesignSpaceDocument as dsp_doc
@@ -6,7 +8,7 @@ from fontTools.designspaceLib.split import _extractSubSpace, defaultMakeInstance
 import fontTools.varLib as varLib
 from fontTools.misc.fixedTools import otRound, strToFixedToFloat, floatToFixedToFloat
 import fnmatch
-from typing import Union, Any, Callable, Dict, Iterator, List, Tuple, cast
+from typing import Union, Any, Callable, Dict, Iterator, List, Tuple, cast, Optional
 
 import re
 import drawBot as bot
@@ -119,7 +121,7 @@ def italic_value(slnt_user_value: int) -> int | float:
     return slant_user_value
 
 
-class proofObjectHandler(list):
+class ProofObjectHandler(list):
     """
     https://stackoverflow.com/questions/6560354/how-would-i-create-a-custom-list-class-in-python
     An extensive user-defined wrapper around list objects.
@@ -131,7 +133,7 @@ class proofObjectHandler(list):
         if initlist is not None:
             if isinstance(initlist, list):
                 self.data[:] = initlist
-            elif isinstance(initlist, proofObjectHandler):
+            elif isinstance(initlist, ProofObjectHandler):
                 self.data[:] = initlist.data[:]
             else:
                 self.data = list(initlist)
@@ -160,7 +162,7 @@ class proofObjectHandler(list):
             yield item
 
     def __add__(self, other):
-        if isinstance(other, proofObjectHandler):
+        if isinstance(other, ProofObjectHandler):
             return self.__class__(self.data + other.data)
         elif isinstance(other, type(self.data)):
             return self.__class__(self.data + other)
@@ -192,22 +194,22 @@ class proofObjectHandler(list):
     def append(self, value):
         self.data.append(value)
 
-    def insert(self, idx: int, value: proofFont | proofLocation):
+    def insert(self, idx: int, value: ProofFont | ProofLocation):
         self.data.insert(idx, value)
 
     def pop(self, idx: int=-1) -> self.__class__(self):
         return self.data.pop(idx)
 
-    def remove(self, value: proofFont | proofLocation):
+    def remove(self, value: ProofFont | ProofLocation):
         self.data.remove(value)
 
     def clear(self):
         self.data.clear()
 
-    def copy(self):
+    def copy(self) -> self.__class__(self):
         return self.__class__(self)
 
-    def index(self, idx: int, *args: int) -> proofFont | proofLocation:
+    def index(self, idx: int, *args: int) -> ProofFont | ProofLocation:
         return self.data.index(idx, *args)
 
     def reverse(self):
@@ -217,9 +219,9 @@ class proofObjectHandler(list):
         # sort a list of instances by locations
         # knows how to sort different subclass types
         test = self.data[0]
-        if isinstance(test, proofLocation):
+        if isinstance(test, ProofLocation):
             self.data.sort(key=lambda d: (-width_class(d.location.get("wdth",0)), -italic_value(d.location.get("slnt",0)), weight_class(d.location.get("wght",0))))
-        elif isinstance(test, proofFont):
+        elif isinstance(test, ProofFont):
             self.data.sort(key=lambda d: (-f.font_object["OS_2"].usWidthClass, -f.font_object["post"].italicAngle, f.font_object["OS_2"].usWeightClass))
         else:
             self.data.sort(*args, **kwds)
@@ -227,12 +229,12 @@ class proofObjectHandler(list):
     def extend(self, other: self.__class__(self), clear:bool=False):
         if clear:
             self.data.clear()
-        if isinstance(other, proofObjectHandler):
+        if isinstance(other, ProofObjectHandler):
             self.data.extend(other.data)
         else:
             self.data.extend(other)
 
-class proofLocation:
+class ProofLocation:
 
     def __repr__(self):
         name = ""
@@ -242,14 +244,12 @@ class proofLocation:
             name = "instance"
         if self.is_source and self.is_instance:
             name = "both"
-        return f"<proofLocation.{name} @ {self.name}>"
+        return f"<ProofLocation.{name} @ {self.name}>"
 
     def __init__(self, location:dict):
 
-        self.type = None
         self.is_instance = False
         self.is_source = False
-        self.tag_location = None
         self.data_from = "TTFont" # DesignSpaceDocument or TTFont
 
         self._in_crop = True
@@ -304,14 +304,14 @@ class proofLocation:
 
 
 
-class proofFont:
+class ProofFont:
 
     def __init__(self, path: str):
         self.path               = path
         self.font_object        = None
         self.load_font()
         self.is_variable        = False
-        self.locations          = proofObjectHandler([])
+        self.locations          = ProofObjectHandler([])
         self.operator           = dsp_doc
         self._name              = self._compile_name()
         self.features           = {}
@@ -391,7 +391,7 @@ class proofFont:
     accuretly so we need to override the
     `keepVFs` attr in the function
     """
-    def splitVariableFonts(
+    def _splitVariableFonts(
         self,
         doc : dsp_doc,
         makeNames: bool = False,
@@ -438,7 +438,7 @@ class proofFont:
         renamer = {a.name:a.tag for a in operator.axes}
 
         if operator:
-            for v in self.splitVariableFonts(operator, expandLocations=True, makeInstanceFilename=True):
+            for v in self._splitVariableFonts(operator, expandLocations=True, makeInstanceFilename=True):
                 sub_space, split_op = v
                 # this is the only way to split the vfs and still keep the paths 
                 # we can assume that post-split we will only have 1 vf to extract
@@ -461,7 +461,7 @@ class proofFont:
                             if temp:
                                 built = temp
                             else:
-                                built = proofLocation(ii.location)
+                                built = ProofLocation(ii.location)
                             built.name = f"{ii.familyName} {ii.styleName}"
                             built.data_from = "DesignSpaceDocument"
                             setattr(built, f"is_{item}", True)
@@ -472,7 +472,7 @@ class proofFont:
         # we dont want to rely on the fvar instances because there is no source data to proof
             if "fvar" in font_obj:
                 for inst in [instance.coordinates for instance in font_obj["fvar"].instances]:
-                    built = proofLocation(inst)
+                    built = ProofLocation(inst)
                     n = built.generate_name(font_obj)
                     built.name = n
                     built.data_from = "TTFont"
@@ -488,10 +488,10 @@ class proofFont:
 
 
 
-class proofDocument:
+class ProofDocument:
 
     def __repr__(self) -> str:
-        return f"<proofDocument @ {self.identifier} : {hash(tuple(self.fonts))}>"
+        return f"<ProofDocument @ {self.identifier} : {hash(tuple(self.fonts))}>"
 
     def __init__(self):
 
@@ -509,7 +509,7 @@ class proofDocument:
         self._path          = None
         self._name          = None
 
-        self.fonts          = proofObjectHandler([])
+        self.fonts          = ProofObjectHandler([])
         self.objects        = []
         # proof UI settings
         # size can either be a tuple of ints or a DrawBot
@@ -772,7 +772,7 @@ class proofDocument:
         self.setup()
 
 
-    def write(self, path=Optional[str], overwrite:bool=True):
+    def write(self, path:Optional[str]=None, overwrite:bool=True):
         if self._compiling:
             pass
         else:
@@ -804,19 +804,20 @@ class proofDocument:
             plistlib.dump(data, proof_settings)
 
 
-    def save(self, path=Optional[str], open="_", overwrite:bool=True):
+    def save(self, path:Optional[str]=None, open="_", overwrite:bool=True):
 
         _save_path = path if path else self.path
         _auto = open if open != "_" else self.open_automatically
 
         self._compile_proof()
         self.paginate()
+
         bot.saveImage(_save_path)
         if _auto:
             os.system(f"open -a Preview '{_save_path}'")
 
 
-    def get_smallest_core_scaler(self, text:str | bot.FormattedString, fonts:list[proofFont]) -> float:
+    def get_smallest_core_scaler(self, text:str | bot.FormattedString, fonts:list[ProofFont]) -> float:
         temp_holder = []
         for font in fonts:
 
@@ -824,10 +825,10 @@ class proofDocument:
             for l in loc:
                 temp_holder.append(
                                     self.draw_core_characters(
-                                        text,
-                                        font.path,
-                                        l.location,
-                                        False
+                                        txt=text,
+                                        font_path=font.path,
+                                        variable_location=l.location,
+                                        will_draw=False
                                         )
                                   )
         return min(temp_holder)
@@ -839,9 +840,9 @@ class proofDocument:
 
 
     def draw_header_footer(self,**kwargs):
-        font       = kwargs.get("font", proofFont(""))
+        font       = kwargs.get("font", ProofFont(""))
         proof_type = kwargs.get("proof_type", "")
-        location   = kwargs.get("location", proofLocation({}))
+        location   = kwargs.get("location", ProofLocation({}))
         cover      = kwargs.get("cover", False)
 
 
@@ -878,7 +879,7 @@ class proofDocument:
                     instances:bool=False,
                     multi_size_page:bool=False,
                     restrict_page:bool=True, # if set to False the overflow will add new pages
-                    openType:dict, # the only camel case :) a dict for activating specific OT on this page
+                    openType:dict={}, # the only camel case :) a dict for activating specific OT on this page
                     ):
 
         to_store = { 
@@ -902,7 +903,7 @@ class proofDocument:
         # we get our data from the storage 
 
 
-    def _draw_paragraph(self, data=list, fonts:list[proofFont]):
+    def _draw_paragraph(self, data=list, fonts:list[ProofFont]=[]):
         for font in fonts:
             to_process = font.locations.find(in_crop=True) if data[0][-1].get("to_store", {}).get("use_instances") else font.locations.find(is_source=True, in_crop=True)
             for loca in to_process:
@@ -946,15 +947,16 @@ class proofDocument:
                                                             openType
                                                             )
 
-    def _draw_gradient(self, data=list, fonts:list[proofFont]):
+    def _draw_gradient(self, data=list, fonts:list[ProofFont]=[]):
         proof_type,local_data = data
         level = local_data.get("level", "ascii")
         txt = self.get_gradient_strings(level=level)
         while txt:
             self._init_page(font=fonts[0],proof_type="gradient")
-            txt = self.draw_text_layout(txt)
+            txt = self.draw_text_layout(txt, font_path=fonts[0].path, overflow=True)
 
-    def _draw_core(self, data=list, fonts:list[proofFont]):
+
+    def _draw_core(self, data=list, fonts:list[ProofFont]=[]):
         for font in fonts:
             to_process = font.locations.find(in_crop=True) if data[-1].get("use_instances") else font.locations.find(is_source=True, in_crop=True)
             for loca in to_process:
@@ -963,12 +965,13 @@ class proofDocument:
                 txt = PROOF_DATA["core"]
 
                 min_size = self.get_smallest_core_scaler(txt, fonts)
-                txt = self.draw_core_characters(txt,
-                                     font.path,
-                                     loca.location,
-                                     True,
-                                     min_size
-                                    )
+                txt = self.draw_core_characters(
+                                                txt=txt,
+                                                font_path=font.path,
+                                                variable_location=loca.location,
+                                                will_draw=True,
+                                                scale=min_size
+                                                )
 
     def _group_data(self, data=list, flatten_objects:bool=False) -> list:
         # using the context manager we find the grouped sections
@@ -1029,7 +1032,7 @@ class proofDocument:
                     self._draw_paragraph(section,[font])
 
 
-    def _draw_features(self, data=list, fonts:list[proofFont]):
+    def _draw_features(self, data=list, fonts:list[ProofFont]=[]):
 
         proof_type, local_data = data
 
@@ -1101,7 +1104,7 @@ class proofDocument:
                     grid.columnTextBox(string, (_margin_left, _margin_bottom, *_text_box_size), subdivisions=cols, gutter=15, draw_grid=False)
 
 
-    def draw_core_characters(self, txt:str | bot.FormattedString, font_path:str, variable_location:dict, will_draw:bool=True, scale:Optional[float], openType:dict={"resetFeatures":True}):
+    def draw_core_characters(self, txt:str | bot.FormattedString, font_path:str, variable_location:dict={}, scale:Optional[float]=None, will_draw:bool=True, openType:dict={"resetFeatures":True}):
         box_w, box_h = self._text_box_size
         box_x, box_y = self._margin_left, self._margin_bottom
 
@@ -1178,7 +1181,7 @@ class proofDocument:
         return txt
 
 
-    def draw_text_layout(self, txt:str | bot.FormattedString, font_path:str, variable_location:dict, columns:int=1, overflow:bool=False, font_size:int=FONT_SIZE_MED, multi_size_page:bool=False, openType:dict={"resetFeatures":True}):  -> str | bot.FormattedString
+    def draw_text_layout(self, txt:str | bot.FormattedString, font_path:str, variable_location:dict={}, columns:int=1, overflow:bool=False, font_size:int=FONT_SIZE_MED, multi_size_page:bool=False, openType:dict={"resetFeatures":True}) -> str | bot.FormattedString: 
         sub_columns = grid.ColumnGrid((self._margin_left, self._margin_bottom, *self._text_box_size), subdivisions=columns)
         bot.fontVariations(**variable_location)
         bot.hyphenation(self.hyphenation)
@@ -1232,7 +1235,7 @@ class proofDocument:
         return closest_file
 
 
-    def get_variable_fonts_from_op(self, designspace:dsp_doc) -> list[proofFont]:
+    def get_variable_fonts_from_op(self, designspace:dsp_doc) -> list[ProofFont]:
         var = designspace.variableFonts
         di,fi = os.path.split(os.path.abspath(designspace.path))
         allVFs = []
@@ -1260,7 +1263,7 @@ class proofDocument:
                         else:
                             p = self.find_close(di,f"{name}.ttf")
                 if p:
-                    te = proofFont(p)
+                    te = ProofFont(p)
                     te.is_variable = True
                     te.operator = designspace
                     te.build_locations()
@@ -1274,7 +1277,7 @@ class proofDocument:
         suffixes = ".ttf .otf .woff .woff2"
         suff = os.path.splitext(path)[-1]
         if suff in suffixes.split(" "):
-            o = proofFont(path)        
+            o = ProofFont(path)        
             self.fonts.append(o)
         elif suff == ".designspace":
             operator = dsp_doc.fromfile(path)
@@ -1376,7 +1379,7 @@ class proofDocument:
         bot.font(self.caption_font, 8)
         bot.fontVariations(None)
 
-    def _cover_page(self, fonts:list[proofFont]):
+    def _cover_page(self, fonts:list[ProofFont]):
         # this function is biased and draws a custom cover page of all
         # locations / fonts and scales to fit them all
 
@@ -1411,7 +1414,7 @@ class proofDocument:
                         fs.fill(0)
                         fs.append(f"{loc.name}")
                     else:
-                        if loc.type == "source":
+                        if loc.is_source:
                             fs.fill(*_faded)
                             fs.append("〖")
                             fs.fill(0)
@@ -1460,7 +1463,7 @@ class proofDocument:
 
 if __name__ == "__main__":
 
-    doc = proofDocument()
+    doc = ProofDocument()
     """load old settings"""
 
     """
@@ -1546,7 +1549,5 @@ if __name__ == "__main__":
         overwrite is set to True by default
         """
         doc.write(overwrite=True)
-
-
 
 
