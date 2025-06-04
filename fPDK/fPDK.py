@@ -50,8 +50,8 @@ PROOF_DATA = {
     "core"           : "ABCDEFGHIJKLM\nNOPQRSTUVWXYZ\nabcdefghijklm\nnopqrstuvwxyz\n0123456789ªº\n%*.,:;!¡?¿‽#/\\\n-—_(){}[]‚“”‘’‹›\"\'\n+−×=><@&§®℗|¢$€£¥",
     "spacing"        : "NULL",
     "figures"        : "0123456789 H0H1H2H3H4H5H6H7H8H9"+"\n"+"".join([str((randint(0,9))) for i in range(1000)]),
-    "lowercaseCopy"  : "Angel Adept Blind Bodice Clique Coast Dunce Docile Enact Eosin Furlong Focal Gnome Gondola Human Hoist Inlet Iodine Justin Jocose Knoll Koala Linden Loads Milliner Modal Number Nodule Onset Oddball Pneumo Poncho Quanta Qophs Rhone Roman Snout Sodium Tundra Tocsin Uncle Udder Vulcan Vocal Whale Woman Xmas Xenon Yunnan Young Zloty Zodiac. Angel angel adept for the nuance loads of the arena cocoa and quaalude. Blind blind bodice for the submit oboe of the club snob and abbot. Clique clique coast for the pouch loco of the franc assoc and accede. Dunce dunce docile for the loudness mastodon of the loud statehood and huddle. Enact enact eosin for the quench coed of the pique canoe and bleep. Furlong furlong focal for the genuflect profound of the motif aloof and offers. Gnome gnome gondola for the impugn logos of the unplug analog and smuggle. Human human hoist for the buddhist alcohol of the riyadh caliph and bathhouse. Inlet inlet iodine for the quince champion of the ennui scampi and shiite. Justin justin jocose for the djibouti sojourn of the oranj raj and hajjis. Knoll knoll koala for the banknote lookout of the dybbuk outlook and trekked. Linden linden loads for the ulna monolog of the consul menthol and shallot. Milliner milliner modal for the alumna solomon of the album custom and summon. Number number nodule for the unmade economic of the shotgun bison and tunnel. Onset onset oddball for the abandon podium of the antiquo tempo and moonlit. Pneumo pneumo poncho for the dauphin opossum of the holdup bishop and supplies. Quanta quanta qophs for the inquest sheqel of the cinq coq and suqqu. Rhone rhone roman for the burnt porous of the lemur clamor and carrot. Snout snout sodium for the ensnare bosom of the genus pathos and missing. Tundra tundra tocsin for the nutmeg isotope of the peasant ingot and ottoman. Uncle uncle udder for the dunes cloud of the hindu thou and continuum. Vulcan vulcan vocal for the alluvial ovoid of the yugoslav chekhov and revved. Whale whale woman for the meanwhile blowout of the forepaw meadow and glowworm. Xmas xmas xenon for the bauxite doxology of the tableaux equinox and exxon. Yunnan yunnan young for the dynamo coyote of the obloquy employ and sayyid. Zloty zloty zodiac for the gizmo ozone of the franz laissez and buzzing.",
-    "uppercaseCopy"  : "ABIDE ACORN OF THE HABIT DACRON FOR THE BUDDHA GOUDA QUAALUDE. BENCH BOGUS OF THE SCRIBE ROBOT FOR THE APLOMB JACOB RIBBON. CENSUS CORAL OF THE SPICED JOCOSE FOR THE BASIC HAVOC SOCCER. DEMURE DOCILE OF THE TIDBIT LODGER FOR THE CUSPID PERIOD BIDDER. EBBING ECHOING OF THE BUSHED DECAL FOR THE APACHE ANODE NEEDS. FEEDER FOCUS OF THE LIFER BEDFORD FOR THE SERIF PROOF BUFFER. GENDER GOSPEL OF THE PIGEON DOGCART FOR THE SPRIG QUAHOG DIGGER. HERALD HONORS OF THE DIHEDRAL MADHOUSE FOR THE PENH RIYADH BATHHOUSE. IBSEN ICEMAN OF THE APHID NORDIC FOR THE SUSHI SAUDI SHIITE. JENNIES JOGGER OF THE TIJERA ADJOURN FOR THE ORANJ KOWBOJ HAJJIS. KEEPER KOSHER OF THE SHRIKE BOOKCASE FOR THE SHEIK LOGBOOK CHUKKAS. LENDER LOCKER OF THE CHILD GIGOLO FOR THE UNCOIL GAMBOL ENROLLED. MENACE MCCOY OF THE NIMBLE TOMCAT FOR THE DENIM RANDOM SUMMON. NEBULA NOSHED OF THE INBRED BRONCO FOR THE COUSIN CARBON KENNEL. OBSESS OCEAN OF THE PHOBIC DOCKSIDE FOR THE GAUCHO LIBIDO HOODED. PENNIES PODIUM OF THE SNIPER OPCODE FOR THE SCRIP BISHOP HOPPER. QUANTA QOPHS OF THE INQUEST OQOS FOR THE CINQ COQ SUQQU. REDUCE ROGUE OF THE GIRDLE ORCHID FOR THE MEMOIR SENSOR SORREL. SENIOR SCONCE OF THE DISBAR GODSON FOR THE HUBRIS AMENDS LESSEN. TENDON TORQUE OF THE UNITED SCOTCH FOR THE NOUGHT FORGOT BITTERS. UNDER UGLINESS OF THE RHUBARB SEDUCE FOR THE MANCHU HINDU CONTINUUM. VERSED VOUCH OF THE DIVER OVOID FOR THE TELAVIV KARPOV FLIVVER. WENCH WORKER OF THE UNWED SNOWCAP FOR THE ANDREW ESCROW GLOWWORM. XENON XOCHITL OF THE MIXED BOXCAR FOR THE SUFFIX ICEBOX EXXON. YEOMAN YONDER OF THE HYBRID ARROYO FOR THE DINGHY BRANDY SAYYID. ZEBRA ZOMBIE OF THE PRIZED OZONE FOR THE FRANZ ARROZ BUZZING.",
+    "lowercase"      : "Angel Adept Blind Bodice Clique Coast Dunce Docile Enact Eosin Furlong Focal Gnome Gondola Human Hoist Inlet Iodine Justin Jocose Knoll Koala Linden Loads Milliner Modal Number Nodule Onset Oddball Pneumo Poncho Quanta Qophs Rhone Roman Snout Sodium Tundra Tocsin Uncle Udder Vulcan Vocal Whale Woman Xmas Xenon Yunnan Young Zloty Zodiac. Angel angel adept for the nuance loads of the arena cocoa and quaalude. Blind blind bodice for the submit oboe of the club snob and abbot. Clique clique coast for the pouch loco of the franc assoc and accede. Dunce dunce docile for the loudness mastodon of the loud statehood and huddle. Enact enact eosin for the quench coed of the pique canoe and bleep. Furlong furlong focal for the genuflect profound of the motif aloof and offers. Gnome gnome gondola for the impugn logos of the unplug analog and smuggle. Human human hoist for the buddhist alcohol of the riyadh caliph and bathhouse. Inlet inlet iodine for the quince champion of the ennui scampi and shiite. Justin justin jocose for the djibouti sojourn of the oranj raj and hajjis. Knoll knoll koala for the banknote lookout of the dybbuk outlook and trekked. Linden linden loads for the ulna monolog of the consul menthol and shallot. Milliner milliner modal for the alumna solomon of the album custom and summon. Number number nodule for the unmade economic of the shotgun bison and tunnel. Onset onset oddball for the abandon podium of the antiquo tempo and moonlit. Pneumo pneumo poncho for the dauphin opossum of the holdup bishop and supplies. Quanta quanta qophs for the inquest sheqel of the cinq coq and suqqu. Rhone rhone roman for the burnt porous of the lemur clamor and carrot. Snout snout sodium for the ensnare bosom of the genus pathos and missing. Tundra tundra tocsin for the nutmeg isotope of the peasant ingot and ottoman. Uncle uncle udder for the dunes cloud of the hindu thou and continuum. Vulcan vulcan vocal for the alluvial ovoid of the yugoslav chekhov and revved. Whale whale woman for the meanwhile blowout of the forepaw meadow and glowworm. Xmas xmas xenon for the bauxite doxology of the tableaux equinox and exxon. Yunnan yunnan young for the dynamo coyote of the obloquy employ and sayyid. Zloty zloty zodiac for the gizmo ozone of the franz laissez and buzzing.",
+    "uppercase"      : "ABIDE ACORN OF THE HABIT DACRON FOR THE BUDDHA GOUDA QUAALUDE. BENCH BOGUS OF THE SCRIBE ROBOT FOR THE APLOMB JACOB RIBBON. CENSUS CORAL OF THE SPICED JOCOSE FOR THE BASIC HAVOC SOCCER. DEMURE DOCILE OF THE TIDBIT LODGER FOR THE CUSPID PERIOD BIDDER. EBBING ECHOING OF THE BUSHED DECAL FOR THE APACHE ANODE NEEDS. FEEDER FOCUS OF THE LIFER BEDFORD FOR THE SERIF PROOF BUFFER. GENDER GOSPEL OF THE PIGEON DOGCART FOR THE SPRIG QUAHOG DIGGER. HERALD HONORS OF THE DIHEDRAL MADHOUSE FOR THE PENH RIYADH BATHHOUSE. IBSEN ICEMAN OF THE APHID NORDIC FOR THE SUSHI SAUDI SHIITE. JENNIES JOGGER OF THE TIJERA ADJOURN FOR THE ORANJ KOWBOJ HAJJIS. KEEPER KOSHER OF THE SHRIKE BOOKCASE FOR THE SHEIK LOGBOOK CHUKKAS. LENDER LOCKER OF THE CHILD GIGOLO FOR THE UNCOIL GAMBOL ENROLLED. MENACE MCCOY OF THE NIMBLE TOMCAT FOR THE DENIM RANDOM SUMMON. NEBULA NOSHED OF THE INBRED BRONCO FOR THE COUSIN CARBON KENNEL. OBSESS OCEAN OF THE PHOBIC DOCKSIDE FOR THE GAUCHO LIBIDO HOODED. PENNIES PODIUM OF THE SNIPER OPCODE FOR THE SCRIP BISHOP HOPPER. QUANTA QOPHS OF THE INQUEST OQOS FOR THE CINQ COQ SUQQU. REDUCE ROGUE OF THE GIRDLE ORCHID FOR THE MEMOIR SENSOR SORREL. SENIOR SCONCE OF THE DISBAR GODSON FOR THE HUBRIS AMENDS LESSEN. TENDON TORQUE OF THE UNITED SCOTCH FOR THE NOUGHT FORGOT BITTERS. UNDER UGLINESS OF THE RHUBARB SEDUCE FOR THE MANCHU HINDU CONTINUUM. VERSED VOUCH OF THE DIVER OVOID FOR THE TELAVIV KARPOV FLIVVER. WENCH WORKER OF THE UNWED SNOWCAP FOR THE ANDREW ESCROW GLOWWORM. XENON XOCHITL OF THE MIXED BOXCAR FOR THE SUFFIX ICEBOX EXXON. YEOMAN YONDER OF THE HYBRID ARROYO FOR THE DINGHY BRANDY SAYYID. ZEBRA ZOMBIE OF THE PRIZED OZONE FOR THE FRANZ ARROZ BUZZING.",
     "paragraph"      : """Tetrahydrobiopterin (BH4, THB), also known as sapropterin (INN), is a cofactor of the three aromatic amino acid hydroxylase enzymes, used in the degradation of amino acid phenylalanine and in the biosynthesis of the neurotransmitters serotonin (5-hydroxytryptamine, 5-HT), melatonin, dopamine, norepinephrine (noradrenaline), epinephrine (adrenaline), and is a cofactor for the production of nitric oxide (NO) by the nitric oxide synthases. Chemically, its structure is that of a (dihydropteridine reductase) reduced pteridine derivative (quinonoid dihydrobiopterin). Tetrahydrobiopterin is available as a tablet for oral administration in the form of sapropterin dihydrochloride (BH4*2HCL). It was approved for use in the United States as a tablet in December 2007 and as a powder in December 2013. It was approved for use in the European Union in December 2008, Canada in April 2010, and Japan in July 2008. It is sold under the brand names Kuvan and Biopten. The typical cost of treating a patient with Kuvan is US$100,000 per year. BioMarin holds the patent for Kuvan until at least 2024, but Par Pharmaceutical has a right to produce a generic version by 2020. Sapropterin is indicated in tetrahydrobiopterin deficiency caused by GTP cyclohydrolase I (GTPCH) deficiency, or 6-pyruvoyltetrahydropterin synthase (PTPS) deficiency. Also, BH4*2HCL is FDA approved for use in phenylketonuria (PKU), along with dietary measures. However, most people with PKU have little or no benefit from BH4*2HCL. The most common adverse effects, observed in more than 10% of people, include headache and a running or obstructed nose. Diarrhea and vomiting are also relatively common, seen in at least 1% of people. No interaction studies have been conducted. Because of its mechanism, tetrahydrobiopterin might interact with dihydrofolate reductase inhibitors like methotrexate and trimethoprim, and NO-enhancing drugs like nitroglycerin, molsidomine, minoxidil, and PDE5 inhibitors. Combination of tetrahydrobiopterin with levodopa can lead to increased excitability. Tetrahydrobiopterin has multiple roles in human biochemistry. The major one is to convert amino acids such as phenylalanine, tyrosine, and tryptophan to precursors of dopamine and serotonin, major monoamine neurotransmitters. It works as a cofactor, being required for an enzyme's activity as a catalyst, mainly hydroxylases. Tetrahydrobiopterin is a cofactor for tryptophan hydroxylase (TPH) for the conversion of L-tryptophan (TRP) to 5-hydroxytryptophan (5-HTP). Phenylalanine hydroxylase (PAH) catalyses the conversion of L-phenylalanine (PHE) to L-tyrosine (TYR). Therefore, a deficiency in tetrahydrobiopterin can cause a toxic buildup of L-phenylalanine, which manifests as the severe neurological issues seen in phenylketonuria. Tyrosine hydroxylase (TH) catalyses the conversion of L-tyrosine to L-DOPA (DOPA), which is the precursor for dopamine. Dopamine is a vital neurotransmitter, and is the precursor of norepinephrine and epinephrine. Thus, a deficiency of BH4 can lead to systemic deficiencies of dopamine, norepinephrine, and epinephrine. In fact, one of the primary conditions that can result from GTPCH-related BH4 deficiency is dopamine-responsive dystonia; currently, this condition is typically treated with carbidopa/levodopa, which directly restores dopamine levels within the brain. Nitric oxide synthase (NOS) catalyses the conversion of a guanidino nitrogen of L-arginine (L-Arg) to nitric oxide (NO). Among other things, nitric oxide is involved in vasodilation, which improves systematic blood flow. The role of BH4 in this enzymatic process is so critical that some research points to a deficiency of BH4 – and thus, of nitric oxide – as being a core cause of the neurovascular dysfunction that is the hallmark of circulation-related diseases such as diabetes. Ether lipid oxidase (alkylglycerol monooxygenase, AGMO) catalyses the conversion of 1-alkyl-sn-glycerol to 1-hydroxyalkyl-sn-glycerol. Tetrahydrobiopterin was discovered to play a role as an enzymatic cofactor. The first enzyme found to use tetrahydrobiopterin is phenylalanine hydroxylase (PAH). Tetrahydrobiopterin is biosynthesized from guanosine triphosphate (GTP) by three chemical reactions mediated by the enzymes GTP cyclohydrolase I (GTPCH), 6-pyruvoyltetrahydropterin synthase (PTPS), and sepiapterin reductase (SR). BH4 can be oxidized by one or two electron reactions, to generate BH4 or BH3 radical and BH2, respectively. Research shows that ascorbic acid (also known as ascorbate or vitamin C) can reduce BH3 radical into BH4, preventing the BH3 radical from reacting with other free radicals (superoxide and peroxynitrite specifically). Without this recycling process, uncoupling of the endothelial nitric oxide synthase (eNOS) enzyme and reduced bioavailability of the vasodilator nitric oxide occur, creating a form of endothelial dysfunction. Ascorbic acid is oxidized to dehydroascorbic acid during this process, although it can be recycled back to ascorbic acid. Folic acid and its metabolites seem to be particularly important in the recycling of BH4 and NOS coupling. Other than PKU studies, tetrahydrobiopterin has participated in clinical trials studying other approaches to solving conditions resultant from a deficiency of tetrahydrobiopterin. These include autism, depression, ADHD, hypertension, endothelial dysfunction, and chronic kidney disease. Experimental studies suggest that tetrahydrobiopterin regulates deficient production of nitric oxide in cardiovascular disease states, and contributes to the response to inflammation and injury, for example in pain due to nerve injury. A 2015 BioMarin-funded study of PKU patients found that those who responded to tetrahydrobiopterin also showed a reduction of ADHD symptoms. In psychiatry, tetrahydrobiopterin has been hypothesized to be involved in the pathophysiology of depression, although evidence is inconclusive to date. In 1997, a small pilot study was published on the efficacy of tetrahydrobiopterin (BH4) on relieving the symptoms of autism, which concluded that it "might be useful for a subgroup of children with autism" and that double-blind trials are needed, as are trials which measure outcomes over a longer period of time. In 2010, Frye et al. published a paper which concluded that it was safe, and also noted that "several clinical trials have suggested that treatment with BH4 improves ASD symptomatology in some individuals." Since nitric oxide production is important in regulation of blood pressure and blood flow, thereby playing a significant role in cardiovascular diseases, tetrahydrobiopterin is a potential therapeutic target. In the endothelial cell lining of blood vessels, endothelial nitric oxide synthase is dependent on tetrahydrobiopterin availability. Increasing tetrahydrobiopterin in endothelial cells by augmenting the levels of the biosynthetic enzyme GTPCH can maintain endothelial nitric oxide synthase function in experimental models of disease states such as diabetes, atherosclerosis, and hypoxic pulmonary hypertension. However, treatment of people with existing coronary artery disease with oral tetrahydrobiopterin is limited by oxidation of tetrahydrobiopterin to the inactive form, dihydrobiopterin, with little benefit on vascular function. Depletion of tetrahydrobiopterin occurs in the hypoxic brain and leads to toxin production. Preclinical studies in mice reveal that treatment with oral tetrahydrobiopterin therapy mitigates the toxic effects of hypoxia on the developing brain, specifically improving white matter development in hypoxic animals. GTPCH (GCH1) and tetrahydrobiopterin were found to have a secondary role protecting against cell death by ferroptosis in cellular models by limiting the formation of toxic lipid peroxides. Tetrahydrobiopterin acts as a potent, diffusable antioxidant that resists oxidative stress and enables cancer cell survival via promotion of angiogenesis.""",
 
     "kerning"        : {
@@ -80,8 +80,8 @@ PROOF_DATA = {
 RUNNING_TEXT_TYPES = [
 "spacing",
 "figures",
-"lowercaseCopy",
-"uppercaseCopy",
+"lowercase",
+"uppercase",
 "paragraph",
 "kerning"
 ]
@@ -509,6 +509,8 @@ class ProofDocument:
         self._path          = None
         self._name          = None
 
+        self._target_size   = None
+
         self.fonts          = ProofObjectHandler([])
         self.objects        = []
         # proof UI settings
@@ -645,6 +647,17 @@ class ProofDocument:
         return self._path
 
     path = property(_get_path, _set_path)
+
+
+    def _set_target_size(self, new_target_size: str):
+        self._target_size = new_target_size
+
+    def _get_target_size(self) -> str:
+        if not self._target_size:
+            self._target_size = False
+        return self._target_size
+
+    target_size = property(_get_target_size, _set_target_size)
 
     def _set_name(self, new_name: str):
         self._name = new_name
@@ -785,8 +798,6 @@ class ProofDocument:
             comp = getattr(self, item)
             if item in ["storage", "fonts"]:
                 continue
-            # if item == "fonts":
-            #     comp = [str(f.path) for f in comp]
             data[item] = comp
             if hasattr(comp, "path"):
                 data[item] = getattr(self,item).path
@@ -798,7 +809,7 @@ class ProofDocument:
                         if "fonts" in stored.keys():
                             del stored["fonts"]
 
-        # pprint(data)
+        #pprint(data)
         dump_path = path if path else self.generate_path_base(".proof", overwrite)
         with open(dump_path, "wb") as proof_settings:
             plistlib.dump(data, proof_settings)
@@ -833,6 +844,7 @@ class ProofDocument:
                                   )
         return min(temp_holder)
 
+
     def _init_page(self,**kwargs):
         bot.newPage(*self.size)
         self.text_attributes()
@@ -844,7 +856,6 @@ class ProofDocument:
         proof_type = kwargs.get("proof_type", "")
         location   = kwargs.get("location", ProofLocation({}))
         cover      = kwargs.get("cover", False)
-
 
         p = Path(proof_type)
         self.text_attributes()
@@ -878,7 +889,7 @@ class ProofDocument:
                     sources:bool=True,
                     instances:bool=False,
                     multi_size_page:bool=False,
-                    restrict_page:bool=True, # if set to False the overflow will add new pages
+                    overflow:bool=False, # if set to False the overflow will add new pages
                     openType:dict={}, # the only camel case :) a dict for activating specific OT on this page
                     ):
 
@@ -889,12 +900,6 @@ class ProofDocument:
                     and not inspect.ismethod(item[1])
                     and item[0] != "storage"
                    }
-        # # i wish we didnt need to do this....
-        # for kk,vv in to_store.items():
-        #     if kk == "fonts":
-        #         to_store[kk] = [v.path for v in vv]
-        # to_store = to_store
-
         cleaned = {k:v for k,v in locals().items() if k != "self"}
         self.move_to_storage(proof_type, cleaned)
 
@@ -916,7 +921,7 @@ class ProofDocument:
                     sources         = local_data.get("sources", True)
                     instances       = local_data.get("instances", False)
                     multi_size_page = local_data.get("multi_size_page", False)
-                    restrict_page   = local_data.get("restrict_page", True)
+                    overflow        = local_data.get("overflow", False)
                     openType        = local_data.get("openType", {})
                     class_data      = local_data.get("to_store", {})
                     point_sizes     = list(mit.always_iterable(point_size))
@@ -929,7 +934,7 @@ class ProofDocument:
                                                         font.path,
                                                         loca.location,
                                                         len(point_sizes),
-                                                        restrict_page,
+                                                        overflow,
                                                         point_sizes,
                                                         multi_size_page,
                                                         openType
@@ -941,7 +946,7 @@ class ProofDocument:
                                                             font.path,
                                                             loca.location,
                                                             columns,
-                                                            restrict_page,
+                                                            overflow,
                                                             pt,
                                                             multi_size_page,
                                                             openType
@@ -1039,7 +1044,14 @@ class ProofDocument:
         caption_font   = local_data["to_store"].get("caption_font", "SFMono-Regular")
         _margin_left   = local_data["to_store"].get("margin", (50)*4)[1]
         _margin_bottom = local_data["to_store"].get("margin", (50)*4)[2]
-        _text_box_size = local_data["to_store"].get("size", PAGE_SIZE_DEFAULT)
+        size           = local_data["to_store"].get("size", PAGE_SIZE_DEFAULT)
+        if isinstance(size, str):
+            size = PAGE_SIZES[size]
+
+        _text_box_size = (
+                          (size[0] - (_margin_left * 2 )),
+                          (size[1] - (_margin_bottom * 2))
+                         )
 
         for font in fonts:
             _to_use = font.locations.find(in_crop=True)
@@ -1048,14 +1060,14 @@ class ProofDocument:
             else:
                 _to_use.sort()
                 _to_use = _to_use[0]
-            location = _to_use.location
+            location = _to_use
 
             font_OT = font.get_OT()
             if not font_OT:
                 print(f"""ERROR: {font.name} does not contain a GSUB table, skipping `feature` proof""")
             else:
-                if self.words == []:
-                    self.words = get_english_words_set(['web2'], lower=True)
+                # if self.words == []:
+                #     self.words = get_english_words_set(['web2'], lower=True)
 
                 for tag, (desc,LookupID,mapping) in font_OT.items():
                     
@@ -1286,20 +1298,21 @@ class ProofDocument:
         if path not in self.objects:
             self.objects.append(path)
 
+
     #convience function to add multiple paths at once
     def add_objects(self, paths:list[str]):
         for path in paths:
             self.add_object(path)
 
 
-    def _reformat_limits(self, limits:str) -> dict:
+    def _reformat_limits(self, zone_limits:str) -> dict:
         '''
         use fontTools.varLib model for extracting the CLI data into a dictionary item
         taken from the source code ^
         '''
         result = {}
-        if limits:
-            for limitString in limits.split(" "):
+        if zone_limits:
+            for limitString in zone_limits.split(" "):
                 match = re.match(r"^(\w{1,4})=(?:(drop)|(?:([^:]+)(?:[:](.+))?))$", limitString)
                 if not match:
                     # raise ValueError("invalid location format: %r" % limitString)
@@ -1327,34 +1340,39 @@ class ProofDocument:
     def crop_space(self, _zone:str):
         zone = self._reformat_limits(_zone)
         valid = False
-        if zone:
-            for font in self.fonts:
-                cropped = []
-                if isinstance(zone, dict):
-                    for inst in font.locations:
-                        check = []
-                        for axis,value in zone.items():
-                            a = inst.location.get(axis)
-                            if a != None:
-                                valid = True
-                                if isinstance(value, float):
-                                    if a == value:
-                                        check.append(1)
-                                    else:
-                                        check.append(0)
-                                if isinstance(value, tuple):
-                                    mn,mx = value[0],value[-1]
-                                    if a:
-                                        if mn <= a <= mx:
+
+        if self.objects == []:
+            print()
+        else:
+
+            if zone:
+                for font in self.fonts:
+                    cropped = []
+                    if isinstance(zone, dict):
+                        for inst in font.locations:
+                            check = []
+                            for axis,value in zone.items():
+                                a = inst.location.get(axis)
+                                if a != None:
+                                    valid = True
+                                    if isinstance(value, float):
+                                        if a == value:
                                             check.append(1)
                                         else:
                                             check.append(0)
+                                    if isinstance(value, tuple):
+                                        mn,mx = value[0],value[-1]
+                                        if a:
+                                            if mn <= a <= mx:
+                                                check.append(1)
+                                            else:
+                                                check.append(0)
+                                else:
+                                    valid = False
+                            if 0 not in check:
+                                inst.in_crop = True
                             else:
-                                valid = False
-                        if 0 not in check:
-                            inst.in_crop = True
-                        else:
-                            inst.in_crop = False
+                                inst.in_crop = False
         if valid:
             self._crop = _zone
 
@@ -1470,84 +1488,34 @@ if __name__ == "__main__":
     add a font or designspace, only accepts path strings
         should it accept designspace objects? ufos?
     """
-    loading_test = False
 
-    if loading_test:
-        doc.load("/Users/connordavenport/Code/Typefaces/Beaujon-Typeface/variable_ttf/2025-0602-Beaujon.proof")
-        # if you want to remove a section from the old proof doc
-        # del doc.storage[2]
-        doc.save(open=True)
-    else:
+    doc.add_object("/Users/connordavenport/Code/Typefaces/Beaujon-Typeface/Beaujon.designspace")
+    doc.crop_space("opsz=10 ital=0")
 
+    doc.size = "LetterLandscape"
+    doc.caption_font = "CoreMono-Regular"
+    doc.margin = "auto"
+    doc.use_instances = True
 
-        doc.add_object("/Users/connordavenport/Code/Typefaces/Beaujon-Typeface/Beaujon.designspace")
-        doc.crop_space("opsz=10 ital=0")
+    doc.setup()
+    doc.new_section("core")
 
-        doc.size = "LetterLandscape"
-        doc.caption_font = "CoreMono-Regular"
-        doc.margin = "auto"
-        doc.use_instances = True
+    with doc.grouping() as group:
+        doc.new_section("paragraph", point_size=[12,20], multi_size_page=True,) # if True and multi point sizes, adds multi-column page with no overflow
+        doc.new_section("paragraph", point_size=[12], multi_size_page=False, overflow=False,)  # if True and multi point sizes, adds multi-column page with no overflow 
 
-        doc.setup()
-        # doc.new_section("core")
+    """exit context manager"""
 
-        """custom context manager that allows us to
-        group specific proof sections by specific
-        styling instead ofproof
-        """
+    doc.new_section(
+                    "paragraph",
+                    point_size=20,
+                    overflow=False
+                   )
 
-        with doc.grouping() as group:
-            """enter context manager
-            anything that happens in here will recompile the order
-            and generate pages in the font grouping and not the section order
-            """
-            doc.new_section("paragraph", point_size=[12,20], multi_size_page=True,) # if True and multi point sizes, adds multi-column page with no overflow
-            doc.new_section("paragraph", point_size=[12], multi_size_page=False, restrict_page=True,)  # if True and multi point sizes, adds multi-column page with no overflow 
+    # doc.new_section("gradient")
+    # doc.new_section("features")
 
-        """exit context manager"""
-
-        doc.new_section(
-                        "paragraph",
-                        point_size=20,
-                        restrict_page=False, # if True and multi point sizes, adds multi-column page with no overflow
-                       )
-
-        # doc.new_section("gradient")
-        # doc.new_section("features")
-
-
-        """
-        proofml is an experimental proofing language
-        that is inspried by Tal Leming's ezui.
-        """
-        proofml_data = '''
-        * proof
-        [         ]|--|
-        [         ]|--|
-        '''
-
-        # doc.new_section(
-        #                 "proofml",
-        #                 data=proofml_data
-        #                )
-
-
-        # doc.open_automatically = False
-        """
-        kwargs inside of save overwrite whatever the doc says.
-        path, compiles name for current proof, will override with given if used
-        open, by default is `False`, open in Preview
-        overwrite, save over older proofs, default is `True`. `False` will append + "1" until path is unique
-        write to disk
-        """
-
-        doc.save(open=True)
-
-        """
-        write to custom file format to save exact proof settings for later
-        doc and save both allow for overwriting the previous file on disk
-        overwrite is set to True by default
-        """
-        doc.write(overwrite=True)
+    doc.save(open=True)
+    doc.write(overwrite=True)
 
 
