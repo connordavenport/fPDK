@@ -77,6 +77,8 @@ PROOF_DATA = {
     }
 }
 
+
+
 RUNNING_TEXT_TYPES = [
 "spacing",
 "figures",
@@ -90,6 +92,22 @@ FONT_SIZE_DEFAULT = 28
 FONT_SIZE_SMALL   = 9
 FONT_SIZE_MED     = 12
 FONT_SIZE_LARGE   = 30
+
+# using frederik's window tilling method
+TILE_REFERENCE = {
+1  : [[1]],
+2  : [[1],[1]],
+3  : [[1],[1, 1]],
+4  : [[1, 1], [1, 1]],
+5  : [[1, 1], [1, 1, 1]],
+6  : [[1, 1, 1], [1, 1, 1]],
+7  : [[1, 1, 1], [1, 1, 1, 1]],
+8  : [[1, 1, 1, 1], [1, 1, 1, 1]],
+9  : [[1, 1, 1, 1], [1, 1, 1, 1, 1]],
+10 : [[1, 1, 1, 1, 1], [1, 1, 1, 1, 1]],
+11 : [[1, 1, 1, 1],[1, 1, 1, 1],[1, 1, 1]],
+12 : [[1, 1, 1, 1],[1, 1, 1, 1],[1, 1, 1, 1]],
+}
 
 PAGE_SIZES = bot.sizes()
 PAGE_SIZE_DEFAULT = "LetterLandscape"
@@ -891,6 +909,7 @@ class ProofDocument:
                     multi_size_page:bool=False,
                     overflow:bool=False, # if set to False the overflow will add new pages
                     openType:dict={}, # the only camel case :) a dict for activating specific OT on this page
+                    tracking_values:list=[], # a list of tracking values to test, 0 (current) will always be the first
                     ):
 
         to_store = { 
@@ -930,26 +949,26 @@ class ProofDocument:
                     while txt:
                         if len(point_sizes) > 1 and multi_size_page:
                             self._init_page(font=font,proof_type=proof_type,location=loca)
-                            txt = self.draw_text_layout(txt,
-                                                        font.path,
-                                                        loca.location,
-                                                        len(point_sizes),
-                                                        overflow,
-                                                        point_sizes,
-                                                        multi_size_page,
-                                                        openType
+                            txt = self.draw_text_layout(txt=txt,
+                                                        font_path=font.path,
+                                                        variable_location=loca.location,
+                                                        columns=len(point_sizes),
+                                                        overflow=overflow,
+                                                        font_size=point_sizes,
+                                                        multi_size_page=multi_size_page,
+                                                        openType=openType
                                                         )
                         else:
                             for pt in point_sizes:
                                 self._init_page(font=font,proof_type=proof_type,location=loca)
-                                txt = self.draw_text_layout(txt,
-                                                            font.path,
-                                                            loca.location,
-                                                            columns,
-                                                            overflow,
-                                                            pt,
-                                                            multi_size_page,
-                                                            openType
+                                txt = self.draw_text_layout(txt=txt,
+                                                            font_path=font.path,
+                                                            variable_location=loca.location,
+                                                            columns=columns,
+                                                            overflow=overflow,
+                                                            font_size=pt,
+                                                            multi_size_page=multi_size_page,
+                                                            openType=openType
                                                             )
 
     def _draw_gradient(self, data=list, fonts:list[ProofFont]=[]):
@@ -1030,11 +1049,55 @@ class ProofDocument:
                     self._draw_gradient(section, fonts)
                 elif name == "features":
                     self._draw_features(section,fonts)
+                elif name == "tracking":
+                    self._draw_tracking(section, fonts)
                 else:
                     pass
             else:
                 for font in fonts:
-                    self._draw_paragraph(section,[font])
+                    for sub in section:
+                        if sub[0] == "tracking":
+                            self._draw_tracking([sub],[font])
+                        else:
+                            self._draw_paragraph([sub],[font])
+
+
+    def _draw_tracking(self, data=list, fonts:list[ProofFont]=[]):
+        for font in fonts:
+            to_process = font.locations.find(in_crop=True) if data[0][-1].get("to_store", {}).get("use_instances") else font.locations.find(is_source=True, in_crop=True)
+            for loca in to_process:
+                for sub_sec in data:
+
+                    proof_type, local_data = sub_sec
+
+                    point_size      = local_data.get("point_size", FONT_SIZE_MED)
+                    tracking_values = local_data.get("tracking_values", [])
+                    openType        = local_data.get("openType", {})
+                    class_data      = local_data.get("to_store", {})
+
+                    point_sizes     = list(mit.always_iterable(point_size))
+
+                    num_of_track_vals = len(tracking_values)
+                    if num_of_track_vals > 12:
+                        raise ValueError
+
+                    columns = len(max(TILE_REFERENCE[num_of_track_vals]))
+                    rows = len(TILE_REFERENCE[num_of_track_vals])
+
+                    txt = PROOF_DATA.get("paragraph") # replace with tracking text later
+
+                    self._init_page(font=font,proof_type=proof_type,location=loca)
+                    txt = self.draw_text_layout(txt=txt,
+                                                font_path=font.path,
+                                                variable_location=loca.location,
+                                                columns=columns,
+                                                rows=rows,
+                                                overflow=False,
+                                                font_size=point_sizes,
+                                                multi_size_page=False,
+                                                openType=openType,
+                                                tracking_values=tracking_values,
+                                                )
 
 
     def _draw_features(self, data=list, fonts:list[ProofFont]=[]):
@@ -1116,7 +1179,7 @@ class ProofDocument:
                     grid.columnTextBox(string, (_margin_left, _margin_bottom, *_text_box_size), subdivisions=cols, gutter=15, draw_grid=False)
 
 
-    def draw_core_characters(self, txt:str | bot.FormattedString, font_path:str, variable_location:dict={}, scale:Optional[float]=None, will_draw:bool=True, openType:dict={"resetFeatures":True}):
+    def draw_core_characters(self, txt:str | bot.FormattedString, font_path:str, variable_location:dict={}, scale:Optional[float]=None, will_draw:bool=True, openType:dict={}):
         box_w, box_h = self._text_box_size
         box_x, box_y = self._margin_left, self._margin_bottom
 
@@ -1193,27 +1256,64 @@ class ProofDocument:
         return txt
 
 
-    def draw_text_layout(self, txt:str | bot.FormattedString, font_path:str, variable_location:dict={}, columns:int=1, overflow:bool=False, font_size:int=FONT_SIZE_MED, multi_size_page:bool=False, openType:dict={"resetFeatures":True}) -> str | bot.FormattedString: 
-        sub_columns = grid.ColumnGrid((self._margin_left, self._margin_bottom, *self._text_box_size), subdivisions=columns)
+    def draw_text_layout(self, txt:str | bot.FormattedString, font_path:str, variable_location:dict={}, columns:int=1, rows:int=1, overflow:bool=False, font_size:int=FONT_SIZE_MED, multi_size_page:bool=False, openType:dict={}, tracking_values:list[int]=[]) -> str | bot.FormattedString: 
+
+        _grid = grid.Grid((self._margin_left, self._margin_bottom, *self._text_box_size),
+                               column_subdivisions=columns, 
+                               row_subdivisions=rows, 
+                               column_gutter=15, 
+                               row_gutter=15)
+
+
         bot.fontVariations(**variable_location)
         bot.hyphenation(self.hyphenation)
         bot.openTypeFeatures(**openType)
 
-        if multi_size_page:
-            for il, size in enumerate(font_size):
+        tile = TILE_REFERENCE.get(len(tracking_values))
+
+        if tracking_values and tile:
+            r_index,c_index = len(tile), 0
+            for ti, trk_val in enumerate(tracking_values):
+                if ti % len(max(tile)) == 0:
+                    # reset line down
+                    c_index  = 0
+                    r_index -= 1
+                else:
+                    c_index += 1
+
+                item_size = _grid
+
+                bot.font(font_path, font_size[0])
+                bot.tracking(font_size[0]*trk_val/1000)
+
+                x,y = (_grid.columns[c_index], _grid.rows[r_index])
+                grid.columnTextBox(txt, (x,y, _grid.columns*1, _grid.rows*1), subdivisions=1, gutter=15, draw_grid=False)
+
+                with bot.savedState():
+                    self.text_attributes()
+                    bot.fill(*self.instance_color)
+                    bot.rotate(90, (x-8, y))
+                    bot.text(str(trk_val), (x, y))
+
+            txt = ""
+
+
+        else:
+            if multi_size_page:
+                for il, size in enumerate(font_size):
+                    bot.font(
+                        font_path,
+                        size
+                    )
+                    grid.columnTextBox(txt, (_grid.columns[il], _grid.bottom, _grid.columns*1, _grid.rows * 1), subdivisions=1, gutter=15, draw_grid=False)
+                txt = ""
+            else:
                 bot.font(
                     font_path,
-                    size
-                )
-                grid.columnTextBox(txt, (sub_columns[il], sub_columns.bottom, sub_columns*1, self._text_box_size[1]), subdivisions=1, gutter=15, draw_grid=False)
-            txt = ""
-        else:
-            bot.font(
-                font_path,
-                font_size
-                )
-            txt = grid.columnTextBox(txt, (self._margin_left, self._margin_bottom, *self._text_box_size), subdivisions=columns, gutter=15, draw_grid=False)
-            txt = txt if overflow else ""
+                    font_size
+                    )
+                txt = grid.columnTextBox(txt, (self._margin_left, self._margin_bottom, *self._text_box_size), subdivisions=columns, gutter=15, draw_grid=False)
+                txt = txt if overflow else ""
         return txt
 
 
@@ -1498,24 +1598,24 @@ if __name__ == "__main__":
     doc.use_instances = True
 
     doc.setup()
-    doc.new_section("core")
+    # doc.new_section("core")
 
     with doc.grouping() as group:
         doc.new_section("paragraph", point_size=[12,20], multi_size_page=True,) # if True and multi point sizes, adds multi-column page with no overflow
-        doc.new_section("paragraph", point_size=[12], multi_size_page=False, overflow=False,)  # if True and multi point sizes, adds multi-column page with no overflow 
+        doc.new_section("tracking", tracking_values=[-20, -10, 0, 10, 20, 30])  # if True and multi point sizes, adds multi-column page with no overflow 
 
     """exit context manager"""
 
-    doc.new_section(
-                    "paragraph",
-                    point_size=20,
-                    overflow=False
-                   )
+    # doc.new_section(
+    #                 "paragraph",
+    #                 point_size=20,
+    #                 overflow=False
+    #                )
 
     # doc.new_section("gradient")
     # doc.new_section("features")
 
     doc.save(open=True)
-    doc.write(overwrite=True)
+    # doc.write(overwrite=True)
 
 
