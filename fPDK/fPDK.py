@@ -29,11 +29,13 @@ from pprint import pprint
 from english_words import get_english_words_set
 from itertools import groupby
 import uuid
-
+from wordsiv import WordSiv
+from iso639 import Lang
 
 # fPDK, font Proofing Development Kit
 
 USER = getpass.getuser()
+FALLBACK = os.path.abspath(os.path.join(__file__, "../../assets/fonts/AdobeBlank.otf"))
 
 CORE         = ()
 RUNNING_TEXT = ()
@@ -52,7 +54,7 @@ PROOF_DATA = {
     "figures"        : "0123456789 H0H1H2H3H4H5H6H7H8H9"+"\n"+"".join([str((randint(0,9))) for i in range(1000)]),
     "lowercase"      : "Angel Adept Blind Bodice Clique Coast Dunce Docile Enact Eosin Furlong Focal Gnome Gondola Human Hoist Inlet Iodine Justin Jocose Knoll Koala Linden Loads Milliner Modal Number Nodule Onset Oddball Pneumo Poncho Quanta Qophs Rhone Roman Snout Sodium Tundra Tocsin Uncle Udder Vulcan Vocal Whale Woman Xmas Xenon Yunnan Young Zloty Zodiac. Angel angel adept for the nuance loads of the arena cocoa and quaalude. Blind blind bodice for the submit oboe of the club snob and abbot. Clique clique coast for the pouch loco of the franc assoc and accede. Dunce dunce docile for the loudness mastodon of the loud statehood and huddle. Enact enact eosin for the quench coed of the pique canoe and bleep. Furlong furlong focal for the genuflect profound of the motif aloof and offers. Gnome gnome gondola for the impugn logos of the unplug analog and smuggle. Human human hoist for the buddhist alcohol of the riyadh caliph and bathhouse. Inlet inlet iodine for the quince champion of the ennui scampi and shiite. Justin justin jocose for the djibouti sojourn of the oranj raj and hajjis. Knoll knoll koala for the banknote lookout of the dybbuk outlook and trekked. Linden linden loads for the ulna monolog of the consul menthol and shallot. Milliner milliner modal for the alumna solomon of the album custom and summon. Number number nodule for the unmade economic of the shotgun bison and tunnel. Onset onset oddball for the abandon podium of the antiquo tempo and moonlit. Pneumo pneumo poncho for the dauphin opossum of the holdup bishop and supplies. Quanta quanta qophs for the inquest sheqel of the cinq coq and suqqu. Rhone rhone roman for the burnt porous of the lemur clamor and carrot. Snout snout sodium for the ensnare bosom of the genus pathos and missing. Tundra tundra tocsin for the nutmeg isotope of the peasant ingot and ottoman. Uncle uncle udder for the dunes cloud of the hindu thou and continuum. Vulcan vulcan vocal for the alluvial ovoid of the yugoslav chekhov and revved. Whale whale woman for the meanwhile blowout of the forepaw meadow and glowworm. Xmas xmas xenon for the bauxite doxology of the tableaux equinox and exxon. Yunnan yunnan young for the dynamo coyote of the obloquy employ and sayyid. Zloty zloty zodiac for the gizmo ozone of the franz laissez and buzzing.",
     "uppercase"      : "ABIDE ACORN OF THE HABIT DACRON FOR THE BUDDHA GOUDA QUAALUDE. BENCH BOGUS OF THE SCRIBE ROBOT FOR THE APLOMB JACOB RIBBON. CENSUS CORAL OF THE SPICED JOCOSE FOR THE BASIC HAVOC SOCCER. DEMURE DOCILE OF THE TIDBIT LODGER FOR THE CUSPID PERIOD BIDDER. EBBING ECHOING OF THE BUSHED DECAL FOR THE APACHE ANODE NEEDS. FEEDER FOCUS OF THE LIFER BEDFORD FOR THE SERIF PROOF BUFFER. GENDER GOSPEL OF THE PIGEON DOGCART FOR THE SPRIG QUAHOG DIGGER. HERALD HONORS OF THE DIHEDRAL MADHOUSE FOR THE PENH RIYADH BATHHOUSE. IBSEN ICEMAN OF THE APHID NORDIC FOR THE SUSHI SAUDI SHIITE. JENNIES JOGGER OF THE TIJERA ADJOURN FOR THE ORANJ KOWBOJ HAJJIS. KEEPER KOSHER OF THE SHRIKE BOOKCASE FOR THE SHEIK LOGBOOK CHUKKAS. LENDER LOCKER OF THE CHILD GIGOLO FOR THE UNCOIL GAMBOL ENROLLED. MENACE MCCOY OF THE NIMBLE TOMCAT FOR THE DENIM RANDOM SUMMON. NEBULA NOSHED OF THE INBRED BRONCO FOR THE COUSIN CARBON KENNEL. OBSESS OCEAN OF THE PHOBIC DOCKSIDE FOR THE GAUCHO LIBIDO HOODED. PENNIES PODIUM OF THE SNIPER OPCODE FOR THE SCRIP BISHOP HOPPER. QUANTA QOPHS OF THE INQUEST OQOS FOR THE CINQ COQ SUQQU. REDUCE ROGUE OF THE GIRDLE ORCHID FOR THE MEMOIR SENSOR SORREL. SENIOR SCONCE OF THE DISBAR GODSON FOR THE HUBRIS AMENDS LESSEN. TENDON TORQUE OF THE UNITED SCOTCH FOR THE NOUGHT FORGOT BITTERS. UNDER UGLINESS OF THE RHUBARB SEDUCE FOR THE MANCHU HINDU CONTINUUM. VERSED VOUCH OF THE DIVER OVOID FOR THE TELAVIV KARPOV FLIVVER. WENCH WORKER OF THE UNWED SNOWCAP FOR THE ANDREW ESCROW GLOWWORM. XENON XOCHITL OF THE MIXED BOXCAR FOR THE SUFFIX ICEBOX EXXON. YEOMAN YONDER OF THE HYBRID ARROYO FOR THE DINGHY BRANDY SAYYID. ZEBRA ZOMBIE OF THE PRIZED OZONE FOR THE FRANZ ARROZ BUZZING.",
-    "paragraph"      : """Tetrahydrobiopterin (BH4, THB), also known as sapropterin (INN), is a cofactor of the three aromatic amino acid hydroxylase enzymes, used in the degradation of amino acid phenylalanine and in the biosynthesis of the neurotransmitters serotonin (5-hydroxytryptamine, 5-HT), melatonin, dopamine, norepinephrine (noradrenaline), epinephrine (adrenaline), and is a cofactor for the production of nitric oxide (NO) by the nitric oxide synthases. Chemically, its structure is that of a (dihydropteridine reductase) reduced pteridine derivative (quinonoid dihydrobiopterin). Tetrahydrobiopterin is available as a tablet for oral administration in the form of sapropterin dihydrochloride (BH4*2HCL). It was approved for use in the United States as a tablet in December 2007 and as a powder in December 2013. It was approved for use in the European Union in December 2008, Canada in April 2010, and Japan in July 2008. It is sold under the brand names Kuvan and Biopten. The typical cost of treating a patient with Kuvan is US$100,000 per year. BioMarin holds the patent for Kuvan until at least 2024, but Par Pharmaceutical has a right to produce a generic version by 2020. Sapropterin is indicated in tetrahydrobiopterin deficiency caused by GTP cyclohydrolase I (GTPCH) deficiency, or 6-pyruvoyltetrahydropterin synthase (PTPS) deficiency. Also, BH4*2HCL is FDA approved for use in phenylketonuria (PKU), along with dietary measures. However, most people with PKU have little or no benefit from BH4*2HCL. The most common adverse effects, observed in more than 10% of people, include headache and a running or obstructed nose. Diarrhea and vomiting are also relatively common, seen in at least 1% of people. No interaction studies have been conducted. Because of its mechanism, tetrahydrobiopterin might interact with dihydrofolate reductase inhibitors like methotrexate and trimethoprim, and NO-enhancing drugs like nitroglycerin, molsidomine, minoxidil, and PDE5 inhibitors. Combination of tetrahydrobiopterin with levodopa can lead to increased excitability. Tetrahydrobiopterin has multiple roles in human biochemistry. The major one is to convert amino acids such as phenylalanine, tyrosine, and tryptophan to precursors of dopamine and serotonin, major monoamine neurotransmitters. It works as a cofactor, being required for an enzyme's activity as a catalyst, mainly hydroxylases. Tetrahydrobiopterin is a cofactor for tryptophan hydroxylase (TPH) for the conversion of L-tryptophan (TRP) to 5-hydroxytryptophan (5-HTP). Phenylalanine hydroxylase (PAH) catalyses the conversion of L-phenylalanine (PHE) to L-tyrosine (TYR). Therefore, a deficiency in tetrahydrobiopterin can cause a toxic buildup of L-phenylalanine, which manifests as the severe neurological issues seen in phenylketonuria. Tyrosine hydroxylase (TH) catalyses the conversion of L-tyrosine to L-DOPA (DOPA), which is the precursor for dopamine. Dopamine is a vital neurotransmitter, and is the precursor of norepinephrine and epinephrine. Thus, a deficiency of BH4 can lead to systemic deficiencies of dopamine, norepinephrine, and epinephrine. In fact, one of the primary conditions that can result from GTPCH-related BH4 deficiency is dopamine-responsive dystonia; currently, this condition is typically treated with carbidopa/levodopa, which directly restores dopamine levels within the brain. Nitric oxide synthase (NOS) catalyses the conversion of a guanidino nitrogen of L-arginine (L-Arg) to nitric oxide (NO). Among other things, nitric oxide is involved in vasodilation, which improves systematic blood flow. The role of BH4 in this enzymatic process is so critical that some research points to a deficiency of BH4 – and thus, of nitric oxide – as being a core cause of the neurovascular dysfunction that is the hallmark of circulation-related diseases such as diabetes. Ether lipid oxidase (alkylglycerol monooxygenase, AGMO) catalyses the conversion of 1-alkyl-sn-glycerol to 1-hydroxyalkyl-sn-glycerol. Tetrahydrobiopterin was discovered to play a role as an enzymatic cofactor. The first enzyme found to use tetrahydrobiopterin is phenylalanine hydroxylase (PAH). Tetrahydrobiopterin is biosynthesized from guanosine triphosphate (GTP) by three chemical reactions mediated by the enzymes GTP cyclohydrolase I (GTPCH), 6-pyruvoyltetrahydropterin synthase (PTPS), and sepiapterin reductase (SR). BH4 can be oxidized by one or two electron reactions, to generate BH4 or BH3 radical and BH2, respectively. Research shows that ascorbic acid (also known as ascorbate or vitamin C) can reduce BH3 radical into BH4, preventing the BH3 radical from reacting with other free radicals (superoxide and peroxynitrite specifically). Without this recycling process, uncoupling of the endothelial nitric oxide synthase (eNOS) enzyme and reduced bioavailability of the vasodilator nitric oxide occur, creating a form of endothelial dysfunction. Ascorbic acid is oxidized to dehydroascorbic acid during this process, although it can be recycled back to ascorbic acid. Folic acid and its metabolites seem to be particularly important in the recycling of BH4 and NOS coupling. Other than PKU studies, tetrahydrobiopterin has participated in clinical trials studying other approaches to solving conditions resultant from a deficiency of tetrahydrobiopterin. These include autism, depression, ADHD, hypertension, endothelial dysfunction, and chronic kidney disease. Experimental studies suggest that tetrahydrobiopterin regulates deficient production of nitric oxide in cardiovascular disease states, and contributes to the response to inflammation and injury, for example in pain due to nerve injury. A 2015 BioMarin-funded study of PKU patients found that those who responded to tetrahydrobiopterin also showed a reduction of ADHD symptoms. In psychiatry, tetrahydrobiopterin has been hypothesized to be involved in the pathophysiology of depression, although evidence is inconclusive to date. In 1997, a small pilot study was published on the efficacy of tetrahydrobiopterin (BH4) on relieving the symptoms of autism, which concluded that it "might be useful for a subgroup of children with autism" and that double-blind trials are needed, as are trials which measure outcomes over a longer period of time. In 2010, Frye et al. published a paper which concluded that it was safe, and also noted that "several clinical trials have suggested that treatment with BH4 improves ASD symptomatology in some individuals." Since nitric oxide production is important in regulation of blood pressure and blood flow, thereby playing a significant role in cardiovascular diseases, tetrahydrobiopterin is a potential therapeutic target. In the endothelial cell lining of blood vessels, endothelial nitric oxide synthase is dependent on tetrahydrobiopterin availability. Increasing tetrahydrobiopterin in endothelial cells by augmenting the levels of the biosynthetic enzyme GTPCH can maintain endothelial nitric oxide synthase function in experimental models of disease states such as diabetes, atherosclerosis, and hypoxic pulmonary hypertension. However, treatment of people with existing coronary artery disease with oral tetrahydrobiopterin is limited by oxidation of tetrahydrobiopterin to the inactive form, dihydrobiopterin, with little benefit on vascular function. Depletion of tetrahydrobiopterin occurs in the hypoxic brain and leads to toxin production. Preclinical studies in mice reveal that treatment with oral tetrahydrobiopterin therapy mitigates the toxic effects of hypoxia on the developing brain, specifically improving white matter development in hypoxic animals. GTPCH (GCH1) and tetrahydrobiopterin were found to have a secondary role protecting against cell death by ferroptosis in cellular models by limiting the formation of toxic lipid peroxides. Tetrahydrobiopterin acts as a potent, diffusable antioxidant that resists oxidative stress and enables cancer cell survival via promotion of angiogenesis.""",
+    "paragraph"      : """La noche del 12 de julio de 1954, sufrió de fiebre alta y dolores extremos. Aproximadamente a las seis de la mañana del 13 de julio, su enfermera la encontró muerta en su cama. Kahlo tenía 47 años al morir, y sus causas de muerte oficiales fueron una embolia pulmonar no traumática y una flebitis en un miembro inferior derecho no traumática. No obstante, no se le realizó una autopsia. Ante esto, una versión alterna asegura que en realidad se suicidó. Los puntos que apoyaron dicha hipótesis fueron las declaraciones de su enfermera, quien aseguró que contaba los analgésicos de la artista para poder tenerle un control de los mismos, pero la noche antes de su muerte se provocó una sobredosis. Tenía prescrito una dosis máxima de siete pastillas, pero ingirió once. En adición, esa noche le dio a Rivera un regalo de aniversario de bodas, con más de un mes de antelación. \n\nSu cuerpo fue velado en el Palacio de Bellas Artes y su ataúd fue cubierto con la bandera del Partido Comunista Mexicano, hecho que la prensa nacional criticó profusamente. Concluidas sus ceremonias de despedida, fue cremada en el Panteón Civil de Dolores. Sus cenizas fueron llevadas a descansar a la Casa Azul en Coyoacán, el mismo lugar donde nació y que años más tarde se convirtió en museo. Rivera, quien afirmó que su muerte fue «el día más trágico de su vida», falleció tres años después, en 1957.""",
 
     "kerning"        : {
         "frequent"       : "the be to of and a in that have I it for not on with he as you do at this but his by from they we say her she or an will my one all would there their what so up out if about who get which go me when make can like time no just him know take people into year your good some could them see other than then now look only come its over think also back after use two how our work first well way even new want because any these give day most us el de que y a en un ser se no haber por con su para como estar tener le lo todo pero más hacer o poder decir este ir otro ese la si me ya ver porque dar cuando él muy sin vez mucho saber qué sobre mi alguno mismo yo también hasta año dos querer entre así primero desde grande eso ni nos llegar pasar tiempo ella sí día uno bien poco deber entonces poner cosa tanto hombre parecer nuestro tan donde ahora parte después vida quedar siempre creer hablar llevar dejar nada cada seguir menos nuevo encontrar como I seu que ele foi para em são com eles ser em uma tem este a por quente palavra mas o alguns é ele você ou teve o de a e uma em nós lata fora outro foram que fazer seu tempo se vontade como disse uma cada dizer faz conjunto três quer ar bem também jogar pequeno fim colocar casa ler mão port grande soletrar adicionar mesmo terra aqui necessário grande tais siga ato por perguntar homens mudança fui luz tipo off precisa casa imagem tentar nós novamente animais ponto mãe mundo perto construir auto terra pai le de un à être et en avoir que pour dans ce il qui ne sur se pas plus pouvoir par je avec tout faire son mettre autre on mais nous comme ou si leur y dire elle devoir avant deux même prendre aussi celui donner bien où fois vous encore nouveau aller cela entre premier vouloir déjà grand mon me moins aucun lui temps très savoir falloir voir quelque sans raison notre dont non an monde jour monsieur demander alors après trouver personne rendre part dernier venir pendant passer peu lequel suite bon comprendre depuis point ainsi heure rester der die das und sein in ein zu haben ich werden sie von nicht mit es sich auch auf für an er so dass können dies als ihr ja wie bei oder wir aber dann man da sein noch nach was also aus all wenn nur müssen sagen um über machen kein Jahr du mein schon vor durch geben mehr andere viel kommen jetzt sollen mir wollen ganz mich immer gehen sehr hier doch bis groß wieder Mal zwei gut wissen neu sehen lassen uns weil unter denn stehen jede Beispiel Zeit erste ihm ihn wo lang eigentlich damit selbst",
@@ -264,7 +266,7 @@ class ProofLocation:
             name = "both"
         return f"<ProofLocation.{name} @ {self.name}>"
 
-    def __init__(self, location:dict):
+    def __init__(self, location:dict={}):
 
         self.is_instance = False
         self.is_source = False
@@ -394,10 +396,34 @@ class ProofFont:
                     tag, desc, LookupID = _temp
                     Lookup = _gsub.table.LookupList.Lookup[LookupID]
                     mapping = None
+                    submap = {}
                     for subtable in Lookup.SubTable:
+
                         if subtable.LookupType == 1:
                             mapping = subtable.mapping
-                    _features[tag] = ((desc,LookupID,mapping))
+                        elif subtable.LookupType == 6:
+                            back = subtable.BacktrackCoverage
+                            inp = subtable.InputCoverage
+                            ahead = subtable.LookAheadCoverage
+                            
+                            ind = subtable.SubstLookupRecord[0].LookupListIndex
+                            subref = _gsub.table.LookupList.Lookup[ind]
+                            sing = subref.SubTable[0].mapping
+                            
+                            if inp:
+                                inp = inp[0].glyphs
+                            if back:
+                                back = back[0].glyphs
+                            if ahead:
+                                ahead = ahead[0].glyphs                            
+                            if not back:
+                                submap[inp[0]] = (sing[inp[0]], dict(extra=sing.get(ahead[0], ahead[0]), pos="middle"))
+                            else:
+                                submap[inp[-1]] = (sing[inp[-1]], dict(extra=back[-1], pos="before"))                 
+                            mapping = submap
+
+                    if mapping:
+                        _features[tag] = ((desc,LookupID,mapping))
 
             self.features = _features
             return _features
@@ -526,6 +552,10 @@ class ProofDocument:
         self._use_instances = False
         self._path          = None
         self._name          = None
+        
+        self._scope         = "core"
+        self._language      = "english"
+        self._lang_tag      = "en"
 
         self._target_size   = None
 
@@ -665,7 +695,20 @@ class ProofDocument:
         return self._path
 
     path = property(_get_path, _set_path)
+    
+    def _set_language(self, new_language: str):
+        
+        self._language = new_language
+        try:
+            self._lang_tag = Lang(new_language.title()).pt1
+        except:
+            self._lang_tag = ""
+    
 
+    def _get_language(self) -> str:
+        return self._language
+
+    language = property(_get_language, _set_language)
 
     def _set_target_size(self, new_target_size: str):
         self._target_size = new_target_size
@@ -687,6 +730,14 @@ class ProofDocument:
         return self._name
 
     name = property(_get_name, _set_name)
+    
+    def _set_scope(self, new_scope: str):
+        self._scope = new_scope
+
+    def _get_scope(self) -> str:
+        return self._scope
+
+    scope = property(_get_scope, _set_scope)
 
     # def _set_operator(self, new_operator):
     #     self._operator = new_operator
@@ -872,8 +923,9 @@ class ProofDocument:
     def draw_header_footer(self,**kwargs):
         font       = kwargs.get("font", ProofFont(""))
         proof_type = kwargs.get("proof_type", "")
-        location   = kwargs.get("location", ProofLocation({}))
+        location   = kwargs.get("location", ProofLocation())
         cover      = kwargs.get("cover", False)
+        features   = kwargs.get("openType", {})
 
         p = Path(proof_type)
         self.text_attributes()
@@ -890,6 +942,13 @@ class ProofDocument:
 
             bot.fill(0)
             bot.text(f'Style: {location.name if location else font.name}', (self._grid[2], header_y_pos))
+
+            if True in features.values():
+                feature_list = [k for k,v in features.items() if v == True]
+                feature_string = ", ".join(feature_list)
+
+                bot.text(f'OT: {feature_string}', (self._grid[3], header_y_pos))
+
             bot.text(f'Type: {p.stem}', (self.size[0]-self._margin_right, header_y_pos), align="right")
         fw,fh = bot.textSize(f'Style: {font.name}')
         if proof_type != "core" and location:
@@ -926,10 +985,20 @@ class ProofDocument:
         # build_proofs is the new house but
         # we get our data from the storage 
 
+    def _get_working_locations(self, data:list, font) -> List: 
+        to_process = [ProofLocation()]
+        if font.is_variable:
+            if data[0] == "core":
+                to_process = font.locations.find(in_crop=True) if data[-1].get("to_store", {}).get("use_instances") else font.locations.find(is_source=True, in_crop=True)
+            else:
+                to_process = font.locations.find(in_crop=True) if data[0][-1].get("to_store", {}).get("use_instances") else font.locations.find(is_source=True, in_crop=True)
+        return to_process
 
-    def _draw_paragraph(self, data=list, fonts:list[ProofFont]=[]):
+
+    def _draw_running_text(self, data=list, fonts:list[ProofFont]=[]):
         for font in fonts:
-            to_process = font.locations.find(in_crop=True) if data[0][-1].get("to_store", {}).get("use_instances") else font.locations.find(is_source=True, in_crop=True)
+
+            to_process = self._get_working_locations(data, font)
             for loca in to_process:
                 for sub_sec in data:
 
@@ -943,33 +1012,69 @@ class ProofDocument:
                     overflow        = local_data.get("overflow", False)
                     openType        = local_data.get("openType", {})
                     class_data      = local_data.get("to_store", {})
+                    tracking_values = local_data.get("tracking_values", [])
                     point_sizes     = list(mit.always_iterable(point_size))
 
-                    txt = PROOF_DATA.get(proof_type)
-                    while txt:
-                        if len(point_sizes) > 1 and multi_size_page:
-                            self._init_page(font=font,proof_type=proof_type,location=loca)
-                            txt = self.draw_text_layout(txt=txt,
-                                                        font_path=font.path,
-                                                        variable_location=loca.location,
-                                                        columns=len(point_sizes),
-                                                        overflow=overflow,
-                                                        font_size=point_sizes,
-                                                        multi_size_page=multi_size_page,
-                                                        openType=openType
-                                                        )
-                        else:
-                            for pt in point_sizes:
-                                self._init_page(font=font,proof_type=proof_type,location=loca)
+
+
+                    if proof_type == "tracking":
+
+                        num_of_track_vals = len(tracking_values)
+                        if num_of_track_vals > 12:
+                            raise ValueError
+
+                        columns = len(max(TILE_REFERENCE[num_of_track_vals]))
+                        rows = len(TILE_REFERENCE[num_of_track_vals])
+
+
+                        txt = PROOF_DATA.get("paragraph") # replace with tracking text later
+                        self._init_page(font=font,proof_type=proof_type,location=loca,openType=openType)
+                        txt = self.draw_text_layout(txt=txt,
+                                                    font_path=font.path,
+                                                    variable_location=loca.location,
+                                                    columns=columns,
+                                                    rows=rows,
+                                                    overflow=False,
+                                                    font_size=point_sizes,
+                                                    multi_size_page=False,
+                                                    openType=openType,
+                                                    tracking_values=tracking_values,
+                                                    )
+
+                    else:
+                        txt = PROOF_DATA.get(proof_type)
+                        if self.scope == "testword": 
+                            txt = ""
+                            for i in range(20):
+                                # try and generate words using the declared language
+                                tag = self._lang_tag if self._lang_tag in WordSiv().list_vocabs() else "en"
+                                wsv = WordSiv(vocab=tag, glyphs="HAMBUGERFONTSIVhambugerfontsiv.,")
+                                txt += f"{wsv.sent(rnd=.03)}"
+                        while txt:
+                            if len(point_sizes) > 1 and multi_size_page:
+                                self._init_page(font=font,proof_type=proof_type,location=loca,openType=openType)
                                 txt = self.draw_text_layout(txt=txt,
                                                             font_path=font.path,
                                                             variable_location=loca.location,
-                                                            columns=columns,
+                                                            columns=len(point_sizes),
                                                             overflow=overflow,
-                                                            font_size=pt,
+                                                            font_size=point_sizes,
                                                             multi_size_page=multi_size_page,
                                                             openType=openType
                                                             )
+                            else:
+                                for pt in point_sizes:
+                                    self._init_page(font=font,proof_type=proof_type,location=loca,openType=openType)
+                                    txt = self.draw_text_layout(txt=txt,
+                                                                font_path=font.path,
+                                                                variable_location=loca.location,
+                                                                columns=columns,
+                                                                overflow=overflow,
+                                                                font_size=pt,
+                                                                multi_size_page=multi_size_page,
+                                                                openType=openType
+                                                                )
+
 
     def _draw_gradient(self, data=list, fonts:list[ProofFont]=[]):
         proof_type,local_data = data
@@ -982,11 +1087,11 @@ class ProofDocument:
 
     def _draw_core(self, data=list, fonts:list[ProofFont]=[]):
         for font in fonts:
-            to_process = font.locations.find(in_crop=True) if data[-1].get("use_instances") else font.locations.find(is_source=True, in_crop=True)
+            to_process = self._get_working_locations(data, font)
             for loca in to_process:
                 # for sub_sec in data:
                 self._init_page(font=font,proof_type="core",location=loca)
-                txt = PROOF_DATA["core"]
+                txt = "HAMBURGE\nFONSTIV" if self.scope == "testword" else PROOF_DATA["core"]
 
                 min_size = self.get_smallest_core_scaler(txt, fonts)
                 txt = self.draw_core_characters(
@@ -1041,64 +1146,19 @@ class ProofDocument:
             if len(section) == 1:
                 section = section[0]
                 name = section[0]
-                if name == "paragraph":
-                    self._draw_paragraph([section], fonts)
+                if name in "paragraph tracking figures".split(" "):
+                    self._draw_running_text([section], fonts)
                 elif name == "core":
-                    self._draw_core(section, fonts)
+                    self._draw_core(section, fonts) # can not be processed inside a group 
                 elif name == "gradient":
-                    self._draw_gradient(section, fonts)
+                    self._draw_gradient(section, fonts) # can not be processed inside a group 
                 elif name == "features":
-                    self._draw_features(section,fonts)
-                elif name == "tracking":
-                    self._draw_tracking(section, fonts)
+                    self._draw_features(section,fonts) # can not be processed inside a group 
                 else:
                     pass
             else:
                 for font in fonts:
-                    for sub in section:
-                        if sub[0] == "tracking":
-                            self._draw_tracking([sub],[font])
-                        else:
-                            self._draw_paragraph([sub],[font])
-
-
-    def _draw_tracking(self, data=list, fonts:list[ProofFont]=[]):
-        for font in fonts:
-            to_process = font.locations.find(in_crop=True) if data[0][-1].get("to_store", {}).get("use_instances") else font.locations.find(is_source=True, in_crop=True)
-            for loca in to_process:
-                for sub_sec in data:
-
-                    proof_type, local_data = sub_sec
-
-                    point_size      = local_data.get("point_size", FONT_SIZE_MED)
-                    tracking_values = local_data.get("tracking_values", [])
-                    openType        = local_data.get("openType", {})
-                    class_data      = local_data.get("to_store", {})
-
-                    point_sizes     = list(mit.always_iterable(point_size))
-
-                    num_of_track_vals = len(tracking_values)
-                    if num_of_track_vals > 12:
-                        raise ValueError
-
-                    columns = len(max(TILE_REFERENCE[num_of_track_vals]))
-                    rows = len(TILE_REFERENCE[num_of_track_vals])
-
-                    txt = PROOF_DATA.get("paragraph") # replace with tracking text later
-
-                    self._init_page(font=font,proof_type=proof_type,location=loca)
-                    txt = self.draw_text_layout(txt=txt,
-                                                font_path=font.path,
-                                                variable_location=loca.location,
-                                                columns=columns,
-                                                rows=rows,
-                                                overflow=False,
-                                                font_size=point_sizes,
-                                                multi_size_page=False,
-                                                openType=openType,
-                                                tracking_values=tracking_values,
-                                                )
-
+                    self._draw_running_text(section,[font])
 
     def _draw_features(self, data=list, fonts:list[ProofFont]=[]):
 
@@ -1119,7 +1179,10 @@ class ProofDocument:
         for font in fonts:
             _to_use = font.locations.find(in_crop=True)
             if not _to_use:
-                _to_use = font.locations[0]
+                if font.locations:
+                    _to_use = font.locations[0]
+                else:
+                    _to_use = None
             else:
                 _to_use.sort()
                 _to_use = _to_use[0]
@@ -1133,9 +1196,10 @@ class ProofDocument:
                 #     self.words = get_english_words_set(['web2'], lower=True)
 
                 for tag, (desc,LookupID,mapping) in font_OT.items():
-                    
+
                     string = bot.FormattedString()
-                    string.fontVariations(**location.location)
+                    if font.is_variable:
+                        string.fontVariations(**location.location)
                     cols = 1
                     if desc:
                         string.append(f"{tag} : {desc}\n", font=caption_font, fontSize=12)
@@ -1146,33 +1210,71 @@ class ProofDocument:
                     if tag in ["c2sc", "smcp"]:
                         string.append("The Quick Brown Fox Jumps Over The Lazy Dog", font=font.path, fontSize=42, openTypeFeatures={tag:True,})            
                     else:
-                        #come up with a much faster word finder algo
-                        contains_all = lambda word, letters: all(letter in word for letter in letters)
-                        contains = [word for word in self.words if contains_all(word, list(mapping.keys())[:2])]
-                        if contains:
-                            if tag.startswith("ss"):
-                                rd = choice(contains)
-                                for gg in rd:
-                                    if gg in list(mapping.keys())[:2]:
-                                        string.fill(0,0,0,.3)
-                                    else:
-                                        string.fill(0,0,0,1)
-                                    string.append(gg, openTypeFeatures={tag:False})
+                        # this means that the opentype lookup is complex
+                        if isinstance(list(mapping.values())[0], tuple):
+
+                            for fr,_to in mapping.items():
+                                to, extra = _to
+                                cxt = extra["extra"]
+                                pos = extra["pos"]
+
+                                print(fr, to)
+                                print(cxt, pos)
+
+                                rd = bot.FormattedString()
+                                rd.append("", font=font.path, fontSize=42)
+                                rd.append("HH")
+                                if pos == "before":
+                                    rd.appendGlyph(cxt)
+                                    rd.appendGlyph(fr)
+                                else:
+                                    rd.appendGlyph(fr)
+                                    rd.appendGlyph(cxt)
+                                rd.append("HH")
+                                string.append(rd, openTypeFeatures={tag:False})
+
+                                # for gg in rd:
+                                #     if gg in list(mapping.keys())[:2]:
+                                #         string.fill(0,0,0,.3)
+                                #     else:
+                                #         string.fill(0,0,0,1)
+                                #     string.append(gg, openTypeFeatures={tag:False})
                     
                                 string.append("→", fill=(0,0,0,.2), openTypeFeatures={tag:False})
                                 string.fill(0)
                                 string.append(rd, fill=(0,0,0,1), openTypeFeatures={tag:True})
                                 string.append("\n")
-                                cols = 1
+                            cols = 1
+
                         else:
-                            for fr,to in mapping.items():
-                                string.fill(0,0,0,.3)            
-                                string.appendGlyph(fr)
-                                string.append("→", fill=(0,0,0,.2))
-                                string.fill(0)
-                                string.appendGlyph(to)
-                                string.append("\n")
-                            cols = 3
+                            contains_all = lambda word, letters: all(letter in word for letter in letters)
+                            #come up with a much faster word finder algo
+                            contains = [word for word in self.words if contains_all(word, list(mapping.keys())[:2])]
+                            if contains:
+                                if tag.startswith("ss"):
+                                    rd = choice(contains)
+                                    for gg in rd:
+                                        if gg in list(mapping.keys())[:2]:
+                                            string.fill(0,0,0,.3)
+                                        else:
+                                            string.fill(0,0,0,1)
+                                        string.append(gg, openTypeFeatures={tag:False})
+                        
+                                    string.append("→", fill=(0,0,0,.2), openTypeFeatures={tag:False})
+                                    string.fill(0)
+                                    string.append(rd, fill=(0,0,0,1), openTypeFeatures={tag:True})
+                                    string.append("\n")
+                                    cols = 1
+                            else:
+                                for fr,to in mapping.items():
+
+                                    string.fill(0,0,0,.3)            
+                                    string.appendGlyph(fr)
+                                    string.append("→", fill=(0,0,0,.2))
+                                    string.fill(0)
+                                    string.appendGlyph(to)
+                                    string.append("\n")
+                                cols = 3
                         # string = Grid.columnTextBox(string, (10, 10, width()-20, height()-20), subdivisions=3, gutter=15, draw_grid=False)
 
                     self._init_page(font=font,proof_type="features",location=location)
@@ -1184,6 +1286,7 @@ class ProofDocument:
         box_x, box_y = self._margin_left, self._margin_bottom
 
         fs = bot.FormattedString()
+        bot.fallbackFont(FALLBACK)
 
         fs.font(
                 font_path,
@@ -1252,7 +1355,6 @@ class ProofDocument:
                     txt.appendGlyph(l)
             txt.append("\n")
 
-        # txt = grid.columnTextBox(txt, (self._margin_left, self._margin_bottom, *self._text_box_size), subdivisions=1, gutter=15, draw_grid=False)
         return txt
 
 
@@ -1264,6 +1366,7 @@ class ProofDocument:
                                column_gutter=15, 
                                row_gutter=15)
 
+        bot.fallbackFont(FALLBACK)
 
         bot.fontVariations(**variable_location)
         bot.hyphenation(self.hyphenation)
@@ -1296,8 +1399,6 @@ class ProofDocument:
                     bot.text(str(trk_val), (x, y))
 
             txt = ""
-
-
         else:
             if multi_size_page:
                 for il, size in enumerate(font_size):
@@ -1442,9 +1543,8 @@ class ProofDocument:
         valid = False
 
         if self.objects == []:
-            print()
+            pass
         else:
-
             if zone:
                 for font in self.fonts:
                     cropped = []
@@ -1581,41 +1681,38 @@ class ProofDocument:
 
 if __name__ == "__main__":
 
+
+
     doc = ProofDocument()
-    """load old settings"""
 
-    """
-    add a font or designspace, only accepts path strings
-        should it accept designspace objects? ufos?
-    """
-
-    doc.add_object("/Users/connordavenport/Code/Typefaces/Beaujon-Typeface/Beaujon.designspace")
-    doc.crop_space("opsz=10 ital=0")
+    doc.add_object(CurrentDesignspace().path)
+    #doc.crop_space("slnt=0")
 
     doc.size = "LetterLandscape"
     doc.caption_font = "CoreMono-Regular"
     doc.margin = "auto"
-    doc.use_instances = True
+    doc.use_instances = False
 
     doc.setup()
-    # doc.new_section("core")
+    doc.new_section("core")
 
     with doc.grouping() as group:
-        doc.new_section("paragraph", point_size=[12,20], multi_size_page=True,) # if True and multi point sizes, adds multi-column page with no overflow
-        doc.new_section("tracking", tracking_values=[-20, -10, 0, 10, 20, 30])  # if True and multi point sizes, adds multi-column page with no overflow 
+        doc.new_section("paragraph", point_size=[12,20], multi_size_page=True) 
+        doc.new_section("paragraph", point_size=[24], multi_size_page=False)
+        doc.new_section("figures", point_size=[36])
+        
+        
 
-    """exit context manager"""
+    doc.new_section(
+                    "paragraph",
+                    point_size=20,
+                   )
 
-    # doc.new_section(
-    #                 "paragraph",
-    #                 point_size=20,
-    #                 overflow=False
-    #                )
+    doc.use_instances = True
 
-    # doc.new_section("gradient")
-    # doc.new_section("features")
+    doc.new_section("gradient")
+    doc.new_section("features")
 
     doc.save(open=True)
-    # doc.write(overwrite=True)
 
 
