@@ -7,17 +7,18 @@ from setuptools import setup
 #         return f.read()
 
 setup(name="fPDK",
-      version="0.1.3",
+      version="0.1.4",
       description="an API for proofing fonts",
       long_description="an API for proofing fonts",
       classifiers=[
         "Development Status :: 4 - Beta",
-        "License :: Other/Proprietary License",
-        "Programming Language :: Python :: 3.7",
-        "Topic :: Software Development :: Build Tools",
+        "License :: MIT License",
+        "Programming Language :: Python :: 3.11",
+        "Topic :: Software Development :: Libraries :: Python Modules",
       ],
       author="Connor Davenport",
       author_email="info@connordavenport.com",
+      url="https://github.com/connordavenport/fPDK",
       license="All rights reserved",
       packages=[
         "fPDK",
@@ -28,5 +29,6 @@ setup(name="fPDK",
         "more_itertools",
         "fontTools"
       ],
+      package_dir={"": "fPDK"},
       include_package_data=True,
       zip_safe=False)

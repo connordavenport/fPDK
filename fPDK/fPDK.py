@@ -432,7 +432,7 @@ class ProofFont:
     """
     I would prefer not to do this but we need
     to keep the old vf paths in order to find the fonts
-    accuretly so we need to override the
+    accurately so we need to override the
     `keepVFs` attr in the function
     """
     def _splitVariableFonts(
@@ -989,6 +989,7 @@ class ProofDocument:
         to_process = [ProofLocation()]
         if font.is_variable:
             if data[0] == "core":
+                # different structure, fix this??
                 to_process = font.locations.find(in_crop=True) if data[-1].get("to_store", {}).get("use_instances") else font.locations.find(is_source=True, in_crop=True)
             else:
                 to_process = font.locations.find(in_crop=True) if data[0][-1].get("to_store", {}).get("use_instances") else font.locations.find(is_source=True, in_crop=True)
@@ -1159,6 +1160,7 @@ class ProofDocument:
             else:
                 for font in fonts:
                     self._draw_running_text(section,[font])
+
 
     def _draw_features(self, data=list, fonts:list[ProofFont]=[]):
 
