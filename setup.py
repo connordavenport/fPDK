@@ -7,7 +7,7 @@ from setuptools import setup
 #         return f.read()
 
 setup(name="fPDK",
-      version="0.1.4",
+      version="0.1.5",
       description="an API for proofing fonts",
       long_description="an API for proofing fonts",
       classifiers=[
@@ -29,6 +29,5 @@ setup(name="fPDK",
         "more_itertools",
         "fontTools"
       ],
-      package_dir={"": "fPDK"},
       include_package_data=True,
       zip_safe=False)
