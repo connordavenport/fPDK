@@ -9,6 +9,8 @@ font Proofing Development Kit
 </picture>
 </p>
 
+### **fPDK is still in development and is a BETA.**
+
 Nobody wants to proof their fonts, firing up inDesign is time consuming and archaic...  
 The fPDK is a **free and open-source** library for building font proofs using a designspace, OTF, TTF, or VFs.  
 
