@@ -1,33 +1,22 @@
 # -*- coding: utf-8 -*-
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
-# def readme():
-#     with open("README.md") as f:
-#         return f.read()
+def parse_requirements(filename):
+    with open(filename, 'r') as f:
+        return [line.strip() for line in f if line.strip() and not line.startswith('#')]
 
 setup(name="fPDK",
-      version="0.1.5",
+      version="0.1.6",
       description="an API for proofing fonts",
-      long_description="an API for proofing fonts",
-      classifiers=[
-        "Development Status :: 4 - Beta",
-        "License :: MIT License",
-        "Programming Language :: Python :: 3.11",
-        "Topic :: Software Development :: Libraries :: Python Modules",
-      ],
       author="Connor Davenport",
       author_email="info@connordavenport.com",
+      maintainer="Connor Davenport",
+      maintainer_email="info@connordavenport.com",
       url="https://github.com/connordavenport/fPDK",
       license="All rights reserved",
-      packages=[
-        "fPDK",
-        ],
-      install_requires=[
-        "drawBot",
-        "drawBotGrid",
-        "more_itertools",
-        "fontTools"
-      ],
+      package_dir={"":"Lib"},
+      packages=find_packages("Lib"),
       include_package_data=True,
+      install_requires=parse_requirements('requirements.txt'),
       zip_safe=False)
