@@ -45,11 +45,9 @@ This is early development version. I am currently considering:
 ## Usage
 
 ```python
-from fPDK import proofDocument
+from fPDK import ProofDocument
 
-doc = proofDocument()
-
-doc.load("path/to/old.proof") # load old settings
+doc = ProofDocument()
 
 """
 add a font or designspace, only accepts path strings
@@ -105,7 +103,7 @@ proof (we need to proof sources more than instances, right?)
 """
 doc.use_instances = True
 
-doc.setup_proof() # setup newDrawing() and make a cover page
+doc.setup() # setup newDrawing() and make a cover page
 
 doc.new_section("core") # there are several custom presets for proof pages
 doc.new_section(

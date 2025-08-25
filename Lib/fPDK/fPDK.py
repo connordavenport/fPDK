@@ -35,7 +35,7 @@ from iso639 import Lang
 # fPDK, font Proofing Development Kit
 
 USER = getpass.getuser()
-FALLBACK = os.path.abspath(os.path.join(__file__, "../../assets/fonts/AdobeBlank.otf"))
+FALLBACK = os.path.abspath(os.path.join(__file__, "../../../assets/fonts/AdobeBlank.otf"))
 
 CORE         = ()
 RUNNING_TEXT = ()
