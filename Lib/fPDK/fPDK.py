@@ -900,14 +900,22 @@ class ProofDocument:
     def get_smallest_core_scaler(self, text:str | bot.FormattedString, fonts:list[ProofFont]) -> float:
         temp_holder = []
         for font in fonts:
-
-            loc = font.locations.find(in_crop=True) if self.use_instances else font.locations.find(is_source=True, in_crop=True)
-            for l in loc:
+            if font.is_variable:
+                loc = font.locations.find(in_crop=True) if self.use_instances else font.locations.find(is_source=True, in_crop=True)
+                for l in loc:
+                    temp_holder.append(
+                                        self.draw_core_characters(
+                                            txt=text,
+                                            font_path=font.path,
+                                            variable_location=l.location,
+                                            will_draw=False
+                                            )
+                                      )
+            else:
                 temp_holder.append(
                                     self.draw_core_characters(
                                         txt=text,
                                         font_path=font.path,
-                                        variable_location=l.location,
                                         will_draw=False
                                         )
                                   )
