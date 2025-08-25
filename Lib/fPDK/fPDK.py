@@ -1469,6 +1469,7 @@ class ProofDocument:
 
                         p = os.path.join(di,file_name)
                         if not os.path.exists(p):
+                            print(f"""ERROR: {file_name} does not exist on disk, cannot load font""")
                             continue 
                 else:
                     if name:
@@ -1483,8 +1484,8 @@ class ProofDocument:
                     te.operator = designspace
                     te.build_locations()
                     allVFs.append(te)
-
-
+                else:
+                    print(f"""ERROR: cannot find VF for {name}""")
         return allVFs
 
 
