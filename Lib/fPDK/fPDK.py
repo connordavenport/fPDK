@@ -32,6 +32,8 @@ import uuid
 from wordsiv import WordSiv
 from iso639 import Lang
 
+from fontgoggles.compile import ufoCompiler, dsCompiler
+
 # fPDK, font Proofing Development Kit
 
 USER = getpass.getuser()
@@ -42,6 +44,8 @@ RUNNING_TEXT = ()
 OPENTYPE     = ()
 GRADIENT     = ()
 INSPECTOR    = ()
+
+CACHE_DIR = ".fPDK_font_cache"
 
 VALID_XML_TYPES = ["str", "bool", "int", "float", "dict", "bytes", "datetime.datetime", "tuple", "list"]
 
@@ -348,7 +352,7 @@ class ProofFont:
         f = self.font_object
         try:
             best_name = f["name"].getBestFullName()
-        except TypeError:
+        except (TypeError, KeyError):
             best_name = ""
 
         return best_name
@@ -552,6 +556,7 @@ class ProofDocument:
         self._use_instances = False
         self._path          = None
         self._name          = None
+        self._build_fonts   = False
         
         self._scope         = "core"
         self._language      = "english"
@@ -738,6 +743,15 @@ class ProofDocument:
         return self._scope
 
     scope = property(_get_scope, _set_scope)
+
+
+    def _set_build_fonts(self, force_build: bool):
+        self._build_fonts = new_build_fonts
+
+    def _get_build_fonts(self) -> str:
+        return self._build_fonts
+
+    build_fonts = property(_get_build_fonts, _set_build_fonts)
 
     # def _set_operator(self, new_operator):
     #     self._operator = new_operator
@@ -1450,9 +1464,10 @@ class ProofDocument:
         return closest_file
 
 
-    def get_variable_fonts_from_op(self, designspace:dsp_doc) -> list[ProofFont]:
+    def get_variable_fonts_from_op(self, designspace:dsp_doc, force_build:bool=False) -> list[ProofFont]:
         var = designspace.variableFonts
-        di,fi = os.path.split(os.path.abspath(designspace.path))
+        abs_path = os.path.abspath(designspace.path)
+        di,fi = os.path.split(abs_path)
         allVFs = []
         if var:
             for vf in var:
@@ -1488,17 +1503,39 @@ class ProofDocument:
                     print(f"""ERROR: cannot find VF for {name}""")
         return allVFs
 
+    def _compile_UFO_to_TTFont(self, path:str, suffix:str, binary_path:Optional[str]=None) -> TTFont:
+        if not binary_path:
+            d,b = os.path.split(path)
+            if os.path.isdir(os.path.join(d,CACHE_DIR)):
+               pass
+            else:
+                os.mkdir(os.path.join(d,CACHE_DIR))
+            binary_path = os.path.join(d,CACHE_DIR,b.replace(suffix, ".otf"))
 
-    def add_object(self, path:str):
+        try: 
+            ufoCompiler.compileUFOToPath(path, binary_path, True)
+        except:
+            ufoCompiler.compileUFOToPath(path, binary_path, False)
+
+        if os.path.exists(binary_path):
+            return binary_path
+
+
+    def add_object(self, path:str, force_build:bool=False):
         suffixes = ".ttf .otf .woff .woff2"
+        ufo_suffixes = ".ufo .ufoz"
         suff = os.path.splitext(path)[-1]
         if suff in suffixes.split(" "):
             o = ProofFont(path)        
             self.fonts.append(o)
         elif suff == ".designspace":
             operator = dsp_doc.fromfile(path)
-            vfs = self.get_variable_fonts_from_op(operator)
+            vfs = self.get_variable_fonts_from_op(operator, force_build)
             self.fonts.extend(vfs)
+        elif suff in ufo_suffixes.split(" "):
+            binary_path = self._compile_UFO_to_TTFont(path, suffix=suff)
+            o = ProofFont(binary_path)
+            self.fonts.append(o)
         if path not in self.objects:
             self.objects.append(path)
 
@@ -1688,7 +1725,7 @@ if __name__ == "__main__":
 
     doc = ProofDocument()
 
-    doc.add_object(CurrentDesignspace().path)
+    doc.add_objects([f.path for f in AllFonts()])
     #doc.crop_space("slnt=0")
 
     doc.size = "LetterLandscape"
