@@ -17,7 +17,9 @@ setup(name="fPDK",
       license="All rights reserved",
       package_dir={"":"Lib"},
       packages=find_packages("Lib"),
-      package_data={'Lib': ['fonts/*.otf']},
+      package_data={
+            'fPDK': ['fonts/*.otf'],
+      },
       include_package_data=True,
       install_requires=parse_requirements('requirements.txt'),
       zip_safe=False)
