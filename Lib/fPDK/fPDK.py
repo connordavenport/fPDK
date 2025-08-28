@@ -31,11 +31,14 @@ from itertools import groupby
 import uuid
 from wordsiv import WordSiv
 from iso639 import Lang
+from importlib import resources
+import sys
 
 # fPDK, font Proofing Development Kit
 
 USER = getpass.getuser()
-FALLBACK = os.path.abspath(os.path.join(__file__, "../../../assets/fonts/AdobeBlank.otf"))
+
+FALLBACK = resources.files(sys.modules["fPDK"]).joinpath('fonts/AdobeBlank.otf')
 
 CORE         = ()
 RUNNING_TEXT = ()
@@ -1722,7 +1725,7 @@ if __name__ == "__main__":
     doc.use_instances = True
 
     doc.new_section("gradient")
-    doc.new_section("features")
+    #doc.new_section("features")
 
     doc.save(open=True)
 
