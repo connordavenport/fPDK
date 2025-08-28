@@ -33,12 +33,13 @@ from wordsiv import WordSiv
 from iso639 import Lang
 from importlib import resources
 import sys
+from fPDK import fonts
 
 # fPDK, font Proofing Development Kit
 
 USER = getpass.getuser()
 
-FALLBACK = resources.files(sys.modules["fPDK"]).joinpath('fonts/AdobeBlank.otf')
+FALLBACK = resources.files(fonts).joinpath('AdobeBlank.otf')
 
 CORE         = ()
 RUNNING_TEXT = ()
