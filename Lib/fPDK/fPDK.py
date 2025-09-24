@@ -556,6 +556,8 @@ class ProofDocument:
         self._use_instances = False
         self._path          = None
         self._name          = None
+
+        self._custom_text   = ""
         
         self._scope         = "core"
         self._language      = "english"
@@ -689,6 +691,15 @@ class ProofDocument:
         return self._auto_open
 
     open_automatically = property(_get_auto_open, _set_auto_open) # open pdf immediately after saving to disk
+
+
+    def _set_custom_text(self, value: str):
+        self._custom_text = value
+
+    def _get_custom_text(self) -> str:
+        return self._custom_text
+
+    text = property(_get_custom_text, _set_custom_text) # override running text content
 
     def _set_path(self, new_path: str):
         self._path = new_path
@@ -953,7 +964,7 @@ class ProofDocument:
                 bot.oval(self._grid[2]-(o_s + (o_s/2)), header_y_pos-(o_s/4), o_s, o_s)
 
             bot.fill(0)
-            bot.text(f'Style: {location.name if location else font.name}', (self._grid[2], header_y_pos))
+            bot.text(f'Style: {location.name if location.name != "unnamed location" else font.name}', (self._grid[2], header_y_pos))
 
             if True in features.values():
                 feature_list = [k for k,v in features.items() if v == True]
@@ -981,6 +992,7 @@ class ProofDocument:
                     overflow:bool=False, # if set to False the overflow will add new pages
                     openType:dict={}, # the only camel case :) a dict for activating specific OT on this page
                     tracking_values:list=[], # a list of tracking values to test, 0 (current) will always be the first
+                    level:str="ascii",
                     ):
 
         to_store = { 
@@ -1039,8 +1051,8 @@ class ProofDocument:
                         columns = len(max(TILE_REFERENCE[num_of_track_vals]))
                         rows = len(TILE_REFERENCE[num_of_track_vals])
 
+                        txt = self.text if self.text else PROOF_DATA.get("paragraph")
 
-                        txt = PROOF_DATA.get("paragraph") # replace with tracking text later
                         self._init_page(font=font,proof_type=proof_type,location=loca,openType=openType)
                         txt = self.draw_text_layout(txt=txt,
                                                     font_path=font.path,
@@ -1055,7 +1067,11 @@ class ProofDocument:
                                                     )
 
                     else:
-                        txt = PROOF_DATA.get(proof_type)
+                        if proof_type != "figures":
+                            txt = self.text if self.text else PROOF_DATA.get("paragraph")
+                        else:
+                            txt = PROOF_DATA.get(proof_type)
+
                         if self.scope == "testword": 
                             txt = ""
                             for i in range(20):
@@ -1332,6 +1348,7 @@ class ProofDocument:
 
     def get_gradient_strings(self, level:Optional[str]="ascii", font_size:int=40) -> str | bot.FormattedString:
         fonts = self.fonts
+
         if level == "all":
             chars = sorted(
                     self.find_common_elements(
@@ -1360,7 +1377,7 @@ class ProofDocument:
 
         for l in chars:
             for font in fonts:
-                locations = font.locations.find(in_crop=True) if self.use_instances else font.locations.find(is_source=True, in_crop=True)
+                locations = font.locations.find(in_crop=True) if self.use_instances else font.locations.find(is_source=True, in_crop=True) or [ProofLocation()]
                 for loca in locations:
                     if loca.location:
                         txt.fontVariations(**loca.location)

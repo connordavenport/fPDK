@@ -7,7 +7,7 @@ def parse_requirements(filename):
         return [line.strip() for line in f if line.strip() and not line.startswith('#')]
 
 setup(name="fPDK",
-      version="0.1.6",
+      version="0.1.7",
       description="an API for proofing fonts",
       author="Connor Davenport",
       author_email="info@connordavenport.com",
