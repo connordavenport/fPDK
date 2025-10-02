@@ -1316,7 +1316,7 @@ class ProofDocument:
         box_x, box_y = self._margin_left, self._margin_bottom
 
         fs = bot.FormattedString()
-        bot.fallbackFont(FALLBACK)
+        fs.fallbackFont(FALLBACK)
 
         fs.font(
                 font_path,
