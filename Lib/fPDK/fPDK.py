@@ -1345,14 +1345,25 @@ class ProofDocument:
         else:
             return sf
 
+    def find_common_order(self, lists:list[list[str]]) -> list[str]:
+        if len(lists) == 0:
+            return []
+        common_elements = set(lists[0])
+        if len(lists) > 1:
+            for lst in lists[1:]:
+                common_elements = common_elements.intersection(lst)
+        else:
+            pass
+        return list(common_elements)
+
 
     def get_gradient_strings(self, level:Optional[str]="ascii", font_size:int=40) -> str | bot.FormattedString:
         fonts = self.fonts
 
         if level == "all":
             chars = sorted(
-                    self.find_common_elements(
-                            [ff.getGlyphOrder() for ff in fonts]
+                    self.find_common_order(
+                            [ff.font_object.getGlyphOrder() for ff in fonts]
                         )
                     )
         elif level == "ascii":
