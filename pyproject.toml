@@ -1,0 +1,37 @@
+[project]
+name = "fpdk"
+version = "0.2.1"
+description = "an API for proofing fonts"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pdm>=2.26.7",
+    "setuptools>=82.0.1",
+    "defcon>=0.12.2",
+    "drawBot @ git+https://github.com/typemytype/drawbot.git",
+    "drawBotGrid @ git+https://github.com/mathieureguer/drawbotgrid.git",
+    "english-words>=2.0.2",
+    "fonttools>=4.59.0",
+    "iso639-lang>=2.6.3",
+    "more-itertools>=10.7.0",
+    "setuptools>=69.1.1",
+    "ufoProcessor>=1.13.3",
+    "wordsiv @ git+https://github.com/tallpauley/wordsiv.git",
+]
+authors = [
+    {name = "Connor Davenport", email = "info@connordavenport.com"},
+]
+maintainers = [
+    {name = "Connor Davenport", email = "info@connordavenport.com"},
+]
+license = {text = "All rights reserved"}
+
+[project.urls]
+Homepage = "https://github.com/connordavenport/fpdk"
+
+[tool.pdm]
+package-dir = "Lib"
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"

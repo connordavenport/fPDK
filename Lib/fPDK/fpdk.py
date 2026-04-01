@@ -33,9 +33,9 @@ from wordsiv import WordSiv
 from iso639 import Lang
 from importlib import resources
 import sys
-from fPDK import fonts
+from fpdk import fonts
 
-# fPDK, font Proofing Development Kit
+# fpdk, font Proofing Development Kit
 
 USER = getpass.getuser()
 

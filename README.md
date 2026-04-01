@@ -5,14 +5,14 @@ font Proofing Development Kit
 <p align="center">
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/images/fpdk_logo_dark.png">
-  <img alt="fPDK Logo" src="assets/images/fpdk_logo_light.png" width="300">
+  <img alt="fpdk Logo" src="assets/images/fpdk_logo_light.png" width="300">
 </picture>
 </p>
 
-### **fPDK is still in development and is a BETA.**
+### **fpdk is still in development and is a BETA.**
 
 Nobody wants to proof their fonts, firing up inDesign is time consuming and archaic...  
-The fPDK is a **free and open-source** library for building font proofs using a designspace, OTF, TTF, or VFs.  
+The fpdk is a **free and open-source** library for building font proofs using a designspace, OTF, TTF, or VFs.  
 
 
 ## Table of Contents
@@ -45,7 +45,7 @@ This is early development version. I am currently considering:
 ## Usage
 
 ```python
-from fPDK import ProofDocument
+from fpdk import ProofDocument
 
 doc = ProofDocument()
 
@@ -97,7 +97,7 @@ we can turn this on and off any setter between new sections
 """
 
 """
-the fPDK will use not use instances in .designspace projects
+the fpdk will use not use instances in .designspace projects
 unless turned on. If a dsp is given, it will use the sources to 
 proof (we need to proof sources more than instances, right?) 
 """
@@ -131,7 +131,7 @@ doc.write(overwrite=False) # save current project as custom `.proof` file for la
 
 ## Support
 
-Please [open an issue](https://github.com/connordavenport/fPDK/issues/new) for support.
+Please [open an issue](https://github.com/connordavenport/fpdk/issues/new) for support.
 This is a personal project and I have limited time so there are no promises that updates will be made in a timely manner.
 
 ## Contributing
