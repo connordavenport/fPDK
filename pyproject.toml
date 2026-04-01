@@ -29,7 +29,7 @@ Homepage = "https://github.com/connordavenport/fpdk"
 Repository = "https://github.com/connordavenport/fpdk.git"
 
 [tool.setuptools]
-include-package-data = false
+include-package-data = true
 
 [tool.setuptools.packages.find]
 where = ["Lib"]
