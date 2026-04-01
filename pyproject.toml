@@ -3,7 +3,7 @@ name = "fpdk"
 version = "0.1.93"
 description = "an API for proofing fonts"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.12"
 authors = [
     {name = "Connor Davenport", email = "c@programme.tools"},
 ]
