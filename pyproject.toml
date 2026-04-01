@@ -30,7 +30,7 @@ license = {text = "All rights reserved"}
 Homepage = "https://github.com/connordavenport/fpdk"
 
 [tool.pdm]
-package-dir = "Lib"
+package-dir = "lib"
 
 [build-system]
 requires = ["pdm-backend"]
