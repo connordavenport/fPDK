@@ -1,0 +1,47 @@
+[project]
+name = "fpdk"
+version = "0.1.9"
+description = "an API for proofing fonts"
+readme = "README.md"
+requires-python = ">=3.13"
+license = "MIT"
+authors = [
+    {name = "Connor Davenport", email = "c@programme.tools"},
+]
+maintainers = [
+    {name = "Connor Davenport", email = "c@programme.tools"},
+]
+dependencies = [
+    "defcon>=0.12.2",
+    "drawbot",
+    "drawbotgrid",
+    "english-words>=2.0.2",
+    "fonttools>=4.59.0",
+    "iso639-lang>=2.6.3",
+    "more-itertools>=10.7.0",
+    "setuptools>=69.1.1",
+    "ufoprocessor>=1.13.3",
+    "wordsiv",
+]
+
+[project.urls]
+Homepage = "https://github.com/connordavenport/fpdk"
+Repository = "https://github.com/connordavenport/fpdk.git"
+
+[tool.setuptools]
+include-package-data = false
+
+[tool.setuptools.packages.find]
+where = ["Lib"]
+include = ["fPDK*"]
+
+[tool.setuptools.package-data]
+fPDK = ["fonts/*.otf"]
+
+[tool.uv]
+package = true
+
+[tool.uv.sources]
+drawbot = { git = "https://github.com/typemytype/drawbot.git" }
+drawbotgrid = { git = "https://github.com/mathieureguer/drawbotgrid.git" }
+wordsiv = { git = "https://github.com/tallpauley/wordsiv.git" }

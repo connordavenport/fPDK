@@ -61,20 +61,11 @@ PROOF_DATA = {
     "paragraph"      : """La noche del 12 de julio de 1954, sufrió de fiebre alta y dolores extremos. Aproximadamente a las seis de la mañana del 13 de julio, su enfermera la encontró muerta en su cama. Kahlo tenía 47 años al morir, y sus causas de muerte oficiales fueron una embolia pulmonar no traumática y una flebitis en un miembro inferior derecho no traumática. No obstante, no se le realizó una autopsia. Ante esto, una versión alterna asegura que en realidad se suicidó. Los puntos que apoyaron dicha hipótesis fueron las declaraciones de su enfermera, quien aseguró que contaba los analgésicos de la artista para poder tenerle un control de los mismos, pero la noche antes de su muerte se provocó una sobredosis. Tenía prescrito una dosis máxima de siete pastillas, pero ingirió once. En adición, esa noche le dio a Rivera un regalo de aniversario de bodas, con más de un mes de antelación. \n\nSu cuerpo fue velado en el Palacio de Bellas Artes y su ataúd fue cubierto con la bandera del Partido Comunista Mexicano, hecho que la prensa nacional criticó profusamente. Concluidas sus ceremonias de despedida, fue cremada en el Panteón Civil de Dolores. Sus cenizas fueron llevadas a descansar a la Casa Azul en Coyoacán, el mismo lugar donde nació y que años más tarde se convirtió en museo. Rivera, quien afirmó que su muerte fue «el día más trágico de su vida», falleció tres años después, en 1957.""",
 
     "kerning"        : {
-        "frequent"       : "the be to of and a in that have I it for not on with he as you do at this but his by from they we say her she or an will my one all would there their what so up out if about who get which go me when make can like time no just him know take people into year your good some could them see other than then now look only come its over think also back after use two how our work first well way even new want because any these give day most us el de que y a en un ser se no haber por con su para como estar tener le lo todo pero más hacer o poder decir este ir otro ese la si me ya ver porque dar cuando él muy sin vez mucho saber qué sobre mi alguno mismo yo también hasta año dos querer entre así primero desde grande eso ni nos llegar pasar tiempo ella sí día uno bien poco deber entonces poner cosa tanto hombre parecer nuestro tan donde ahora parte después vida quedar siempre creer hablar llevar dejar nada cada seguir menos nuevo encontrar como I seu que ele foi para em são com eles ser em uma tem este a por quente palavra mas o alguns é ele você ou teve o de a e uma em nós lata fora outro foram que fazer seu tempo se vontade como disse uma cada dizer faz conjunto três quer ar bem também jogar pequeno fim colocar casa ler mão port grande soletrar adicionar mesmo terra aqui necessário grande tais siga ato por perguntar homens mudança fui luz tipo off precisa casa imagem tentar nós novamente animais ponto mãe mundo perto construir auto terra pai le de un à être et en avoir que pour dans ce il qui ne sur se pas plus pouvoir par je avec tout faire son mettre autre on mais nous comme ou si leur y dire elle devoir avant deux même prendre aussi celui donner bien où fois vous encore nouveau aller cela entre premier vouloir déjà grand mon me moins aucun lui temps très savoir falloir voir quelque sans raison notre dont non an monde jour monsieur demander alors après trouver personne rendre part dernier venir pendant passer peu lequel suite bon comprendre depuis point ainsi heure rester der die das und sein in ein zu haben ich werden sie von nicht mit es sich auch auf für an er so dass können dies als ihr ja wie bei oder wir aber dann man da sein noch nach was also aus all wenn nur müssen sagen um über machen kein Jahr du mein schon vor durch geben mehr andere viel kommen jetzt sollen mir wollen ganz mich immer gehen sehr hier doch bis groß wieder Mal zwei gut wissen neu sehen lassen uns weil unter denn stehen jede Beispiel Zeit erste ihm ihn wo lang eigentlich damit selbst",
-        "kern king"      : "lynx tuft frogs, dolphins abduct by proxy the ever awkward klutz, dud, dummkopf, jinx snubnose filmgoer, orphan sgt. renfruw grudgek reyfus, md. sikh psych if halt tympany jewelry sri heh! twyer vs jojo pneu fylfot alcaaba son of nonplussed halfbreed bubbly playboy guggenheim daddy coccyx sgraffito effect, vacuum dirndle impossible attempt to disvalue, muzzle the afghan czech czar and exninja, bob bixby dvorak wood dhurrie savvy, dizzy eye aeon circumcision uvula scrungy picnic luxurious special type carbohydrate ovoid adzuki kumquat bomb? afterglows gold girl pygmy gnome lb. ankhs acme aggroupment akmed brouhha tv wt. ujjain ms. oz abacus mnemonics bhikku khaki bwana aorta embolism vivid owls often kvetch otherwise, wysiwyg densfort wright you’ve absorbed rhythm, put obstacle kyaks krieg kern wurst subject enmity equity coquet quorum pique tzetse hepzibah sulfhydryl briefcase ajax ehler kafka fjord elfship halfdressed jugful eggcup hummingbirds swingdevil bagpipe legwork reproachful hunchback archknave baghdad wejh rijswijk rajbansi rajput ajdir okay weekday obfuscate subpoena liebknecht marcgravia ecbolic arcticward dickcissel pincpinc boldface maidkin adjective adcraft adman dwarfness applejack darkbrown kiln palzy always farmland flimflam unbossy nonlineal stepbrother lapdog stopgap sx countdown basketball beaujolais vb. flowchart aztec lazy bozo syrup tarzan annoying dyke yucky hawg gagzhukz cuzco squire when hiho mayhem nietzsche szasz gumdrop milk emplotment ambidextrously lacquer byway ecclesiastes stubchen hobgoblins crabmill aqua hawaii blvd. subquality byzantine empire debt obvious cervantes jekabzeel anecdote flicflac mechanicville bedbug couldn’t i’ve it’s they’ll they’d dpt. headquarter burkhardt xerxes atkins govt. ebenezer lg. lhama amtrak amway fixity axmen quumbabda upjohn hrumpf",
-        "diacritic cntx" : "Zsittnik Sinn Féin Oötooid Echinococcose Ovoviviparous Tqibuli Ñacuñán Üüdipä Annuis Cœptis Sígarettumunn Skoðaðu Stuöðugri Eðlisfræði syvyys Pääsymaksut Þórarinsson Næstvæd Åsså Åbenrå Fæøerne Føroyar Nöje Pinggera Egger Schifffahrt Greüzi Nööd Türkçe Şiir ürünü výročné súţže zeeëgel Koffie IJsbrand Ÿsbrand Meeùs Wisła Łódź łódź Michał Złoty złoty",
-        "ruder 1"        : "bibel malhabile modo biegen peuple punibile blind qualifier quindi damals quelle dinamica china quelque analiso schaden salomon macchina schein sellier secondo lager sommier singolo legion unique possibile mime unanime unico mohn usuel legge nagel abonner unione puder agir punizione quälen aiglon dunque huldigen allégir quando geduld alliance uomini",
-        "ruder 2"        : "vertrag crainte screw verwalter croyant science verzicht fratricide sketchy vorrede frivolité story yankee instruction take zwetschge lyre treaty zypresse navette tricycle fraktur nocturne typograph kraft pervertir vanity raffeln presto victory reaktion prévoyant vivacity rekord priorité wayward revolte proscrire efficiency tritt raviver without trotzkopf tactilité through tyrann arrêt known",
         "all pairs"      : "Aardvark Ablution Acrimonious Adventures Aeolian Africa Agamemnon Ahoy Aileron Ajax Akimbo Altruism America Anecdote Aorta Aptitude Aquarium Arcade Aspartame Attrition Aurelius Avuncular Awning Axminster Ayers Azure Banishment Bb Bc Bd Benighted Bf Bg Bhagavad Biblical Bjorn Bk Blancmange Bm Bn Bolton Bp Bq Brusque Bs Bt Burnish Bv Bwana Bx Byzantium Bz Cabbala Cb Cc Cd Cetacean Cf Cg Charlemagne Cicero Cj Ck Clamorous Cm Cnidarian Conifer Cp Cq Crustacean Cs Ctenoid Culled Cv Cw Cx Cynosure Czarina Dalmatian Db Dc Dd Delphi Df Dg Dhurrie Dinner Djinn Dk Dl Dm Dn Document Dp Dq Drill Ds Dt Dunleary Dvorak Dwindle Dx Dynamo Dz Eames Ebullient Echo Edify Eels Eftsoons Egress Ehrlich Eindhoven Eject Ekistics Elzevir Eminence Ennoble Eocene Ephemeral Equator Erstwhile Estienne Etiquette Eucalyptus Everyman Ewen Exeter Eyelet Ezekiel Fanfare Fb Fc Fd Ferocious Ffestiniog Fg Fh Finicky Fjord Fk Flanders Fm Fn Forestry Fp Fq Frills Fs Ft Furniture Fv Fw Fx Fylfot Fz Garrulous Gb Gc Gd Generous Gf Gg Ghastly Gimlet Gj Gk Glorious Gm Gnomon Golfer Gp Gq Grizzled Gs Gt Gumption Gv Gwendolyn Gx Gymkhana Gz Harrow Hb Hc Hd Heifer Hf Hg Hh Hindemith Hj Hk Hl Hm Hn Horace Hp Hq Hr Hsi Ht Hubris Hv Hw Hx Hybrid Hz Iambic Ibarra Ichthyology Identity Ievgeny Ifrit Ignite Ihre Ii Ij Ikon Iliad Imminent Innovation Iolanthe Ipanema Iq Irascible Island Italic Iu Ivory Iwis Ixtapa Iyar Izzard Janacek Jb Jc Jd Jenson Jf Jg Jh Jitter Jj Jk Jl Jm Jn Joinery Jp Jq Jr. Js Jt Jungian Jv Jw Jx Jy Jz Kaiser Kb Kc Kd Kenilworth Kf Kg Khaki Kindred Kj Kk Klondike Km Knowledge Kohlrabi Kp Kq Kraken Ks Kt Kudzu Kvetch Kwacha Kx Kyrie Kz Labrador Lb Lc Ld Lent Lf Lg Lhasa Liniment Lj Lk Llama Lm Ln Longboat Lp Lq Lr Ls Lt Luddite Lv Lw Lx Lyceum Lz Mandarin Mbandaka Mcintyre Mdina Mendacious Mfg. Mg Mh Millinery Mj Mk Mlle. Mme. Mnemonic Moribund Mp Mq Mr. Ms. Mtn. Munitions Mv Mw Mx Myra Mz Narragansett Nb Nc Nd Nefarious Nf Nguyen Nh Nile Nj Nkoso Nl Nm Nnenna Nonsense Np Nq Nr. Ns Nt Nunnery Nv Nw Nx Nyack Nz Oarsman Oblate Ocular Odessa Oedipus Often Ogre Ohms Oilers Oj Okra Olfactory Ominous Onerous Oogamous Opine Oq Ornate Ossified Othello Oubliette Ovens Owlish Oxen Oyster Ozymandias Parisian Pb Pc Pd. Penrose Pfennig Pg. Pharmacy Pirouette Pj Pk Pleistocene Pm Pneumatic Porridge Pp. Pq Principle Psaltery Ptarmigan Pundit Pv Pw Px Pyrrhic Pz Qaid Qb Qc Qd Qed Qf Qg Qh Qibris Qj Qk Ql Qm Qn Qom Qp Qq Qr Qs Qt Quill Qv Qw Qx Qy Qz Ransom Rb. Rc Rd. Renfield Rf Rg Rheumatic Ringlet Rj Rk Rl Rm. Rn Ronsard Rp. Rq Rr Rs Rte. Runcible Rv Rwanda Rx Rye Rz Salacious Sbeitla Scherzo Sd Serpentine Sforza Sg Shackles Sinful Sjoerd Skull Slalom Smelting Snipe Sorbonne Spartan Squire Sri Ss Stultified Summoner Svelte Swarthy Sx Sykes Szentendre Tarragon Tblisi Tcherny Td Tennyson Tf Tg Thaumaturge Tincture Tj Tk Tlaloc Tm Tn Toreador Tp Tq Treacherous Tsunami Tt Turkey Tv Twine Tx Tyrolean Tzara Ua Ubiquitous Ucello Udder Ue Ufology Ugric Uhlan Uitlander Uj Ukulele Ulster Umber Unguent Uomo Uplift Uq Ursine Usurious Utrecht Uu Uvula Uw Uxorious Uy Uzbek Vanished Vb Vc Vd. Venomous Vf Vg Vh Vindicate Vj Vk Vl Vm Vn Voracious Vp Vq Vrillier Vs. Vt. Vulnerable Vv Vw Vx Vying Vz Washington Wb Wc Wd Wendell Wf Wg Wharf Window Wj Wk Wl Wm. Wn Worth Wp Wq Wrung Ws Wt. Wunderman Wv Wx Wy Wyes Wz Xanthan Xb Xc Xd Xenon Xf Xg Xh Xiao Xj Xk Xl Xmas Xn Xo Xp Xq Xray Xs Xt Xuxa Xv Xw Xx Xylem Xz Yarrow Ybarra Ycair Yds. Yellowstone Yf Yggdrasil Yh Yin Yj Yk Ylang Ym Yn Yours Ypsilanti Yquem Yrs. Ys. Ytterbium Yunnan Yvonne Yw Yx Yy Yz Zanzibar Zb Zc Zd Zero Zf Zg Zhora Zinfandel Zj Zk Zl Zm Zn Zone Zp Zq Zr Zs Zt Zuni Zv Zwieback Zx Zygote Zz",
-        "lowercase"      : "aaabacadaeafagahaiajakala amanaoapaqarasatauavawaxa ayazaðađałaøaħaŧaþaæaœaßaıa babbbcbdbebfbgbhbibjbkblb bmbnbobpbqbrbsbtbubvbwbxb bybzbðbđbłbøbħbŧbþbæbœbßbıb cacbcccdcecfcgchcicjckclc cmcncocpcqcrcsctcucvcwcxc cyczcðcđcłcøcħcŧcþcæcœcßcıc dadbdcdddedfdgdhdidjdkdld dmdndodpdqdrdsdtdudvdwdxd dydzdðdđdłdødħdŧdþdædœdßdıd eaebecedeeefegeheiejekele emeneoepeqereseteuevewexe eyezeðeđełeøeħeŧeþeæeœeßeıe fafbfcfdfefffgfhfifjfkflf fmfnfofpfqfrfsftfufvfwfxf fyfzfðfđfłføfħfŧfþfæfœfßfıf gagbgcgdgegfggghgigjgkglg gmgngogpgqgrgsgtgugvgwgxg gygzgðgđgłgøgħgŧgþgægœgßgıg hahbhchdhehfhghhhihjhkhlh hmhnhohphqhrhshthuhvhwhxh hyhzhðhđhłhøhħhŧhþhæhœhßhıh iaibicidieifigihiiijikili iminioipiqirisitiuiviwixi iyiziðiđiłiøiħiŧiþiæiœißiıi jajbjcjdjejfjgjhjijjjkjlj jmjnjojpjqjrjsjtjujvjwjxj jyjzjðjđjłjøjħjŧjþjæjœjßjıj kakbkckdkekfkgkhkikjkkklk kmknkokpkqkrksktkukvkwkxk kykzkðkđkłkøkħkŧkþkækœkßkık lalblcldlelflglhliljlklll lmlnlolplqlrlsltlulvlwlxl lylzlðlđlłlølħlŧlþlælœlßlıl mambmcmdmemfmgmhmimjmkmlm mmmnmompmqmrmsmtmumvmwmxm mymzmðmđmłmømħmŧmþmæmœmßmım nanbncndnenfngnhninjnknln nmnnnonpnqnrnsntnunvnwnxn nynznðnđnłnønħnŧnþnænœnßnın oaobocodoeofogohoiojokolo omonooopoqorosotouovowoxo oyozoðođołoøoħoŧoþoæoœoßoıo papbpcpdpepfpgphpipjpkplp pmpnpopppqprpsptpupvpwpxp pypzpðpđpłpøpħpŧpþpæpœpßpıp qaqbqcqdqeqfqgqhqiqjqkqlq qmqnqoqpqqqrqsqtquqvqwqxq qyqzqðqđqłqøqħqŧqþqæqœqßqıq rarbrcrdrerfrgrhrirjrkrlr rmrnrorprqrrrsrtrurvrwrxr ryrzrðrđrłrørħrŧrþrærœrßrır sasbscsdsesfsgshsisjsksls smsnsospsqsrssstsusvswsxs syszsðsđsłsøsħsŧsþsæsœsßsıs tatbtctdtetftgthtitjtktlt tmtntotptqtrtstttutvtwtxt tytztðtđtłtøtħtŧtþtætœtßtıt uaubucudueufuguhuiujukulu umunuoupuqurusutuuuvuwuxu uyuzuðuđułuøuħuŧuþuæuœußuıu vavbvcvdvevfvgvhvivjvkvlv vmvnvovpvqvrvsvtvuvvvwvxv vyvzvðvđvłvøvħvŧvþvævœvßvıv wawbwcwdwewfwgwhwiwjwkwlw wmwnwowpwqwrwswtwuwvwwwxw wywzwðwđwłwøwħwŧwþwæwœwßwıw xaxbxcxdxexfxgxhxixjxkxlx xmxnxoxpxqxrxsxtxuxvxwxxx xyxzxðxđxłxøxħxŧxþxæxœxßxıx yaybycydyeyfygyhyiyjykyly ymynyoypyqyrysytyuyvywyxy yyyzyðyđyłyøyħyŧyþyæyœyßyıy zazbzczdzezfzgzhzizjzkzlz zmznzozpzqzrzsztzuzvzwzxz zyzzzðzđzłzøzħzŧzþzæzœzßzız ðaðbðcðdðeðfðgðhðiðjðkðlð ðmðnðoðpðqðrðsðtðuðvðwðxð ðyðzðððđðłðøðħðŧðþðæðœðßðıð đađbđcđdđeđfđgđhđiđjđkđlđ đmđnđođpđqđrđsđtđuđvđwđxđ đyđzđðđđđłđøđħđŧđþđæđœđßđıđ łałbłcłdłełfłgłhłiłjłkłlł łmłnłołpłqłrłsłtłułvłwłxł łyłzłðłđłłłøłħłŧłþłæłœłßłıł øaøbøcødøeøføgøhøiøjøkølø ømønøoøpøqørøsøtøuøvøwøxø øyøzøðøđøłøøøħøŧøþøæøœøßøıø ħaħbħcħdħeħfħgħhħiħjħkħlħ ħmħnħoħpħqħrħsħtħuħvħwħxħ ħyħzħðħđħłħøħħħŧħþħæħœħßħıħ ŧaŧbŧcŧdŧeŧfŧgŧhŧiŧjŧkŧlŧ ŧmŧnŧoŧpŧqŧrŧsŧtŧuŧvŧwŧxŧ ŧyŧzŧðŧđŧłŧøŧħŧŧŧþŧæŧœŧßŧıŧ þaþbþcþdþeþfþgþhþiþjþkþlþ þmþnþoþpþqþrþsþtþuþvþwþxþ þyþzþðþđþłþøþħþŧþþþæþœþßþıþ æaæbæcædæeæfægæhæiæjækælæ æmænæoæpæqæræsætæuævæwæxæ æyæzæðæđæłæøæħæŧæþæææœæßæıæ œaœbœcœdœeœfœgœhœiœjœkœlœ œmœnœoœpœqœrœsœtœuœvœwœxœ œyœzœðœđœłœøœħœŧœþœæœœœßœıœ ßaßbßcßdßeßfßgßhßißjßkßlß ßmßnßoßpßqßrßsßtßußvßwßxß ßyßzßðßđßłßøßħßŧßþßæßœßßßıß ıaıbıcıdıeıfıgıhıiıjıkılı ımınıoıpıqırısıtıuıvıwıxı ıyızıðıđıłıøıħıŧıþıæıœıßııı",
-        "uppercase"      : "aAaBaCaDaEaFaGaHaIaJaKa aLaMaNaOaPaQaRaSaTaUaVa aWaXaYaZaÐaŁaØaĦaŦaÞaÆaŒa bAbBbCbDbEbFbGbHbIbJbKb bLbMbNbObPbQbRbSbTbUbVb bWbXbYbZbÐbŁbØbĦbŦbÞbÆbŒb cAcBcCcDcEcFcGcHcIcJcKc cLcMcNcOcPcQcRcScTcUcVc cWcXcYcZcÐcŁcØcĦcŦcÞcÆcŒc dAdBdCdDdEdFdGdHdIdJdKd dLdMdNdOdPdQdRdSdTdUdVd dWdXdYdZdÐdŁdØdĦdŦdÞdÆdŒd eAeBeCeDeEeFeGeHeIeJeKe eLeMeNeOePeQeReSeTeUeVe eWeXeYeZeÐeŁeØeĦeŦeÞeÆeŒe fAfBfCfDfEfFfGfHfIfJfKf fLfMfNfOfPfQfRfSfTfUfVf fWfXfYfZfÐfŁfØfĦfŦfÞfÆfŒf gAgBgCgDgEgFgGgHgIgJgKg gLgMgNgOgPgQgRgSgTgUgVg gWgXgYgZgÐgŁgØgĦgŦgÞgÆgŒg hAhBhChDhEhFhGhHhIhJhKh hLhMhNhOhPhQhRhShThUhVh hWhXhYhZhÐhŁhØhĦhŦhÞhÆhŒh iAiBiCiDiEiFiGiHiIiJiKi iLiMiNiOiPiQiRiSiTiUiVi iWiXiYiZiÐiŁiØiĦiŦiÞiÆiŒi jAjBjCjDjEjFjGjHjIjJjKj jLjMjNjOjPjQjRjSjTjUjVj jWjXjYjZjÐjŁjØjĦjŦjÞjÆjŒj kAkBkCkDkEkFkGkHkIkJkKk kLkMkNkOkPkQkRkSkTkUkVk kWkXkYkZkÐkŁkØkĦkŦkÞkÆkŒk lAlBlClDlElFlGlHlIlJlKl lLlMlNlOlPlQlRlSlTlUlVl lWlXlYlZlÐlŁlØlĦlŦlÞlÆlŒl mAmBmCmDmEmFmGmHmImJmKm mLmMmNmOmPmQmRmSmTmUmVm mWmXmYmZmÐmŁmØmĦmŦmÞmÆmŒm nAnBnCnDnEnFnGnHnInJnKn nLnMnNnOnPnQnRnSnTnUnVn nWnXnYnZnÐnŁnØnĦnŦnÞnÆnŒn oAoBoCoDoEoFoGoHoIoJoKo oLoMoNoOoPoQoRoSoToUoVo oWoXoYoZoÐoŁoØoĦoŦoÞoÆoŒo pApBpCpDpEpFpGpHpIpJpKp pLpMpNpOpPpQpRpSpTpUpVp pWpXpYpZpÐpŁpØpĦpŦpÞpÆpŒp qAqBqCqDqEqFqGqHqIqJqKq qLqMqNqOqPqQqRqSqTqUqVq qWqXqYqZqÐqŁqØqĦqŦqÞqÆqŒq rArBrCrDrErFrGrHrIrJrKr rLrMrNrOrPrQrRrSrTrUrVr rWrXrYrZrÐrŁrØrĦrŦrÞrÆrŒr sAsBsCsDsEsFsGsHsIsJsKs sLsMsNsOsPsQsRsSsTsUsVs sWsXsYsZsÐsŁsØsĦsŦsÞsÆsŒs tAtBtCtDtEtFtGtHtItJtKt tLtMtNtOtPtQtRtStTtUtVt tWtXtYtZtÐtŁtØtĦtŦtÞtÆtŒt uAuBuCuDuEuFuGuHuIuJuKu uLuMuNuOuPuQuRuSuTuUuVu uWuXuYuZuÐuŁuØuĦuŦuÞuÆuŒu vAvBvCvDvEvFvGvHvIvJvKv vLvMvNvOvPvQvRvSvTvUvVv vWvXvYvZvÐvŁvØvĦvŦvÞvÆvŒv wAwBwCwDwEwFwGwHwIwJwKw wLwMwNwOwPwQwRwSwTwUwVw wWwXwYwZwÐwŁwØwĦwŦwÞwÆwŒw xAxBxCxDxExFxGxHxIxJxKx xLxMxNxOxPxQxRxSxTxUxVx xWxXxYxZxÐxŁxØxĦxŦxÞxÆxŒx yAyByCyDyEyFyGyHyIyJyKy yLyMyNyOyPyQyRySyTyUyVy yWyXyYyZyÐyŁyØyĦyŦyÞyÆyŒy zAzBzCzDzEzFzGzHzIzJzKz zLzMzNzOzPzQzRzSzTzUzVz zWzXzYzZzÐzŁzØzĦzŦzÞzÆzŒz ðAðBðCðDðEðFðGðHðIðJðKð ðLðMðNðOðPðQðRðSðTðUðVð ðWðXðYðZðÐðŁðØðĦðŦðÞðÆðŒð đAđBđCđDđEđFđGđHđIđJđKđ đLđMđNđOđPđQđRđSđTđUđVđ đWđXđYđZđÐđŁđØđĦđŦđÞđÆđŒđ łAłBłCłDłEłFłGłHłIłJłKł łLłMłNłOłPłQłRłSłTłUłVł łWłXłYłZłÐłŁłØłĦłŦłÞłÆłŒł øAøBøCøDøEøFøGøHøIøJøKø øLøMøNøOøPøQøRøSøTøUøVø øWøXøYøZøÐøŁøØøĦøŦøÞøÆøŒø ħAħBħCħDħEħFħGħHħIħJħKħ ħLħMħNħOħPħQħRħSħTħUħVħ ħWħXħYħZħÐħŁħØħĦħŦħÞħÆħŒħ ŧAŧBŧCŧDŧEŧFŧGŧHŧIŧJŧKŧ ŧLŧMŧNŧOŧPŧQŧRŧSŧTŧUŧVŧ ŧWŧXŧYŧZŧÐŧŁŧØŧĦŧŦŧÞŧÆŧŒŧ þAþBþCþDþEþFþGþHþIþJþKþ þLþMþNþOþPþQþRþSþTþUþVþ þWþXþYþZþÐþŁþØþĦþŦþÞþÆþŒþ æAæBæCæDæEæFæGæHæIæJæKæ æLæMæNæOæPæQæRæSæTæUæVæ æWæXæYæZæÐæŁæØæĦæŦæÞæÆæŒæ œAœBœCœDœEœFœGœHœIœJœKœ œLœMœNœOœPœQœRœSœTœUœVœ œWœXœYœZœÐœŁœØœĦœŦœÞœÆœŒœ ßAßBßCßDßEßFßGßHßIßJßKß ßLßMßNßOßPßQßRßSßTßUßVß ßWßXßYßZßÐßŁßØßĦßŦßÞßÆßŒß ıAıBıCıDıEıFıGıHıIıJıKı ıLıMıNıOıPıQıRıSıTıUıVı ıWıXıYıZıÐıŁıØıĦıŦıÞıÆıŒı AAABACADAEAFAGAHAIAJAKA ALAMANAOAPAQARASATAUAVA AWAXAYAZAÐAŁAØAĦAŦAÞAÆAŒA BABBBCBDBEBFBGBHBIBJBKB BLBMBNBOBPBQBRBSBTBUBVB BWBXBYBZBÐBŁBØBĦBŦBÞBÆBŒB CACBCCCDCECFCGCHCICJCKC CLCMCNCOCPCQCRCSCTCUCVC CWCXCYCZCÐCŁCØCĦCŦCÞCÆCŒC DADBDCDDDEDFDGDHDIDJDKD DLDMDNDODPDQDRDSDTDUDVD DWDXDYDZDÐDŁDØDĦDŦDÞDÆDŒD EAEBECEDEEEFEGEHEIEJEKE ELEMENEOEPEQERESETEUEVE EWEXEYEZEÐEŁEØEĦEŦEÞEÆEŒE FAFBFCFDFEFFFGFHFIFJFKF FLFMFNFOFPFQFRFSFTFUFVF FWFXFYFZFÐFŁFØFĦFŦFÞFÆFŒF GAGBGCGDGEGFGGGHGIGJGKG GLGMGNGOGPGQGRGSGTGUGVG GWGXGYGZGÐGŁGØGĦGŦGÞGÆGŒG HAHBHCHDHEHFHGHHHIHJHKH HLHMHNHOHPHQHRHSHTHUHVH HWHXHYHZHÐHŁHØHĦHŦHÞHÆHŒH IAIBICIDIEIFIGIHIIIJIKI ILIMINIOIPIQIRISITIUIVI IWIXIYIZIÐIŁIØIĦIŦIÞIÆIŒI JAJBJCJDJEJFJGJHJIJJJKJ JLJMJNJOJPJQJRJSJTJUJVJ JWJXJYJZJÐJŁJØJĦJŦJÞJÆJŒJ KAKBKCKDKEKFKGKHKIKJKKK KLKMKNKOKPKQKRKSKTKUKVK KWKXKYKZKÐKŁKØKĦKŦKÞKÆKŒK LALBLCLDLELFLGLHLILJLKL LLLMLNLOLPLQLRLSLTLULVL LWLXLYLZLÐLŁLØLĦLŦLÞLÆLŒL MAMBMCMDMEMFMGMHMIMJMKM MLMMMNMOMPMQMRMSMTMUMVM MWMXMYMZMÐMŁMØMĦMŦMÞMÆMŒM NANBNCNDNENFNGNHNINJNKN NLNMNNNONPNQNRNSNTNUNVN NWNXNYNZNÐNŁNØNĦNŦNÞNÆNŒN OAOBOCODOEOFOGOHOIOJOKO OLOMONOOOPOQOROSOTOUOVO OWOXOYOZOÐOŁOØOĦOŦOÞOÆOŒO PAPBPCPDPEPFPGPHPIPJPKP PLPMPNPOPPPQPRPSPTPUPVP PWPXPYPZPÐPŁPØPĦPŦPÞPÆPŒP QAQBQCQDQEQFQGQHQIQJQKQ QLQMQNQOQPQQQRQSQTQUQVQ QWQXQYQZQÐQŁQØQĦQŦQÞQÆQŒQ RARBRCRDRERFRGRHRIRJRKR RLRMRNRORPRQRRRSRTRURVR RWRXRYRZRÐRŁRØRĦRŦRÞRÆRŒR SASBSCSDSESFSGSHSISJSKS SLSMSNSOSPSQSRSSSTSUSVS SWSXSYSZSÐSŁSØSĦSŦSÞSÆSŒS TATBTCTDTETFTGTHTITJTKT TLTMTNTOTPTQTRTSTTTUTVT TWTXTYTZTÐTŁTØTĦTŦTÞTÆTŒT UAUBUCUDUEUFUGUHUIUJUKU ULUMUNUOUPUQURUSUTUUUVU UWUXUYUZUÐUŁUØUĦUŦUÞUÆUŒU VAVBVCVDVEVFVGVHVIVJVKV VLVMVNVOVPVQVRVSVTVUVVV VWVXVYVZVÐVŁVØVĦVŦVÞVÆVŒV WAWBWCWDWEWFWGWHWIWJWKW WLWMWNWOWPWQWRWSWTWUWVW WWWXWYWZWÐWŁWØWĦWŦWÞWÆWŒW XAXBXCXDXEXFXGXHXIXJXKX XLXMXNXOXPXQXRXSXTXUXVX XWXXXYXZXÐXŁXØXĦXŦXÞXÆXŒX YAYBYCYDYEYFYGYHYIYJYKY YLYMYNYOYPYQYRYSYTYUYVY YWYXYYYZYÐYŁYØYĦYŦYÞYÆYŒY ZAZBZCZDZEZFZGZHZIZJZKZ ZLZMZNZOZPZQZRZSZTZUZVZ ZWZXZYZZZÐZŁZØZĦZŦZÞZÆZŒZ ÐAÐBÐCÐDÐEÐFÐGÐHÐIÐJÐKÐ ÐLÐMÐNÐOÐPÐQÐRÐSÐTÐUÐVÐ ÐWÐXÐYÐZÐÐÐŁÐØÐĦÐŦÐÞÐÆÐŒÐ ŁAŁBŁCŁDŁEŁFŁGŁHŁIŁJŁKŁ ŁLŁMŁNŁOŁPŁQŁRŁSŁTŁUŁVŁ ŁWŁXŁYŁZŁÐŁŁŁØŁĦŁŦŁÞŁÆŁŒŁ ØAØBØCØDØEØFØGØHØIØJØKØ ØLØMØNØOØPØQØRØSØTØUØVØ ØWØXØYØZØÐØŁØØØĦØŦØÞØÆØŒØ ĦAĦBĦCĦDĦEĦFĦGĦHĦIĦJĦKĦ ĦLĦMĦNĦOĦPĦQĦRĦSĦTĦUĦVĦ ĦWĦXĦYĦZĦÐĦŁĦØĦĦĦŦĦÞĦÆĦŒĦ ŦAŦBŦCŦDŦEŦFŦGŦHŦIŦJŦKŦ ŦLŦMŦNŦOŦPŦQŦRŦSŦTŦUŦVŦ ŦWŦXŦYŦZŦÐŦŁŦØŦĦŦŦŦÞŦÆŦŒŦ ÞAÞBÞCÞDÞEÞFÞGÞHÞIÞJÞKÞ ÞLÞMÞNÞOÞPÞQÞRÞSÞTÞUÞVÞ ÞWÞXÞYÞZÞÐÞŁÞØÞĦÞŦÞÞÞÆÞŒÞ ÆAÆBÆCÆDÆEÆFÆGÆHÆIÆJÆKÆ ÆLÆMÆNÆOÆPÆQÆRÆSÆTÆUÆVÆ ÆWÆXÆYÆZÆÐÆŁÆØÆĦÆŦÆÞÆÆÆŒÆ ŒAŒBŒCŒDŒEŒFŒGŒHŒIŒJŒKŒ ŒLŒMŒNŒOŒPŒQŒRŒSŒTŒUŒVŒ ŒWŒXŒYŒZŒÐŒŁŒØŒĦŒŦŒÞŒÆŒŒŒ",
-        "lnum,pnum"      : "0001020 0304050 060708090 1011121 1314151 161718191 2021222 2324252 262728292 3031323 3334353 363738393 4041424 4344454 464748494 5051525 5354555 565758595 6061626 6364656 666768696 7071727 7374757 767778797 8081828 8384858 868788898 9091929 9394959 969798999",
-        "onum,pnum"      : "0001020 0304050 060708090 1011121 1314151 161718191 2021222 2324252 262728292 3031323 3334353 363738393 4041424 4344454 464748494 5051525 5354555 565758595 6061626 6364656 666768696 7071727 7374757 767778797 8081828 8384858 868788898 9091929 9394959 969798999",
-        "lnum,tnum"      : "0001020 0304050 060708090 1011121 1314151 161718191 2021222 2324252 262728292 3031323 3334353 363738393 4041424 4344454 464748494 5051525 5354555 565758595 6061626 6364656 666768696 7071727 7374757 767778797 8081828 8384858 868788898 9091929 9394959 969798999",
-        "onum,tnum"      : "0001020 0304050 060708090 1011121 1314151 161718191 2021222 2324252 262728292 3031323 3334353 363738393 4041424 4344454 464748494 5051525 5354555 565758595 6061626 6364656 666768696 7071727 7374757 767778797 8081828 8384858 868788898 9091929 9394959 969798999",
+        "lowercase"      : "a b c d e f g h i j k l m n o p q r s t u v w x y z ß æ ð ø þ đ ħ ŋ œ ł ŧ" ,
+        "uppercase"      : "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z ẞ Æ Ð Ø Þ Ħ Ł Ŋ Œ Ł Ŧ",
+        "mixed"          : "",
         "numr"           : "0001020 0304050 060708090 1011121 1314151 161718191 2021222 2324252 262728292 3031323 3334353 363738393 4041424 4344454 464748494 5051525 5354555 565758595 6061626 6364656 666768696 7071727 7374757 767778797 8081828 8384858 868788898 9091929 9394959 969798999",
-        "frac"           : "000 0/0 101 1/1 202 2/2 303 3/3 404 4/4 505 5/5 606 6/6 707 7/7 808 8/8 909 9/9",
         "lower punx"     : "‘a’ ‘b’ ‘c’ ‘d’ ‘e’ ‘f’ ‘g’ ‘h’ ‘i’ ‘j’ ‘k’ ‘l’ ‘m’ ‘n’ ‘o’ ‘p’ ‘q’ ‘r’ ‘s’ ‘t’ ‘u’ ‘v’ ‘w’ ‘x’ ‘y’ ‘z’ ‘ð’ ‘đ’ ‘ł’ ‘ø’ ‘ħ’ ‘ŧ’ ‘þ’ ‘æ’ ‘œ’ ‘ß’ ‘ı’ ’a‘ ’b‘ ’c‘ ’d‘ ’e‘ ’f‘ ’g‘ ’h‘ ’i‘ ’j‘ ’k‘ ’l‘ ’m‘ ’n‘ ’o‘ ’p‘ ’q‘ ’r‘ ’s‘ ’t‘ ’u‘ ’v‘ ’w‘ ’x‘ ’y‘ ’z‘ ’ð‘ ’đ‘ ’ł‘ ’ø‘ ’ħ‘ ’ŧ‘ ’þ‘ ’æ‘ ’œ‘ ’ß‘ ’ı‘ ”a”b”c”d”e”f”g”h”i”j”k”l”m”n”o”p”q”r” ”s”t”u”v”w”x”y”z”ð”đ”ł”ø”ħ”ŧ”þ”æ”œ”ß”ı” “a“b“c“d“e“f“g“h“i“j“k“l“m“n“o“p“q“r“ “s“t“u“v“w“x“y“z“ð“đ“ł“ø“ħ“ŧ“þ“æ“œ“ß“ı“ .a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p.q.r. .s.t.u.v.w.x.y.z.ð.đ.ł.ø.ħ.ŧ.þ.æ.œ.ß.ı. ,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r, ,s,t,u,v,w,x,y,z,ð,đ,ł,ø,ħ,ŧ,þ,æ,œ,ß,ı, :a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:r: :s:t:u:v:w:x:y:z:ð:đ:ł:ø:ħ:ŧ:þ:æ:œ:ß:ı: ;a;b;c;d;e;f;g;h;i;j;k;l;m;n;o;p;q;r; ;s;t;u;v;w;x;y;z;ð;đ;ł;ø;ħ;ŧ;þ;æ;œ;ß;ı; ‹a› ‹b› ‹c› ‹d› ‹e› ‹f› ‹g› ‹h› ‹i› ‹j› ‹k› ‹l› ‹m› ‹n› ‹o› ‹p› ‹q› ‹r› ‹s› ‹t› ‹u› ‹v› ‹w› ‹x› ‹y› ‹z› ‹ð› ‹đ› ‹ł› ‹ø› ‹ħ› ‹ŧ› ‹þ› ‹æ› ‹œ› ‹ß› ‹ı› ›a‹ ›b‹ ›c‹ ›d‹ ›e‹ ›f‹ ›g‹ ›h‹ ›i‹ ›j‹ ›k‹ ›l‹ ›m‹ ›n‹ ›o‹ ›p‹ ›q‹ ›r‹ ›s‹ ›t‹ ›u‹ ›v‹ ›w‹ ›x‹ ›y‹ ›z‹ ›ð‹ ›đ‹ ›ł‹ ›ø‹ ›ħ‹ ›ŧ‹ ›þ‹ ›æ‹ ›œ‹ ›ß‹ ›ı‹ «a«b«c«d«e«f«g«h«i«j«k«l«m«n«o«p«q«r« «s«t«u«v«w«x«y«z«ð«đ«ł«ø«ħ«ŧ«þ«æ«œ«ß«ı« »a»b»c»d»e»f»g»h»i»j»k»l»m»n»o»p»q»r» »s»t»u»v»w»x»y»z»ð»đ»ł»ø»ħ»ŧ»þ»æ»œ»ß»ı» -a-b-c-d-e-f-g-h-i-j-k-l-m-n-o-p-q-r- -s-t-u-v-w-x-y-z-ð-đ-ł-ø-ħ-ŧ-þ-æ-œ-ß-ı- –a–b–c–d–e–f–g–h–i–j–k–l–m–n–o–p–q–r– –s–t–u–v–w–x–y–z–ð–đ–ł–ø–ħ–ŧ–þ–æ–œ–ß–ı– ·a·b·c·d·e·f·g·h·i·j·k·l·m·n·o·p·q·r· ·s·t·u·v·w·x·y·z·ð·đ·ł·ø·ħ·ŧ·þ·æ·œ·ß·ı· •a•b•c•d•e•f•g•h•i•j•k•l•m•n•o•p•q•r• •s•t•u•v•w•x•y•z•ð•đ•ł•ø•ħ•ŧ•þ•æ•œ•ß•ı• +a+b+c+d+e+f+g+h+i+j+k+l+m+n+o+p+q+r+ +s+t+u+v+w+x+y+z+ð+đ+ł+ø+ħ+ŧ+þ+æ+œ+ß+ı+ (a) (b) (c) (d) (e) (f) (g) (h)(i)(j)(k)(l)(m)(n)(o)(p)(q)(r)(s)(t)(u)(v)(w)(x)(y)(z)(ð)(đ)(ł)(ø)(ħ)(ŧ)(þ)(æ)(œ)(ß)(ı)[a][b][c][d] [e][f][g][h][i][j][k][l][m][n][o][p][q][r][s][t][u][v][w][x][y][z][ð][đ][ł][ø][ħ][ŧ][þ][æ][œ][ß][ı]{a}{b} {c}{d}{e}{f}{g}{h}{i}{j}{k}{l}{m}{n}{o}{p}{q}{r}{s}{t}{u}{v}{w}{x}{y}{z}{ð}{đ}{ł}{ø}{ħ}{ŧ}{þ}{æ}{œ}{ß} {ı}¡a!¡b!¡c!¡d!¡e!¡f!¡g!¡h!¡i!¡j!¡k!¡l!¡m!¡n!¡o!¡p!¡q!¡r!¡s!¡t!¡u!¡v!¡w!¡x!¡y!¡z!¡ð!¡đ!¡ł!¡ø!¡ħ!¡ŧ!¡þ!¡æ!¡œ!¡ß!¡ı!¿a? ¿b?¿c?¿d?¿e?¿f?¿g?¿h?¿i?¿j?¿k?¿l?¿m?¿n?¿o?¿p?¿q?¿r?¿s?¿t?¿u?¿v?¿w?¿x?¿y?¿z?¿ð?¿đ?¿ł?¿ø?¿ħ?¿ŧ?¿þ?¿æ? ¿œ? ¿ß? ¿ı? &a&b&c&d&e&f&g&h&i&j&k&l&m&n&o&p&q&r& &s&t&u&v&w&x&y&z&ð&đ&ł&ø&ħ&ŧ&þ&æ&œ&ß&ı& *a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r* *s*t*u*v*w*x*y*z*ð*đ*ł*ø*ħ*ŧ*þ*æ*œ*ß*ı* a® b® c® d® e® f® g® h® i® j® k® l® m® n® o® p® q® r® s®t®u®v®w®x®y®z®ð®đ®ł®ø®ħ®ŧ®þ®æ®œ®ß®ı®a™b™c™d™e™f™g™h™i™j™k™l™m™n™o™p™q™r™s™t™u™v™ w™x™y™z™ð™đ™ł™ø™ħ™ŧ™þ™æ™œ™ß™ı™a℠b℠c℠d℠e℠f℠g℠h℠i℠j℠k℠l℠m℠n℠o℠p℠q℠r℠s℠t℠u℠v℠ w℠ x℠ y℠ z℠ ð℠ đ℠ ł℠ ø℠ ħ℠ ŧ℠ þ℠ æ℠ œ℠ ß℠ ı℠ †a†b†c†d†e†f†g†h†i†j†k†l†m†n†o†p†q†r† †s†t†u†v†w†x†y†z†ð†đ†ł†ø†ħ†ŧ†þ†æ†œ†ß†ı† ‡a‡b‡c‡d‡e‡f‡g‡h‡i‡j‡k‡l‡m‡n‡o‡p‡q‡r‡ ‡s‡t‡u‡v‡w‡x‡y‡z‡ð‡đ‡ł‡ø‡ħ‡ŧ‡þ‡æ‡œ‡ß‡ı‡ @a@b@c@d@e@f@g@h@i@j@k@l@m@n@o@p@q@r@s@t@u@v@w@x@y@z@ð@đ@ł@ø@ħ@ŧ@þ@æ@œ@ß@ı@ #a#b#c#d#e#f#g#h#i#j#k#l#m#n#o#p#q#r# #s#t#u#v#w#x#y#z#ð#đ#ł#ø#ħ#ŧ#þ#æ#œ#ß#ı# /a/b/c/d/e/f/g/h/i/j/k/l/m/n/ o/p/q/r/ /s/t/u/v/w/x/y/z/ð/đ/ł/ø/ħ/ŧ/þ/æ/œ/ß/ı/",
         "upper punx"     : "‘A’ ‘B’ ‘C’ ‘D’ ‘E’ ‘F’ ‘G’ ‘H’ ‘I’ ‘J’ ‘K’ ‘L’ ‘M’ ‘N’ ‘O’ ‘P’ ‘Q’ ‘R’ ‘S’ ‘T’ ‘U’ ‘V’ ‘W’ ‘X’ ‘Y’ ‘Z’ ‘Ð’ ‘Ł’ ‘Ø’ ‘Ħ’ ‘Ŧ’ ‘Þ’ ‘Æ’ ‘Œ’ ’A‘ ’B‘ ’C‘ ’D‘ ’E‘ ’F‘ ’G‘ ’H‘ ’I‘ ’J‘ ’K‘ ’L‘ ’M‘ ’N‘ ’O‘ ’P‘ ’Q‘ ’R‘ ’S‘ ’T‘ ’U‘ ’V‘ ’W‘ ’X‘ ’Y‘ ’Z‘ ’Ð‘ ’Ł‘ ’Ø‘ ’Ħ‘ ’Ŧ‘ ’Þ‘ ’Æ‘ ’Œ‘ ”A”B”C”D”E”F”G”H”I”J”K”L”M”N”O”P”Q”R” ”S”T”U”V”W”X”Y”Z”Ð”Ł”Ø”Ħ”Ŧ”Þ”Æ”Œ” “A“B“C“D“E“F“G“H“I“J“K“L“M“N“O“P“Q“R“ “S“T“U“V“W“X“Y“Z“Ð“Ł“Ø“Ħ“Ŧ“Þ“Æ“Œ“ .A.B.C.D.E.F.G.H.I.J.K.L.M. N.O.P.Q.R. .S.T.U.V.W.X.Y.Z.Ð.Ł.Ø.Ħ.Ŧ.Þ.Æ.Œ. ,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R, ,S,T,U,V,W,X,Y,Z,Ð,Ł,Ø,Ħ,Ŧ,Þ,Æ,Œ, :A:B:C:D:E:F:G:H:I:J:K:L:M:N:O:P:Q:R: :S:T:U:V:W:X:Y:Z:Ð:Ł:Ø:Ħ:Ŧ:Þ:Æ:Œ: ;A;B;C;D;E;F;G;H;I;J;K;L;M;N;O;P;Q;R; ;S;T;U;V;W;X;Y;Z;Ð;Ł;Ø;Ħ;Ŧ;Þ;Æ;Œ; ‹A› ‹B› ‹C› ‹D› ‹E› ‹F› ‹G› ‹H› ‹I› ‹J› ‹K› ‹L› ‹M› ‹N› ‹O› ‹P› ‹Q› ‹R› ‹S› ‹T› ‹U› ‹V› ‹W› ‹X› ‹Y› ‹Z› ‹Ð› ‹Ł› ‹Ø› ‹Ħ› ‹Ŧ› ‹Þ› ‹Æ› ‹Œ› ›A‹ ›B‹ ›C‹ ›D‹ ›E‹ ›F‹ ›G‹ ›H‹ ›I‹ ›J‹ ›K‹ ›L‹ ›M‹ ›N‹ ›O‹ ›P‹ ›Q‹ ›R‹ ›S‹ ›T‹ ›U‹ ›V‹ ›W‹ ›X‹ ›Y‹ ›Z‹ ›Ð‹ ›Ł‹ ›Ø‹ ›Ħ‹ ›Ŧ‹ ›Þ‹ ›Æ‹ ›Œ‹ «A«B«C«D«E«F«G«H«I«J«K«L«M«N«O«P«Q«R« «S«T«U«V«W«X«Y«Z«Ð«Ł«Ø«Ħ«Ŧ«Þ«Æ«Œ« »A»B»C»D»E»F»G»H»I»J»K»L»M»N»O»P»Q»R» »S»T»U»V»W»X»Y»Z»Ð»Ł»Ø»Ħ»Ŧ»Þ»Æ»Œ» -A-B-C- D-E-F-G-H-I-J-K-L-M-N-O-P-Q-R- -S-T-U-V-W-X-Y-Z-Ð-Ł-Ø-Ħ-Ŧ-Þ-Æ-Œ- –A–B–C–D–E–F–G–H–I–J–K–L–M–N–O–P–Q–R– –S–T–U–V–W–X–Y–Z–Ð–Ł–Ø–Ħ–Ŧ–Þ–Æ–Œ– ·A·B·C·D·E·F·G·H·I·J·K·L·M·N·O·P·Q·R· ·S·T·U·V·W·X·Y·Z·Ð·Ł·Ø·Ħ·Ŧ·Þ·Æ·Œ· •A•B•C•D•E•F•G•H•I•J•K•L•M•N•O•P•Q•R• •S•T•U•V•W•X•Y•Z•Ð•Ł•Ø•Ħ•Ŧ•Þ•Æ•Œ• +A+B+C+D+E+F+G+H+I+J+K+L+M+N+O+P+Q+R+ +S+T+U+V+W+X+Y+Z+Ð+Ł+Ø+Ħ+Ŧ+Þ+Æ+Œ+ (A) (B) (C) (D) (E) (F) (G) (H) (I) (J) (K) (L) (M) (N) (O) (P) (Q) (R) (S) (T) (U) (V) (W) (X) (Y) (Z) (Ð) (Ł) (Ø) (Ħ) (Ŧ) (Þ) (Æ) (Œ) [A] [B] [C] [D] [E] [F] [G] [H] [I] [J] [K] [L] [M] [N] [O] [P] [Q] [R] [S] [T] [U] [V] [W] [X] [Y] [Z] [Ð] [Ł] [Ø] [Ħ] [Ŧ] [Þ] [Æ] [Œ] {A} {B} {C} {D} {E} {F} {G} {H} {I} {J} {K} {L} {M} {N} {O} {P} {Q} {R} {S} {T} {U} {V} {W} {X} {Y} {Z} {Ð} {Ł} {Ø} {Ħ} {Ŧ} {Þ} {Æ} {Œ}¡A!¡B!¡C!¡D!¡E!¡F!¡G!¡H!¡I!¡J!¡K!¡L!¡M!¡N!¡O!¡P!¡Q!¡R!¡S!¡T!¡U!¡V!¡W!¡X!¡Y!¡Z!¡Ð!¡Ł!¡Ø!¡Ħ!¡Ŧ!¡Þ!¡Æ!¡Œ!¿A? ¿B? ¿C? ¿D? ¿E? ¿F? ¿G? ¿H? ¿I? ¿J? ¿K? ¿L? ¿M? ¿N? ¿O? ¿P? ¿Q? ¿R? ¿S? ¿T? ¿U? ¿V? ¿W? ¿X? ¿Y? ¿Z? ¿Ð? ¿Ł? ¿Ø? ¿Ħ? ¿Ŧ? ¿Þ? ¿Æ? ¿Œ? &A&B&C&D&E&F&G&H&I&J&K&L&M&N&O&P&Q&R& &S&T&U&V&W&X&Y&Z&Ð&Ł&Ø&Ħ&Ŧ&Þ&Æ&Œ& *A*B*C*D*E*F*G*H*I*J*K*L*M*N*O*P*Q*R* *S*T*U*V*W*X*Y*Z*Ð*Ł*Ø*Ħ*Ŧ*Þ*Æ*Œ* A® B® C® D® E® F® G® H® I® J® K® L® M® N®O®P®Q®R®S®T®U®V®W®X®Y®Z®Ð®Ł®Ø®Ħ®Ŧ®Þ®Æ®Œ®A™B™C™D™E™F™G™H™I™J™K™L™M™N™O™ P™Q™R™S™T™U™V™W™X™Y™Z™Ð™Ł™Ø™Ħ™Ŧ™Þ™Æ™Œ™A℠B℠C℠D℠E℠F℠G℠H℠I℠J℠K℠L℠M℠ N℠ O℠ P℠ Q℠ R℠ S℠ T℠ U℠ V℠ W℠ X℠ Y℠ Z℠ Ð℠ Ł℠ Ø℠ Ħ℠ Ŧ℠ Þ℠ Æ℠ Œ℠ †A†B†C†D†E†F†G†H†I†J†K†L†M†N†O†P†Q†R† †S†T†U†V†W†X†Y†Z†Ð†Ł†Ø†Ħ†Ŧ†Þ†Æ†Œ† ‡A‡B‡C‡D‡E‡F‡G‡H‡I‡J‡K‡L‡M‡N‡O‡P‡Q‡R‡ ‡S‡T‡U‡V‡W‡X‡Y‡Z‡Ð‡Ł‡Ø‡Ħ‡Ŧ‡Þ‡Æ‡Œ‡ @A@B@C@D@E@F@G@H@I@ @J@K@L@M@N@O@P@Q@ @R@S@T@U@V@W@X@Y@Z@ @Ð@Ł@Ø@Ħ@Ŧ@Þ@Æ@Œ@ #A#B#C#D#E#F#G#H#I# #J#K#L#M#N#O#P#Q# #R#S#T#U#V#W#X#Y#Z# #Ð#Ł#Ø#Ħ#Ŧ#Þ#Æ#Œ# /A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R/ /S/T/U/V/W/X/Y/Z/Ð/Ł/Ø/Ħ/Ŧ/Þ/Æ/Œ/ ‘0’ ‘1’ ‘2’ ‘3’ ‘4’ ‘5’ ‘6’ ‘7’ ‘8’ ‘9’ ’0‘ ’1‘ ’2‘ ’3‘ ’4‘ ’5‘ ’6‘ ’7‘ ’8‘ ’9‘ ”0”1”2”3”4”5”6”7”8”9” “0“1“2“3“4“5“6“7“8“9“ .0.1.2.3.4.5.6.7.8.9. ,0,1,2,3,4,5,6,7,8,9, :0:1:2:3:4:5:6:7:8:9: ;0;1;2;3;4;5;6;7;8;9; ‹0› ‹1› ‹2› ‹3› ‹4› ‹5› ‹6› ‹7› ‹8› ‹9› ›0‹ ›1‹ ›2‹ ›3‹ ›4‹ ›5‹ ›6‹ ›7‹ ›8‹ ›9‹ «0«1«2«3«4«5«6«7«8«9« »0»1»2»3»4»5»6»7»8»9» -0-1-2-3-4-5-6-7-8-9- –0–1–2–3–4–5–6–7–8–9– ·0·1·2·3·4·5·6·7·8·9· •0•1•2•3•4•5•6•7•8•9• +0+1+2+3+4+5+6+7+8+9+ −0−1−2−3−4−5−6−7−8−9− ×0×1×2×3×4×5×6×7×8×9× ÷0÷1÷2÷3÷4÷5÷6÷7÷8÷9÷ <0<1<2<3<4<5<6<7<8<9< >0>1>2>3>4>5>6>7>8>9> =0=1=2=3=4=5=6=7=8=9= ~0~1~2~3~4~5~6~7~8~9~ (0) (1) (2) (3) (4) (5)(6)(7)(8)(9)[0][1][2][3][4][5][6][7][8][9]{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}¡0!¡1!¡2!¡3!¡4!¡5!¡6!¡7!¡8!¡9!¿0? ¿1? ¿2? ¿3? ¿4? ¿5? ¿6? ¿7? ¿8? ¿9? &0&1&2&3&4&5&6&7&8&9& *0*1*2*3*4*5*6*7*8*9* 0® 1® 2® 3® 4® 5® 6® 7® 8® 9® 0™ 1™ 2™ 3™ 4™ 5™ 6™ 7™ 8™ 9™ 0℠ 1℠ 2℠ 3℠ 4℠ 5℠ 6℠ 7℠ 8℠ 9℠ †0†1†2†3†4†5†6†7†8†9† ‡0‡1‡2‡3‡4‡5‡6‡7‡8‡9‡ $0$1$2$3$4$5$6$7$8$9$ ¢0¢1¢2¢3¢4¢5¢6¢7¢8¢9¢ £0£1£2£3£4£5£6£7£8£9£ ¥0¥1¥2¥3¥4¥5¥6¥7¥8¥9¥ ƒ0ƒ1ƒ2ƒ3ƒ4ƒ5ƒ6ƒ7ƒ8ƒ9ƒ €0€1€2€3€4€5€6€7€8€9€ ₹0₹1₹2₹3₹4₹5₹6₹7₹8₹9₹ ₺0₺1₺2₺3₺4₺5₺6₺7₺8₺9₺ ₽0₽1₽2₽3₽4₽5₽6₽7₽8₽9₽ ₿0₿1₿2₿3₿4₿5₿6₿7₿8₿9₿ №0№1№2№3№4№5№6№7№8№9№ ©0©1©2©3©4©5©6©7©8©9© §0§1§2§3§4§5§6§7§8§9§ ¶0¶1¶2¶3¶4¶5¶6¶7¶8¶9¶ %0%1%2%3%4%5%6%7%8%9% a0a1a2a3a4a5a6a7a8a9a o0o1o2o3o4o5o6o7o8o9o @0@1@2@3@4@5@6@7@8@9@ #0#1#2#3#4#5#6#7#8#9# /0/1/2/3/4/5/6/7/8/9/ ‘0’ ‘1’ ‘2’ ‘3’ ‘4’ ‘5’ ‘6’ ‘7’ ‘8’ ‘9’ ’0‘ ’1‘ ’2‘ ’3‘ ’4‘ ’5‘ ’6‘ ’7‘ ’8‘ ’9‘ ”0”1”2”3”4”5”6”7”8”9” “0“1“2“3“4“5“6“7“8“9“ .0.1.2.3.4.5.6.7.8.9. ,0,1,2,3,4,5,6,7,8,9, :0:1:2:3:4:5:6:7:8:9: ;0;1;2;3;4;5;6;7;8;9; ‹0› ‹1› ‹2› ‹3› ‹4› ‹5› ‹6› ‹7› ‹8› ‹9› ›0‹ ›1‹ ›2‹ ›3‹ ›4‹ ›5‹ ›6‹ ›7‹ ›8‹ ›9‹ «0«1«2«3«4«5«6«7«8«9« »0»1»2»3»4»5»6»7»8»9» -0-1-2-3-4-5-6-7-8-9- –0–1–2–3–4–5–6–7–8–9– ·0·1·2·3·4·5·6·7·8·9· •0•1•2•3•4•5•6•7•8•9• +0+1+2+3+4+5+6+7+8+9+ −0−1−2−3−4−5−6−7−8−9− ×0×1×2×3×4×5×6×7×8×9× ÷0÷1÷2÷3÷4÷5÷6÷7÷8÷9÷ <0<1<2<3<4<5<6<7<8<9< >0>1>2>3>4>5>6>7>8>9> =0=1=2=3=4=5=6=7=8=9= ~0~1~2~3~4~5~6~7~8~9~ (0) (1) (2) (3) (4) (5) (6) (7) (8) (9) [0] [1] [2] [3] [4] [5] [6] [7] [8] [9] {0} {1} {2} {3} {4} {5} {6} {7} {8} {9} ¡0! ¡1! ¡2! ¡3! ¡4! ¡5! ¡6! ¡7! ¡8! ¡9! ¿0? ¿1? ¿2? ¿3? ¿4? ¿5? ¿6? ¿7? ¿8? ¿9? &0&1&2&3&4&5&6&7&8&9& *0*1*2*3*4*5*6*7*8*9* 0®1®2®3®4®5®6®7®8®9®0™1™2™3™4™5™6™7™8™9™0℠1℠2℠3℠4℠5℠6℠7℠8℠9℠†0†1†2†3†4†5†6†7†8†9† ‡0‡1‡2‡3‡4‡5‡6‡7‡8‡9‡ $0$1$2$3$4$5$6$7$8$9$ ¢0¢1¢2¢3¢4¢5¢6¢7¢8¢9¢ £0£1£2£3£4£5£6£7£8£9£ ¥0¥1¥2¥3¥4¥5¥6¥7¥8¥9¥ ƒ0ƒ1ƒ2ƒ3ƒ4ƒ5ƒ6ƒ7ƒ8ƒ9ƒ €0€1€2€3€4€5€6€7€8€9€ ₹0₹1₹2₹3₹4₹5₹6₹7₹8₹9₹ ₺0₺1₺2₺3₺4₺5₺6₺7₺8₺9₺ ₽0₽1₽2₽3₽4₽5₽6₽7₽8₽9₽ ₿0₿1₿2₿3₿4₿5₿6₿7₿8₿9₿ №0№1№2№3№4№5№6№7№8№9№ ©0©1©2©3©4©5©6©7©8©9© §0§1§2§3§4§5§6§7§8§9§ ¶0¶1¶2¶3¶4¶5¶6¶7¶8¶9¶ %0%1%2%3%4%5%6%7%8%9% a0a1a2a3a4a5a6a7a8a9a o0o1o2o3o4o5o6o7o8o9o @0@1@2@3@4@5@6@7@8@9@ #0#1#2#3#4#5#6#7#8#9# /0/1/2/3/4/5/6/7/8/9/",
         "case punx"      : "‹A› ‹B› ‹C› ‹D› ‹E› ‹F› ‹G› ‹H› ‹I› ‹J› ‹K› ‹L› ‹M› ‹N› ‹O› ‹P› ‹Q› ‹R› ‹S› ‹T› ‹U› ‹V› ‹W› ‹X› ‹Y› ‹Z› ‹Ð› ‹Ł› ‹Ø›‹Ħ›‹Ŧ›‹Þ›‹Æ›‹Œ››A‹›B‹›C‹›D‹›E‹›F‹›G‹›H‹›I‹›J‹›K‹›L‹›M‹›N‹›O‹›P‹›Q‹›R‹›S‹›T‹›U‹›V‹›W‹›X‹›Y‹›Z‹›Ð‹›Ł‹ ›Ø‹ ›Ħ‹ ›Ŧ‹ ›Þ‹ ›Æ‹ ›Œ‹ «A«B«C«D«E«F«G«H«I«J«K«L«M«N«O«P«Q«R« «S«T«U«V«W«X«Y«Z«Ð«Ł«Ø«Ħ«Ŧ«Þ«Æ«Œ« »A»B»C»D»E»F»G»H»I»J»K»L»M»N»O»P»Q»R» »S»T»U»V»W»X»Y»Z»Ð»Ł»Ø»Ħ»Ŧ»Þ»Æ»Œ» -A-B-C-D-E-F-G-H-I-J-K-L-M- N-O-P-Q-R- -S-T-U-V-W-X-Y-Z-Ð-Ł-Ø-Ħ-Ŧ-Þ-Æ-Œ- –A–B–C–D–E–F–G–H–I–J–K–L–M–N–O–P–Q–R– –S–T–U–V–W–X–Y–Z– Ð–Ł–Ø–Ħ–Ŧ–Þ–Æ–Œ– (A) (B) (C) (D) (E) (F) (G) (H) (I) (J) (K) (L) (M) (N) (O) (P) (Q) (R) (S) (T) (U) (V) (W) (X) (Y) (Z) (Ð) (Ł)(Ø)(Ħ)(Ŧ)(Þ)(Æ)(Œ)[A][B][C][D][E][F][G][H][I][J][K][L][M][N][O][P][Q][R][S][T][U][V][W][X][Y][Z][Ð] [Ł][Ø][Ħ][Ŧ][Þ][Æ][Œ]{A}{B}{C}{D}{E}{F}{G}{H}{I}{J}{K}{L}{M}{N}{O}{P}{Q}{R}{S}{T}{U}{V}{W}{X}{Y}{Z} {Ð}{Ł}{Ø}{Ħ}{Ŧ}{Þ}{Æ}{Œ}¡A!¡B!¡C!¡D!¡E!¡F!¡G!¡H!¡I!¡J!¡K!¡L!¡M!¡N!¡O!¡P!¡Q!¡R!¡S!¡T!¡U!¡V!¡W!¡X!¡Y!¡Z!¡Ð! ¡Ł! ¡Ø! ¡Ħ! ¡Ŧ! ¡Þ! ¡Æ! ¡Œ! ¿A? ¿B? ¿C? ¿D? ¿E? ¿F? ¿G? ¿H? ¿I? ¿J? ¿K? ¿L? ¿M? ¿N? ¿O? ¿P? ¿Q? ¿R? ¿S? ¿T? ¿U? ¿V? ¿W? ¿X? ¿Y? ¿Z? ¿Ð? ¿Ł? ¿Ø? ¿Ħ? ¿Ŧ? ¿Þ? ¿Æ? ¿Œ? ‹0› ‹1› ‹2› ‹3› ‹4› ‹5› ‹6› ‹7› ‹8› ‹9› ›0‹ ›1‹ ›2‹ ›3‹ ›4‹ ›5‹ ›6‹ ›7‹ ›8‹ ›9‹ «0«1«2«3«4«5«6«7«8«9« »0»1»2»3»4»5»6»7»8»9» -0-1-2-3-4-5-6-7-8-9- –0–1–2–3–4–5–6–7–8–9–(0) (1) (2) (3) (4) (5) (6) (7) (8) (9) [0] [1] [2] [3] [4] [5] [6][7][8][9]{0}{1}{2}{3}{4}{5}{6}{7}{8}{9}¡0!¡1!¡2!¡3!¡4!¡5!¡6!¡7!¡8!¡9!¿0?¿1?¿2?¿3?¿4?¿5?¿6?¿7?¿8?¿9?",
@@ -200,11 +191,11 @@ class ProofObjectHandler(list):
         inst.__dict__["data"] = self.__dict__["data"][:]
 
         return inst
-        
+
     def find(self, **kwargs):
         # getter that finds items in object that have the given attributes
         # this *must* pass all the kwarg values to be valid item
-        found = self.__class__()    
+        found = self.__class__()
         for item in self.data:
             test = []
             for attr, value in kwargs.items():
@@ -214,7 +205,7 @@ class ProofObjectHandler(list):
                     test.append(False)
             if False not in test: found.append(item)
         return found
-        
+
     def append(self, value):
         self.data.append(value)
 
@@ -246,7 +237,7 @@ class ProofObjectHandler(list):
         if isinstance(test, ProofLocation):
             self.data.sort(key=lambda d: (-width_class(d.location.get("wdth",0)), -italic_value(d.location.get("slnt",0)), weight_class(d.location.get("wght",0))))
         elif isinstance(test, ProofFont):
-            self.data.sort(key=lambda d: (-f.font_object["OS_2"].usWidthClass, -f.font_object["post"].italicAngle, f.font_object["OS_2"].usWeightClass))
+            self.data.sort(key=lambda f: (f.font_object["OS/2"].usWeightClass, -f.font_object["post"].italicAngle, -f.font_object["OS/2"].usWidthClass))
         else:
             self.data.sort(*args, **kwds)
 
@@ -318,9 +309,9 @@ class ProofLocation:
     def generate_name(self, font_obj: TTFont) -> str:
         best_name = font_obj["name"].getBestFullName()
         if "fvar" in font_obj:
-            for i in font_obj["fvar"].instances: 
+            for i in font_obj["fvar"].instances:
                 l = self._location
-                if i.coordinates == l:   
+                if i.coordinates == l:
                     for name in font_obj["name"].names:
                         if name.nameID == i.subfamilyNameID:
                             best_name = f'{font_obj["name"].getBestFamilyName()} {name}'
@@ -409,21 +400,21 @@ class ProofFont:
                             back = subtable.BacktrackCoverage
                             inp = subtable.InputCoverage
                             ahead = subtable.LookAheadCoverage
-                            
+
                             ind = subtable.SubstLookupRecord[0].LookupListIndex
                             subref = _gsub.table.LookupList.Lookup[ind]
                             sing = subref.SubTable[0].mapping
-                            
+
                             if inp:
                                 inp = inp[0].glyphs
                             if back:
                                 back = back[0].glyphs
                             if ahead:
-                                ahead = ahead[0].glyphs                            
+                                ahead = ahead[0].glyphs
                             if not back:
                                 submap[inp[0]] = (sing[inp[0]], dict(extra=sing.get(ahead[0], ahead[0]), pos="middle"))
                             else:
-                                submap[inp[-1]] = (sing[inp[-1]], dict(extra=back[-1], pos="before"))                 
+                                submap[inp[-1]] = (sing[inp[-1]], dict(extra=back[-1], pos="before"))
                             mapping = submap
 
                     if mapping:
@@ -478,7 +469,7 @@ class ProofFont:
             yield vf.name, vfDoc
 
 
-    def build_locations(self):
+    def build_locations(self, should_sort:bool=True):
         font_obj   = self.font_object
         operator = self.operator
 
@@ -488,7 +479,7 @@ class ProofFont:
         if operator:
             for v in self._splitVariableFonts(operator, expandLocations=True, makeInstanceFilename=True):
                 sub_space, split_op = v
-                # this is the only way to split the vfs and still keep the paths 
+                # this is the only way to split the vfs and still keep the paths
                 # we can assume that post-split we will only have 1 vf to extract
                 extracted_path = split_op.variableFonts[0].filename
                 name = sub_space
@@ -532,7 +523,8 @@ class ProofFont:
                 _instances = {}
 
         self.locations.extend(list(_instances.values()), clear=True)
-        self.locations.sort() # = self._sort_locations(list(_instances.values()))
+        if should_sort:
+            self.locations.sort() # = self._sort_locations(list(_instances.values()))
 
 
 
@@ -554,11 +546,12 @@ class ProofDocument:
         self._operator      = None
         self._crop          = ""
         self._use_instances = False
+        self._sort          = True
         self._path          = None
         self._name          = None
 
         self._custom_text   = ""
-        
+
         self._scope         = "core"
         self._language      = "english"
         self._lang_tag      = "en"
@@ -658,7 +651,7 @@ class ProofDocument:
                               )
         # keep a stored grid for reference
         self._grid = grid.ColumnGrid(
-                                    (   
+                                    (
                                         self._margin_left,
                                         self._margin_bottom,
                                         *self._text_box_size
@@ -710,15 +703,15 @@ class ProofDocument:
         return self._path
 
     path = property(_get_path, _set_path)
-    
+
     def _set_language(self, new_language: str):
-        
+
         self._language = new_language
         try:
             self._lang_tag = Lang(new_language.title()).pt1
         except:
             self._lang_tag = ""
-    
+
 
     def _get_language(self) -> str:
         return self._language
@@ -745,7 +738,7 @@ class ProofDocument:
         return self._name
 
     name = property(_get_name, _set_name)
-    
+
     def _set_scope(self, new_scope: str):
         self._scope = new_scope
 
@@ -765,13 +758,13 @@ class ProofDocument:
     def _get_margin(self) -> list[int]:
         return (
                 self._margin_top,
-                self._margin_left, 
+                self._margin_left,
                 self._margin_bottom,
                 self._margin_right,
                 )
 
     def _set_margin(self, new_margin: int | tuple[int]):
-        # we can accept a tuple of 4 to set individual 
+        # we can accept a tuple of 4 to set individual
         # or 1 value to apply across the board
         if isinstance(new_margin, (tuple, list)):
             if len(new_margin) == 4:
@@ -810,6 +803,15 @@ class ProofDocument:
 
     use_instances = property(_get_use_instances, _set_use_instances)
 
+    def _get_should_sort(self) -> str:
+        return self._sort
+
+    def _set_should_sort(self, value: bool):
+        # self._sort = fence
+        self._sort = value
+
+    sort = property(_get_should_sort, _set_should_sort)
+
     def _get_crop(self) -> str:
         return self._crop
 
@@ -830,7 +832,7 @@ class ProofDocument:
 
     def generate_path_base(self, suffix: str=".pdf", overwrite: bool=True) -> str:
         cd = os.path.split(self.fonts[0].path)[0]
-        directory = self.find_proof_directory(cd, "proofs") 
+        directory = self.find_proof_directory(cd, "proofs")
         if not directory:
             directory = cd
         type = "-Proof" if suffix == ".pdf" else ""
@@ -995,21 +997,22 @@ class ProofDocument:
                     level:str="ascii",
                     ):
 
-        to_store = { 
+        to_store = {
                     item[0]:item[1]
                     for item in inspect.getmembers(self)
                     if not item[0].startswith("_")
                     and not inspect.ismethod(item[1])
                     and item[0] != "storage"
                    }
+
         cleaned = {k:v for k,v in locals().items() if k != "self"}
         self.move_to_storage(proof_type, cleaned)
 
         # new_section is just a moving company...
         # build_proofs is the new house but
-        # we get our data from the storage 
+        # we get our data from the storage
 
-    def _get_working_locations(self, data:list, font) -> List: 
+    def _get_working_locations(self, data:list, font) -> List:
         to_process = [ProofLocation()]
         if font.is_variable:
             if data[0] == "core":
@@ -1067,12 +1070,45 @@ class ProofDocument:
                                                     )
 
                     else:
-                        if proof_type != "figures":
-                            txt = self.text if self.text else PROOF_DATA.get("paragraph")
-                        else:
-                            txt = PROOF_DATA.get(proof_type)
 
-                        if self.scope == "testword": 
+                        if proof_type == "spacing":
+                            txt = self._parse_spacing_strings(
+                                font.font_object.getGlyphOrder(),
+                                string_data=dict(font=font.path, font_size=point_sizes[0])
+                                )
+                        elif proof_type == "kerning":
+                            temp = PROOF_DATA.get("kerning")
+                            def getString(word):
+                                return f"nn{word}nn" if len(word) == 2 else word
+
+                            def getKerningPair(pair, case):
+                                side = "HO" if case == "uppercase" else "no"
+                                l,r = side
+                                if case == "mixed":
+                                    return f"HH{pair[0]}{pair[1]}nn"
+                                else:
+                                    return f"{l}{l}{pair[0]}{pair[1]}{l}{r}{pair[0]}{pair[1]}{r}{r}"
+
+                            hold = " ".join([getString(i) for i in temp["all pairs"].split(" ")])
+                            temp["all pairs"] = hold
+
+                            hold = " ".join([getKerningPair((ll,rr), "mixed") for ll in temp["uppercase"].split(" ") for rr in temp["lowercase"].split(" ")])
+                            temp["mixed"] = hold
+                            
+                            hold = " ".join([getKerningPair((ll,rr), "lowercase") for ll in temp["lowercase"].split(" ") for rr in temp["lowercase"].split(" ")])
+                            temp["lowercase"] = hold
+
+                            hold = " ".join([getKerningPair((ll,rr), "uppercase") for ll in temp["uppercase"].split(" ") for rr in temp["uppercase"].split(" ")])
+                            temp["uppercase"] = hold
+
+                            txt = " ".join([t for n,t in temp.items() if "," not in n])
+                        else:
+                            if proof_type != "figures":
+                                txt = self.text if self.text else PROOF_DATA.get("paragraph")
+                            else:
+                                txt = PROOF_DATA.get(proof_type)
+
+                        if self.scope == "testword":
                             txt = ""
                             for i in range(20):
                                 # try and generate words using the declared language
@@ -1114,6 +1150,42 @@ class ProofDocument:
             txt = self.draw_text_layout(txt, font_path=fonts[0].path, overflow=True)
 
 
+    def _parse_spacing_strings(self, characters:list[str,...],string_data:dict):
+        from defcon.tools import unicodeTools as uni
+        from defcon.objects.uniData import UnicodeData as ud
+        from glyphNameFormatter.data import unicodeCategories
+        from glyphNameFormatter.reader import n2u
+
+        # characters = characters.replace("\n", "")
+
+        fb = "HO"
+        catMap = {"Lu":fb,"Ll":"no","Lt":fb,"Lm":fb,"Lo":"no","Mn":fb,"Mc":fb,"Me":fb,"Nd":"01","Nl":"01","No":"01","Pc":fb,"Pd":fb,"Ps":fb,"Pe":fb,"Pi":fb,"Pf":fb,"Po":fb,"Sm":"01","Sc":"01","Sk":fb,"So":fb,"Zs":fb,"Zl":fb,"Zp":fb,"Cc":fb,"Cf":fb,"Cs":fb,"Co":fb,"Cn":fb}
+
+        #spacingStrings = ""
+        spacingStrings = bot.FormattedString()
+        for c in characters:
+            w = True
+            cat = unicodeCategories.get(n2u(c), "Cn")
+            cm = catMap[cat]
+            oo = ""
+            if "P" == cat[0]:
+                if cat[1] in ["i","s"]:
+                    oo = chr(uni.closeRelative(n2u(c)))
+                elif cat[1] in ["e","f"]:
+                    oo = chr(uni.openRelative(n2u(c)))
+                    w = False
+            start,end = cm
+            if w: 
+                spacingStrings.append(f"{start}{start}", font=string_data.get("font"), fontSize=string_data.get("font_size"))
+                spacingStrings.appendGlyph(c)
+                spacingStrings.append(f"{start}{oo}{end}{start}{end}")
+                spacingStrings.appendGlyph(c)
+                spacingStrings.append(f"{end}{end}\n")
+
+                #spacingStrings += f"{start}{start}{c}{start}{oo}{end}{start}{end}{c}{end}{end}\n"
+        return spacingStrings
+        
+
     def _draw_core(self, data=list, fonts:list[ProofFont]=[]):
         for font in fonts:
             to_process = self._get_working_locations(data, font)
@@ -1141,7 +1213,7 @@ class ProofDocument:
 
         for prev, curr in zip(data, data[1:]):
 
-            # if flatten_objects: 
+            # if flatten_objects:
             #     curr[-1]["to_store"]["fonts"] = flatten(curr)
 
             if curr[-1]["to_store"].get("in_group") and (curr[-1]["to_store"].get("in_group") == prev[-1]["to_store"].get("in_group")):
@@ -1163,8 +1235,8 @@ class ProofDocument:
         self.packaged = subs = self._group_data(storage)
 
         if subs[0][0][0] == "cover":
-            """we can safely assume that the 
-            first item will always be cover because 
+            """we can safely assume that the
+            first item will always be cover because
             it is drawn when we initiate a new proof
             with the setup function
             """
@@ -1175,14 +1247,14 @@ class ProofDocument:
             if len(section) == 1:
                 section = section[0]
                 name = section[0]
-                if name in "paragraph tracking figures".split(" "):
+                if name in "paragraph tracking figures spacing kerning".split(" "):
                     self._draw_running_text([section], fonts)
                 elif name == "core":
-                    self._draw_core(section, fonts) # can not be processed inside a group 
+                    self._draw_core(section, fonts) # can not be processed inside a group
                 elif name == "gradient":
-                    self._draw_gradient(section, fonts) # can not be processed inside a group 
+                    self._draw_gradient(section, fonts) # can not be processed inside a group
                 elif name == "features":
-                    self._draw_features(section,fonts) # can not be processed inside a group 
+                    self._draw_features(section,fonts) # can not be processed inside a group
                 else:
                     pass
             else:
@@ -1236,9 +1308,9 @@ class ProofDocument:
                     else:
                         string.append(f"{tag}\n", font=caption_font, fontSize=12)
                     string.append("", font=font.path, fontSize=42)
-                    
+
                     if tag in ["c2sc", "smcp"]:
-                        string.append("The Quick Brown Fox Jumps Over The Lazy Dog", font=font.path, fontSize=42, openTypeFeatures={tag:True,})            
+                        string.append("The Quick Brown Fox Jumps Over The Lazy Dog", font=font.path, fontSize=42, openTypeFeatures={tag:True,})
                     else:
                         # this means that the opentype lookup is complex
                         if isinstance(list(mapping.values())[0], tuple):
@@ -1269,7 +1341,7 @@ class ProofDocument:
                                 #     else:
                                 #         string.fill(0,0,0,1)
                                 #     string.append(gg, openTypeFeatures={tag:False})
-                    
+
                                 string.append("→", fill=(0,0,0,.2), openTypeFeatures={tag:False})
                                 string.fill(0)
                                 string.append(rd, fill=(0,0,0,1), openTypeFeatures={tag:True})
@@ -1289,7 +1361,7 @@ class ProofDocument:
                                         else:
                                             string.fill(0,0,0,1)
                                         string.append(gg, openTypeFeatures={tag:False})
-                        
+
                                     string.append("→", fill=(0,0,0,.2), openTypeFeatures={tag:False})
                                     string.fill(0)
                                     string.append(rd, fill=(0,0,0,1), openTypeFeatures={tag:True})
@@ -1298,7 +1370,7 @@ class ProofDocument:
                             else:
                                 for fr,to in mapping.items():
 
-                                    string.fill(0,0,0,.3)            
+                                    string.fill(0,0,0,.3)
                                     string.appendGlyph(fr)
                                     string.append("→", fill=(0,0,0,.2))
                                     string.fill(0)
@@ -1330,7 +1402,7 @@ class ProofDocument:
 
         txt_w = bot.textSize(fs)[0]
         txt_h = bot.textSize(fs)[1]
-        width_ratio = box_w/txt_w 
+        width_ratio = box_w/txt_w
         height_ratio = box_h/(FONT_SIZE_LARGE * txt.count("\n") * 1.5)
 
         sf = min([width_ratio , height_ratio]) if not scale else scale
@@ -1382,7 +1454,7 @@ class ProofDocument:
             chars = []
             for n in names:
                 if n not in chars:
-                    chars.append(n)    
+                    chars.append(n)
 
         txt = bot.FormattedString()
 
@@ -1393,19 +1465,19 @@ class ProofDocument:
                     if loca.location:
                         txt.fontVariations(**loca.location)
                     txt.font(font.path)
-                    txt.append("", tracking=(font_size*20/1000), lineHeight=font_size*1.1, fontSize=font_size)
+                    txt.append("", tracking=(font_size*50/1000), lineHeight=font_size*1.1, fontSize=font_size)
                     txt.appendGlyph(l)
             txt.append("\n")
 
         return txt
 
 
-    def draw_text_layout(self, txt:str | bot.FormattedString, font_path:str, variable_location:dict={}, columns:int=1, rows:int=1, overflow:bool=False, font_size:int=FONT_SIZE_MED, multi_size_page:bool=False, openType:dict={}, tracking_values:list[int]=[]) -> str | bot.FormattedString: 
+    def draw_text_layout(self, txt:str | bot.FormattedString, font_path:str, variable_location:dict={}, columns:int=1, rows:int=1, overflow:bool=False, font_size:int=FONT_SIZE_MED, multi_size_page:bool=False, openType:dict={}, tracking_values:list[int]=[]) -> str | bot.FormattedString:
 
         _grid = grid.Grid((self._margin_left, self._margin_bottom, *self._text_box_size),
-                               column_subdivisions=columns, 
-                               row_subdivisions=rows, 
-                               column_gutter=15, 
+                               column_subdivisions=columns,
+                               row_subdivisions=rows,
+                               column_gutter=15,
                                row_gutter=15)
 
         bot.fallbackFont(FALLBACK)
@@ -1465,7 +1537,7 @@ class ProofDocument:
         totalPages = len(allPages)
 
         self.text_attributes()
-        tw,th = bot.textSize(f'Page {totalPages}/{totalPages}') 
+        tw,th = bot.textSize(f'Page {totalPages}/{totalPages}')
 
         for pp, page in enumerate(allPages):
             with page:
@@ -1482,7 +1554,7 @@ class ProofDocument:
             for filename in fnmatch.filter(filenames, target_filename):
                 file_path = os.path.join(foldername, filename)
                 mtime = os.path.getmtime(file_path)
-                
+
                 if mtime < closest_mtime:
                     closest_mtime = mtime
                     closest_file = file_path
@@ -1510,7 +1582,7 @@ class ProofDocument:
                         p = os.path.join(di,file_name)
                         if not os.path.exists(p):
                             print(f"""ERROR: {file_name} does not exist on disk, cannot load font""")
-                            continue 
+                            continue
                 else:
                     if name:
                         pp = os.path.join(di,"variable_ttf",f"{name}.ttf")
@@ -1522,18 +1594,25 @@ class ProofDocument:
                     te = ProofFont(p)
                     te.is_variable = True
                     te.operator = designspace
-                    te.build_locations()
+                    te.build_locations(should_sort=self.sort)
                     allVFs.append(te)
                 else:
                     print(f"""ERROR: cannot find VF for {name}""")
         return allVFs
 
 
-    def add_object(self, path:str):
+    def add_object(self, path:str, should_sort:bool=True):
+        """Summary
+        Args:
+            path (str): Path to an OpenType font or designspace
+            should_sort (bool, optional): Should sort designspace locations on load
+        """
+        self.sort = should_sort
+
         suffixes = ".ttf .otf .woff .woff2"
         suff = os.path.splitext(path)[-1]
         if suff in suffixes.split(" "):
-            o = ProofFont(path)        
+            o = ProofFont(path)
             self.fonts.append(o)
         elif suff == ".designspace":
             operator = dsp_doc.fromfile(path)
@@ -1693,23 +1772,23 @@ class ProofDocument:
                 fs.align("center")
                 fs.append(f"{proof_font.name}")
                 if proof_font != fonts[-1]:
-                    fs.append("\n")    
-                
+                    fs.append("\n")
+
         txt_w = bot.textSize(fs)[0]
         txt_h = bot.textSize(fs)[1]
 
         try:
-            width_ratio = box_w/txt_w 
+            width_ratio = box_w/txt_w
         except ZeroDivisionError:
             width_ratio = 1
         mu = str(fs).count("\n") or 1
-        height_ratio = box_h/(FONT_SIZE_DEFAULT * mu * 1.5)
+        height_ratio = box_h/(FONT_SIZE_DEFAULT * (mu+1) * 1.5)
 
         sf = min([width_ratio , height_ratio])
 
         with bot.savedState():
             bot.scale(sf)
-            bot.textBox(fs, (box_x/sf, box_y/sf, box_w/sf, box_h/sf))   
+            bot.textBox(fs, (box_x/sf, box_y/sf, box_w/sf, box_h/sf))
 
 
     @contextmanager
@@ -1740,11 +1819,11 @@ if __name__ == "__main__":
     doc.new_section("core")
 
     with doc.grouping() as group:
-        doc.new_section("paragraph", point_size=[12,20], multi_size_page=True) 
+        doc.new_section("paragraph", point_size=[12,20], multi_size_page=True)
         doc.new_section("paragraph", point_size=[24], multi_size_page=False)
         doc.new_section("figures", point_size=[36])
-        
-        
+
+
 
     doc.new_section(
                     "paragraph",
@@ -1757,5 +1836,3 @@ if __name__ == "__main__":
     #doc.new_section("features")
 
     doc.save(open=True)
-
-
