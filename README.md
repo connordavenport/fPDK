@@ -4,8 +4,7 @@ font proofing development kit
 
 <p align="center">
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/images/fpdk_logo_dark.png">
-  <img alt="fpdk Logo" src="assets/images/fpdk_logo_light.png" width="300">
+  <img alt="fpdk icon" src="assets/images/fpdk_icon.png">
 </picture>
 </p>
 
