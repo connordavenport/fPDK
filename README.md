@@ -1,5 +1,5 @@
 
-font Proofing Development Kit
+font proofing development kit
 =============================
 
 <p align="center">
